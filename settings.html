@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0A">
+<title>Settings — KUMG Forge</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 0;border-bottom:1px solid var(--line);
+  }
+  .row:last-child{border-bottom:0}
+  .row .label{font-size:14px;color:var(--muted)}
+  .row .value{font-weight:700;font-size:15px}
+  .plan-card{
+    background:var(--deep);border:1px solid var(--green);
+    border-radius:var(--radius);padding:18px;margin-bottom:20px;
+  }
+  .plan-card h3{margin:0 0 4px;font-size:18px}
+  .plan-card p{margin:0 0 14px;color:var(--mint);font-size:13px;opacity:.85}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <a href="index.html" style="display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none">
+      <div class="logo">K</div>
+      <div>KUMG <span class="accent">Forge</span></div>
+    </a>
+  </div>
+  <div class="actions">
+    <button class="btn-ghost" onclick="location.href='index.html'" style="font-size:13px;padding:8px 12px">Back</button>
+  </div>
+</header>
+
+<main class="container" style="max-width:520px">
+  <h1 class="page-title">Settings</h1>
+  <p class="page-sub">Manage your account and plan.</p>
+
+  <div class="plan-card" id="planCard">
+    <h3>Free plan</h3>
+    <p>1 published site · limited templates</p>
+    <button class="btn btn-block" id="upgradeBtn">Upgrade to Pro — $5/mo</button>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <div class="label">Email</div>
+      <div class="value" id="emailVal">—</div>
+    </div>
+    <div class="row">
+      <div class="label">Username</div>
+      <div class="value" id="userVal">—</div>
+    </div>
+    <div class="row">
+      <div class="label">Plan</div>
+      <div class="value" id="planVal">Free</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 10px">Account</h3>
+    <button class="btn-ghost btn-block" id="logoutBtn" style="margin-bottom:8px">Sign out</button>
+    <button class="btn-danger btn-block" id="deleteBtn">Delete account</button>
+  </div>
+
+  <p style="text-align:center;color:var(--muted);font-size:12px;margin-top:20px">
+    KUMG Forge v0.1 · Made with 💚 in Zimbabwe
+  </p>
+</main>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script>
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+(async () => {
+  const { data } = await db.auth.getSession();
+  if (!data.session){ location.href = 'auth.html'; return; }
+
+  const user = data.session.user;
+  document.getElementById('emailVal').textContent = user.email;
+
+  const { data: profile } = await db
+    .from('profiles')
+    .select('username, plan')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (profile){
+    document.getElementById('userVal').textContent = profile.username || '—';
+    const plan = profile.plan || 'free';
+    document.getElementById('planVal').textContent = plan === 'pro' ? 'Pro' : 'Free';
+
+    if (plan === 'pro'){
+      const card = document.getElementById('planCard');
+      card.innerHTML = `
+        <h3>✨ Pro plan</h3>
+        <p>Unlimited published sites · all templates</p>
+      `;
+    }
+  }
+})();
+
+document.getElementById('upgradeBtn')?.addEventListener('click', () => {
+  toast('Paynow integration coming Day 7 🙂');
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await db.auth.signOut();
+  location.href = 'auth.html';
+});
+
+document.getElementById('deleteBtn').addEventListener('click', () => {
+  toast('Account deletion coming soon');
+});
+</script>
+</body>
+</html>

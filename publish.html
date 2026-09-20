@@ -5,12 +5,20 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0A0A0A">
 <title>Publish — KUMG Forge</title>
+<script>
+(function(){
+  var t = localStorage.getItem('kumg_theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme','light');
+  var l = localStorage.getItem('kumg_lang') || 'en';
+  document.documentElement.setAttribute('lang', l);
+})();
+</script>
 <link rel="stylesheet" href="css/style.css">
 <style>
   .domain-row{display:flex;align-items:center;gap:8px}
   .domain-row input{flex:1}
   .domain-row .suffix{
-    background:#0F1512;border:1px solid var(--line);
+    background:var(--card);border:1px solid var(--line);
     padding:12px 14px;border-radius:var(--radius);
     color:var(--muted);font-size:14px;white-space:nowrap;
   }
@@ -20,10 +28,12 @@
   .live-box{
     background:var(--deep);border:1px solid var(--green);
     border-radius:var(--radius);padding:16px;margin-top:16px;
-    display:none;
+    display:none;color:#E8F5EE;
   }
+  [data-theme="light"] .live-box{color:#FFFFFF}
   .live-box.show{display:block}
-  .live-box a{color:var(--mint);font-weight:700;word-break:break-all}
+  .live-box a{color:#E8F5EE;font-weight:700;word-break:break-all}
+  [data-theme="light"] .live-box a{color:#FFFFFF}
   .live-box .row{display:flex;gap:8px;margin-top:12px}
 </style>
 </head>
@@ -36,7 +46,7 @@
     </a>
   </div>
   <div class="actions">
-    <button class="btn-ghost" onclick="location.href='index.html'" style="font-size:13px;padding:8px 12px">Back</button>
+    <button class="btn-ghost" onclick="location.href='index.html'" style="font-size:13px;padding:8px 12px" data-i18n="common.back">Back</button>
   </div>
 </header>
 
@@ -73,6 +83,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
+<script src="js/settings.js"></script>
 <script src="js/projects.js"></script>
 <script src="js/publish.js"></script>
 </body>

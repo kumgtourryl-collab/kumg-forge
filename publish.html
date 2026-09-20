@@ -13,6 +13,11 @@
   document.documentElement.setAttribute('lang', l);
 })();
 </script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="KUMG">
 <link rel="stylesheet" href="css/style.css">
 <style>
   .domain-row{display:flex;align-items:center;gap:8px}
@@ -86,5 +91,10 @@
 <script src="js/settings.js"></script>
 <script src="js/projects.js"></script>
 <script src="js/publish.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
 </body>
 </html>

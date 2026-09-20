@@ -13,6 +13,11 @@
   document.documentElement.setAttribute('lang', l);
 })();
 </script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="KUMG">
 <link rel="stylesheet" href="css/style.css">
 <style>
   .row{
@@ -40,9 +45,7 @@
     border-radius:10px;padding:10px;font-size:14px;font-weight:700;
   }
   .seg button.active{background:var(--green);color:#04140C}
-  select{
-    margin-top:8px;
-  }
+  select{margin-top:8px}
 </style>
 </head>
 <body>
@@ -62,7 +65,6 @@
   <h1 class="page-title" data-i18n="settings.title">Settings</h1>
   <p class="page-sub" data-i18n="settings.sub">Manage your account and preferences.</p>
 
-  <!-- Appearance -->
   <div class="card">
     <h3 style="margin:0 0 6px" data-i18n="settings.appearance">Appearance</h3>
 
@@ -80,16 +82,21 @@
     </select>
   </div>
 
-  <!-- Plan -->
   <div class="plan-card" id="planCard">
     <h3>Free plan</h3>
     <p>1 published site · limited templates</p>
-    <button class="btn btn-block" id="upgradeBtn" data-i18n="settings.upgrade">Upgrade to Pro</button>
+    <button class="btn btn-block" id="upgradeBtn" data-i18n="settings.upgrade">Upgrade to Pro — $5/mo</button>
+    <p id="paynowMsg" style="font-size:12px;color:#E8F5EE;margin-top:8px;text-align:center;opacity:.85"></p>
   </div>
 
-  <!-- Account -->
   <div class="card">
     <h3 style="margin:0 0 10px" data-i18n="settings.account">Account</h3>
+
+    <div class="row" onclick="location.href='profile.html'" style="cursor:pointer">
+      <div class="label">Profile</div>
+      <div class="value">Edit →</div>
+    </div>
+
     <div class="row">
       <div class="label" data-i18n="auth.email">Email</div>
       <div class="value" id="emailVal">—</div>
@@ -123,7 +130,6 @@ function toast(msg){
   setTimeout(()=> t.classList.remove('show'), 2200);
 }
 
-// Theme toggle
 const themeSeg = document.getElementById('themeSeg');
 function paintThemeSeg(){
   const cur = kumgGetTheme();
@@ -139,7 +145,6 @@ themeSeg.querySelectorAll('button').forEach(btn => {
 });
 paintThemeSeg();
 
-// Language
 const langSelect = document.getElementById('langSelect');
 langSelect.value = kumgGetLang();
 langSelect.addEventListener('change', () => {
@@ -147,7 +152,6 @@ langSelect.addEventListener('change', () => {
   toast(KUMG_LANGS[langSelect.value].name);
 });
 
-// Account
 (async () => {
   const { data } = await db.auth.getSession();
   if (!data.session){ location.href = 'auth.html'; return; }
@@ -176,13 +180,18 @@ langSelect.addEventListener('change', () => {
 })();
 
 document.getElementById('upgradeBtn')?.addEventListener('click', () => {
-  toast('Paynow integration coming Day 7 🙂');
+  toast('Paynow integration coming in Day 7');
 });
 
 document.getElementById('logoutBtn').addEventListener('click', async () => {
   await db.auth.signOut();
   location.href = 'auth.html';
 });
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
 </script>
 </body>
 </html>

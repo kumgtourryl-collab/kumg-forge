@@ -13,6 +13,11 @@
   document.documentElement.setAttribute('lang', l);
 })();
 </script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="KUMG">
 <link rel="stylesheet" href="css/style.css">
 <style>
   body.editor{overflow:hidden;height:100vh}
@@ -43,9 +48,12 @@
   .save-status.saving{color:var(--muted)}
   .save-status.error{color:var(--danger)}
 
-  .editor-actions{display:flex;gap:6px}
+  .editor-actions{display:flex;gap:6px;flex-wrap:nowrap}
   .editor-actions button{
-    font-size:12px;padding:8px 12px;border-radius:10px;
+    font-size:12px;padding:8px 10px;border-radius:10px;
+  }
+  .editor-actions .icon-btn{
+    padding:8px 10px;font-size:14px;
   }
 
   .tab-row{
@@ -105,6 +113,7 @@
   <input id="nameInput" type="text" placeholder="Untitled" maxlength="60">
   <span class="save-status" id="saveStatus">Saved</span>
   <div class="editor-actions">
+    <button class="btn-ghost icon-btn" id="toolsBtn" title="Tools">🧰</button>
     <button class="btn-ghost" id="previewToggle">Preview</button>
     <button class="btn-ghost" id="saveBtn">Save</button>
     <button id="publishBtn">Publish</button>
@@ -134,5 +143,10 @@
 <script src="js/settings.js"></script>
 <script src="js/projects.js"></script>
 <script src="js/editor.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
 </body>
 </html>

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0A">
+<title>Tools — KUMG Forge</title>
+<script>
+(function(){
+  var t = localStorage.getItem('kumg_theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme','light');
+  var l = localStorage.getItem('kumg_lang') || 'en';
+  document.documentElement.setAttribute('lang', l);
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="KUMG">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .cat-title{
+    font-size:12px;text-transform:uppercase;letter-spacing:1.2px;
+    color:var(--muted);margin:22px 0 8px;font-weight:800;
+  }
+  .tag-item{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:10px;padding:12px 14px;margin-bottom:8px;
+    cursor:pointer;transition:border-color .15s;
+  }
+  .tag-item:hover{border-color:var(--green)}
+  .tag-item .name{
+    font-family:var(--mono);font-weight:700;color:var(--green);
+    font-size:14px;margin-bottom:2px;
+  }
+  .tag-item .desc{font-size:13px;color:var(--muted)}
+  .tag-item .ex{
+    font-family:var(--mono);font-size:12px;
+    background:rgba(31,157,98,.1);
+    border-left:3px solid var(--green);
+    padding:6px 10px;margin-top:8px;border-radius:0 6px 6px 0;
+    color:var(--mint);overflow-x:auto;white-space:nowrap;
+  }
+  [data-theme="light"] .tag-item .ex{color:#0A1F17}
+  .back-hint{
+    background:var(--deep);color:#E8F5EE;
+    border-radius:10px;padding:10px 14px;
+    font-size:13px;margin-bottom:14px;
+    border:1px solid var(--green);
+  }
+  [data-theme="light"] .back-hint{color:#FFFFFF}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <a href="index.html" style="display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none">
+      <div class="logo">K</div>
+      <div>KUMG <span class="accent">Forge</span></div>
+    </a>
+  </div>
+  <div class="actions">
+    <button class="btn-ghost" id="backBtn" style="font-size:13px;padding:8px 12px">Back</button>
+  </div>
+</header>
+
+<main class="container" style="max-width:600px">
+  <h1 class="page-title">Tools</h1>
+  <p class="page-sub">Tap any tag to copy it. Paste it into your project.</p>
+
+  <div id="backHint" class="back-hint" style="display:none">
+    Editing a project — tapping a tag will copy it. Go back to paste.
+  </div>
+
+  <input id="search" type="text" placeholder="Search tags… e.g. image, video, form" style="margin-bottom:12px">
+
+  <div id="list"></div>
+</main>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/tools-data.js"></script>
+<script>
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 1800);
+}
+
+const listEl = document.getElementById('list');
+const searchEl = document.getElementById('search');
+const backHint = document.getElementById('backHint');
+
+// Did we come from the editor?
+const returnId = new URLSearchParams(location.search).get('return');
+if (returnId) backHint.style.display = 'block';
+
+document.getElementById('backBtn').addEventListener('click', () => {
+  if (returnId){
+    location.href = 'editor.html?id=' + encodeURIComponent(returnId);
+  } else {
+    location.href = 'index.html';
+  }
+});
+
+function renderList(filter){
+  const q = (filter || '').toLowerCase().trim();
+  const groups = {};
+  KUMG_HTML_TAGS.forEach(t => {
+    if (q &&
+        !t.tag.toLowerCase().includes(q) &&
+        !t.desc.toLowerCase().includes(q) &&
+        !t.cat.toLowerCase().includes(q)) return;
+    if (!groups[t.cat]) groups[t.cat] = [];
+    groups[t.cat].push(t);
+  });
+
+  if (!Object.keys(groups).length){
+    listEl.innerHTML = '<div class="empty"><h3>No tags found</h3><p>Try a different search.</p></div>';
+    return;
+  }
+
+  listEl.innerHTML = Object.entries(groups).map(([cat, items]) => `
+    <div class="cat-title">${cat}</div>
+    ${items.map(t => `
+      <div class="tag-item" data-code="${encodeURIComponent(t.example)}">
+        <div class="name">&lt;${t.tag}&gt;</div>
+        <div class="desc">${t.desc}</div>
+        <div class="ex">${t.example.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      </div>
+    `).join('')}
+  `).join('');
+
+  listEl.querySelectorAll('.tag-item').forEach(el => {
+    el.addEventListener('click', async () => {
+      const code = decodeURIComponent(el.dataset.code);
+      try {
+        await navigator.clipboard.writeText(code);
+        toast('Copied: ' + code.slice(0, 28) + (code.length > 28 ? '…' : ''));
+      } catch {
+        // Fallback for older browsers
+        const ta = document.createElement('textarea');
+        ta.value = code;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); toast('Copied'); }
+        catch { toast('Copy failed'); }
+        document.body.removeChild(ta);
+      }
+    });
+  });
+}
+
+searchEl.addEventListener('input', () => renderList(searchEl.value));
+renderList('');
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>

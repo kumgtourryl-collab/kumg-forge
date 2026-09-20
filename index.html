@@ -13,6 +13,11 @@
   document.documentElement.setAttribute('lang', l);
 })();
 </script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="KUMG">
 <link rel="stylesheet" href="css/style.css">
 <style>
   .project-card{
@@ -51,7 +56,8 @@
   </div>
   <div class="actions">
     <span class="badge" id="planBadge">Free</span>
-    <button class="btn-ghost" id="settingsBtn" style="font-size:15px;padding:8px 12px">⚙</button>
+    <button class="btn-ghost" id="toolsBtn" style="font-size:15px;padding:8px 12px" title="Tools">🧰</button>
+    <button class="btn-ghost" id="settingsBtn" style="font-size:15px;padding:8px 12px" title="Settings">⚙</button>
   </div>
 </header>
 
@@ -146,6 +152,14 @@ document.getElementById('tplBtn').addEventListener('click', () => {
   location.href = 'templates.html';
 });
 
+document.getElementById('toolsBtn').addEventListener('click', () => {
+  location.href = 'tools.html';
+});
+
+document.getElementById('settingsBtn').addEventListener('click', () => {
+  location.href = 'settings.html';
+});
+
 document.getElementById('newBtn').addEventListener('click', () => {
   nameInput.value = '';
   modalBg.classList.add('show');
@@ -173,10 +187,6 @@ document.getElementById('createBtn').addEventListener('click', async () => {
   }
 });
 
-document.getElementById('settingsBtn').addEventListener('click', () => {
-  location.href = 'settings.html';
-});
-
 (async () => {
   const { data } = await db.auth.getSession();
   if (!data.session){
@@ -199,6 +209,11 @@ document.getElementById('settingsBtn').addEventListener('click', () => {
 
   render();
 })();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
 </script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 // KUMG Forge — Publish page logic
 // IMPORTANT: change this to your Render URL after deploy
-const PUBLISH_API = 'https://kumg-forge-server.onrender.com';
+const PUBLISH_API = 'https://kumg-forge-server-fg88.onrender.com';
 
 let project = null;
 let userId = null;

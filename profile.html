@@ -45,6 +45,25 @@
   }
   .stat .num{font-size:22px;font-weight:800;color:var(--green)}
   .stat .lbl{font-size:11px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.6px}
+  .row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 0;border-bottom:1px solid var(--line);
+  }
+  .row:last-child{border-bottom:0}
+  .row .label{font-size:14px;color:var(--muted)}
+  .row .value{font-weight:700;font-size:15px}
+  .dob-row{
+    display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:10px;
+    margin-bottom:10px;
+  }
+  .dob-row label{
+    display:block;font-size:11px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:1px;font-weight:700;
+    margin-bottom:6px;
+  }
+  .dob-row input{
+    text-align:center;font-family:var(--mono);letter-spacing:2px;
+  }
 </style>
 </head>
 <body>
@@ -87,12 +106,56 @@
   </div>
 
   <div class="card">
-    <div style="font-size:13px;color:var(--muted)">Email</div>
-    <div style="font-weight:700;margin-bottom:12px;word-break:break-all" id="emailVal">—</div>
-    <div style="font-size:13px;color:var(--muted)">Plan</div>
-    <div style="font-weight:700" id="planVal">Free</div>
+    <div class="row" onclick="location.href='settings.html'" style="cursor:pointer">
+      <div class="label">Settings</div>
+      <div class="value">Open →</div>
+    </div>
+    <div class="row">
+      <div class="label">Email</div>
+      <div class="value" id="emailVal" style="word-break:break-all">—</div>
+    </div>
+    <div class="row" id="dobRow" style="cursor:pointer">
+      <div class="label">Date of birth</div>
+      <div class="value" id="dobVal">—</div>
+    </div>
+    <div class="row">
+      <div class="label">Plan</div>
+      <div class="value" id="planVal">Free</div>
+    </div>
   </div>
+
+  <footer class="legal" style="text-align:center;font-size:12px;color:var(--muted);padding:24px 0">
+    <a href="terms.html" style="color:var(--muted)">Terms</a> ·
+    <a href="privacy.html" style="color:var(--muted)">Privacy</a>
+  </footer>
 </main>
+
+<!-- DOB modal -->
+<div class="modal-bg" id="dobModal" style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:50;display:none;align-items:center;justify-content:center;padding:20px">
+  <div class="modal" style="background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;width:100%;max-width:400px">
+    <h3 style="margin:0 0 4px">Date of birth</h3>
+    <p style="margin:0 0 14px;color:var(--muted);font-size:13px">Must be 13 or older.</p>
+    <div class="dob-row">
+      <div>
+        <label>Day</label>
+        <input id="pDd" type="text" inputmode="numeric" maxlength="2" placeholder="DD">
+      </div>
+      <div>
+        <label>Month</label>
+        <input id="pMm" type="text" inputmode="numeric" maxlength="2" placeholder="MM">
+      </div>
+      <div>
+        <label>Year</label>
+        <input id="pYyyy" type="text" inputmode="numeric" maxlength="4" placeholder="YYYY">
+      </div>
+    </div>
+    <p id="dobMsg" style="font-size:12px;min-height:18px;margin:0 0 12px"></p>
+    <div style="display:flex;gap:8px">
+      <button class="btn-ghost" id="dobCancel" style="flex:1">Cancel</button>
+      <button id="dobSave" style="flex:1">Save</button>
+    </div>
+  </div>
+</div>
 
 <div id="toast"></div>
 
@@ -107,6 +170,7 @@ function toast(msg){
 }
 
 let userId = null;
+let currentDob = null;
 
 async function init(){
   const { data } = await db.auth.getSession();
@@ -116,7 +180,7 @@ async function init(){
 
   const { data: profile } = await db
     .from('profiles')
-    .select('username, plan, bio, avatar_url, created_at')
+    .select('username, plan, bio, avatar_url, dob, created_at')
     .eq('id', userId)
     .maybeSingle();
 
@@ -124,6 +188,15 @@ async function init(){
     document.getElementById('username').value = profile.username || '';
     document.getElementById('bio').value = profile.bio || '';
     document.getElementById('planVal').textContent = (profile.plan === 'pro' ? 'Pro' : 'Free');
+
+    if (profile.dob){
+      currentDob = profile.dob;
+      const [y,m,d] = profile.dob.split('-');
+      document.getElementById('dobVal').textContent = `${d}/${m}/${y}`;
+      document.getElementById('pDd').value = d;
+      document.getElementById('pMm').value = m;
+      document.getElementById('pYyyy').value = y;
+    }
 
     if (profile.avatar_url){
       const av = document.getElementById('avatar');
@@ -140,7 +213,6 @@ async function init(){
     }
   }
 
-  // Stats
   const { count: projCount } = await db
     .from('projects').select('*', { count: 'exact', head: true })
     .eq('owner', userId);
@@ -153,6 +225,7 @@ async function init(){
   document.getElementById('statPublished').textContent = pubCount || 0;
 }
 
+// Avatar
 document.getElementById('avatar').addEventListener('click', () => {
   document.getElementById('fileInput').click();
 });
@@ -183,6 +256,7 @@ document.getElementById('fileInput').addEventListener('change', async (e) => {
   toast('Photo updated');
 });
 
+// Save profile
 document.getElementById('saveBtn').addEventListener('click', async () => {
   const username = document.getElementById('username').value
     .trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
@@ -201,6 +275,75 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
     toast('Saved');
   } catch(err){
     toast(err.message || 'Save failed');
+  }
+});
+
+// ===== DOB edit =====
+const dobRow = document.getElementById('dobRow');
+const dobModal = document.getElementById('dobModal');
+const pDd = document.getElementById('pDd');
+const pMm = document.getElementById('pMm');
+const pYyyy = document.getElementById('pYyyy');
+const dobMsg = document.getElementById('dobMsg');
+
+[pDd, pMm, pYyyy].forEach(el => {
+  el.addEventListener('input', () => {
+    el.value = el.value.replace(/[^0-9]/g,'');
+  });
+});
+pDd.addEventListener('input', () => { if (pDd.value.length === 2) pMm.focus(); });
+pMm.addEventListener('input', () => { if (pMm.value.length === 2) pYyyy.focus(); });
+
+dobRow.addEventListener('click', () => {
+  dobMsg.textContent = '';
+  dobModal.style.display = 'flex';
+});
+document.getElementById('dobCancel').addEventListener('click', () => {
+  dobModal.style.display = 'none';
+});
+dobModal.addEventListener('click', (e) => {
+  if (e.target === dobModal) dobModal.style.display = 'none';
+});
+
+document.getElementById('dobSave').addEventListener('click', async () => {
+  dobMsg.textContent = '';
+  const d = parseInt(pDd.value, 10);
+  const m = parseInt(pMm.value, 10);
+  const y = parseInt(pYyyy.value, 10);
+
+  if (!d || !m || !y || pYyyy.value.length !== 4){
+    dobMsg.textContent = 'Please fill in all three fields.';
+    dobMsg.style.color = 'var(--danger)';
+    return;
+  }
+  if (m < 1 || m > 12 || d < 1 || d > 31){
+    dobMsg.textContent = 'Invalid day or month.';
+    dobMsg.style.color = 'var(--danger)';
+    return;
+  }
+  const dobStr = `${y.toString().padStart(4,'0')}-${m.toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+  const dobDate = new Date(dobStr + 'T00:00:00Z');
+  if (dobDate.getUTCDate() !== d || dobDate.getUTCMonth() + 1 !== m || dobDate.getUTCFullYear() !== y){
+    dobMsg.textContent = 'That date does not exist.';
+    dobMsg.style.color = 'var(--danger)';
+    return;
+  }
+
+  try {
+    const { error } = await db.from('profiles')
+      .update({ dob: dobStr, age_verified: true })
+      .eq('id', userId);
+    if (error) throw error;
+
+    currentDob = dobStr;
+    document.getElementById('dobVal').textContent =
+      `${pDd.value.padStart(2,'0')}/${pMm.value.padStart(2,'0')}/${pYyyy.value}`;
+    dobModal.style.display = 'none';
+    toast('Date of birth updated');
+  } catch(err){
+    const raw = (err?.message || 'Failed').toString();
+    dobMsg.textContent = /13/.test(raw) ? 'You must be at least 13.' : raw;
+    dobMsg.style.color = 'var(--danger)';
   }
 });
 

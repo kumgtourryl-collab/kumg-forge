@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="theme-color" content="#0A0A0A">
+<title>Editor — KUMG Forge</title>
+<script>
+(function(){
+  var t = localStorage.getItem('kumg_theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme','light');
+  var l = localStorage.getItem('kumg_lang') || 'en';
+  document.documentElement.setAttribute('lang', l);
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="KUMG">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  body.editor{overflow:hidden;height:100vh}
+  .editor-top{
+    display:flex;align-items:center;gap:8px;
+    padding:10px 12px;background:#0A0A0A;
+    border-bottom:1px solid var(--line);
+  }
+  [data-theme="light"] .editor-top{background:#FFFFFF}
+  .editor-top .logo{
+    width:32px;height:32px;border-radius:9px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--deep),var(--green));
+    display:grid;place-items:center;color:#04140C;font-weight:900;font-size:15px;
+    text-decoration:none;
+  }
+  .editor-top input#nameInput{
+    flex:1;min-width:0;background:transparent;border:0;
+    font-size:15px;font-weight:700;padding:6px 4px;
+    color:var(--mint);
+  }
+  .editor-top input#nameInput:focus{outline:none;background:var(--card);border-radius:8px}
+  .save-status{
+    font-size:11px;color:var(--muted);white-space:nowrap;
+    padding:2px 6px;border-radius:6px;
+  }
+  .save-status.saved{color:var(--green)}
+  .save-status.dirty{color:#E5A93D}
+  .save-status.saving{color:var(--muted)}
+  .save-status.error{color:var(--danger)}
+
+  .editor-actions{display:flex;gap:6px;flex-wrap:nowrap}
+  .editor-actions button{
+    font-size:12px;padding:8px 10px;border-radius:10px;
+  }
+  .editor-actions .icon-btn{padding:8px 10px;font-size:14px}
+
+  .tab-row{
+    display:flex;gap:4px;padding:6px 8px;background:#0D1210;
+    border-bottom:1px solid var(--line);
+  }
+  [data-theme="light"] .tab-row{background:#EEF3EF}
+  .tab-btn{
+    flex:1;background:transparent;color:var(--muted);
+    border-radius:8px;padding:8px 6px;font-size:13px;font-weight:700;
+  }
+  .tab-btn.active{background:var(--deep);color:var(--mint)}
+  [data-theme="light"] .tab-btn.active{background:var(--green);color:#FFFFFF}
+
+  .work-area{display:flex;flex-direction:column;flex:1;min-height:0}
+  .code-pane{flex:1;min-height:0;display:flex;flex-direction:column}
+  .code-pane textarea{
+    flex:1;border:0;border-radius:0;background:#0A0A0A;
+    font-family:var(--mono);font-size:13.5px;line-height:1.6;
+    padding:14px;color:var(--mint);
+    -webkit-text-size-adjust:100%;
+    padding-bottom:70px;
+  }
+  [data-theme="light"] .code-pane textarea{background:#FFFFFF;color:#0A1F17}
+  .preview-pane{
+    flex:1;min-height:0;display:flex;flex-direction:column;
+    border-top:1px solid var(--line);
+  }
+  .preview-pane .ph{
+    font-size:11px;text-transform:uppercase;letter-spacing:.8px;
+    color:var(--muted);padding:6px 14px;background:#0D1210;
+    border-bottom:1px solid var(--line);
+  }
+  [data-theme="light"] .preview-pane .ph{background:#EEF3EF}
+  .preview-pane iframe{flex:1;border:0;background:#fff;width:100%}
+
+  /* ===== CODE KEYS — glued to keyboard ===== */
+  .code-keys{
+    display: none;
+    position: fixed;
+    left: 0; right: 0;
+    bottom: 0;
+    z-index: 40;
+    background: #0D1210;
+    border-top: 1px solid var(--line);
+    padding: 8px 8px 8px;
+    box-shadow: 0 -8px 20px rgba(0,0,0,.4);
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+    transition: transform .12s ease-out;
+  }
+  [data-theme="light"] .code-keys{
+    background:#EEF3EF;
+    box-shadow: 0 -8px 20px rgba(0,0,0,.08);
+  }
+  .code-keys.show{ display: block; }
+  .ck-scroll{
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .ck-scroll::-webkit-scrollbar{ display: none; }
+  .ck-key{
+    flex-shrink: 0;
+    background: #0A0A0A;
+    color: var(--mint);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    min-width: 42px;
+    text-align: center;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    cursor: pointer;
+  }
+  [data-theme="light"] .ck-key{
+    background:#FFFFFF;
+    color:#0A1F17;
+  }
+  .ck-key:active,
+  .ck-key.pressed{
+    background: var(--deep);
+    border-color: var(--green);
+    color: var(--mint);
+  }
+
+  @media(max-width:819px){
+    body.editor .preview-pane{display:none}
+    body.editor.preview-on .code-pane{display:none}
+    body.editor.preview-on .preview-pane{display:flex}
+    body.editor.preview-on .code-keys{display:none !important}
+  }
+  @media(min-width:820px){
+    .work-area{flex-direction:row}
+    .code-pane,.preview-pane{flex:1;border-top:0}
+    .preview-pane{border-left:1px solid var(--line)}
+    #previewToggle{display:none}
+    .code-keys{display:none !important}
+  }
+</style>
+</head>
+<body class="editor">
+
+<header class="editor-top">
+  <a href="index.html" class="logo" id="backBtn">K</a>
+  <input id="nameInput" type="text" placeholder="Untitled" maxlength="60">
+  <span class="save-status" id="saveStatus">Saved</span>
+  <div class="editor-actions">
+    <button class="btn-ghost icon-btn" id="toolsBtn" title="Tools">🧰</button>
+    <button class="btn-ghost icon-btn" id="downloadBtn" title="Download">⬇</button>
+    <button class="btn-ghost" id="previewToggle">Preview</button>
+    <button class="btn-ghost" id="saveBtn">Save</button>
+    <button id="publishBtn">Publish</button>
+  </div>
+</header>
+
+<div class="tab-row">
+  <button class="tab-btn active" data-tab="html">HTML</button>
+  <button class="tab-btn" data-tab="css">CSS</button>
+  <button class="tab-btn" data-tab="js">JS</button>
+</div>
+
+<div class="work-area">
+  <div class="code-pane">
+    <textarea id="editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off"></textarea>
+  </div>
+  <div class="preview-pane">
+    <div class="ph">Preview</div>
+    <iframe id="preview" sandbox="allow-scripts allow-forms allow-modals"></iframe>
+  </div>
+</div>
+
+<!-- Code keys bar (mobile) -->
+<div class="code-keys" id="codeKeys">
+  <div class="ck-scroll" id="ckScroll"></div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/projects.js"></script>
+<script src="js/editor.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>

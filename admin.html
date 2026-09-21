@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0A">
+<title>Admin — KUMG Forge</title>
+<script>
+(function(){
+  var t = localStorage.getItem('kumg_theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme','light');
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="KUMG">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;
+    margin-bottom:20px;
+  }
+  .stat{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);padding:16px;
+  }
+  .stat .num{font-size:26px;font-weight:800;color:var(--green)}
+  .stat .lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+  .u-row{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:12px 14px;margin-bottom:8px;
+    font-size:13px;
+  }
+  .u-row .top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+  .u-row .email{font-weight:700;word-break:break-all}
+  .u-row .meta{color:var(--muted);font-size:11px;margin-top:4px}
+  .u-row .badge{font-size:10px;padding:2px 8px;border-radius:999px;background:var(--deep);color:var(--mint)}
+  .u-row .badge.pro{background:var(--green);color:#04140C}
+  .u-row .badge.admin{background:#C43D3D;color:#fff}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <a href="index.html" style="display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none">
+      <div class="logo">K</div>
+      <div>KUMG <span class="accent">Forge</span></div>
+    </a>
+  </div>
+  <div class="actions">
+    <button class="btn-ghost" onclick="location.href='index.html'" style="font-size:13px;padding:8px 12px">Back</button>
+  </div>
+</header>
+
+<main class="container" style="max-width:640px">
+  <h1 class="page-title">Admin</h1>
+  <p class="page-sub">Founder dashboard — live stats and users.</p>
+
+  <div class="grid">
+    <div class="stat"><div class="num" id="sUsers">—</div><div class="lbl">Users</div></div>
+    <div class="stat"><div class="num" id="sProjects">—</div><div class="lbl">Projects</div></div>
+    <div class="stat"><div class="num" id="sPublished">—</div><div class="lbl">Live sites</div></div>
+    <div class="stat"><div class="num" id="sPro">—</div><div class="lbl">Pro users</div></div>
+  </div>
+
+  <h2 style="font-size:16px;margin:24px 0 10px">Latest users</h2>
+  <div id="users"></div>
+
+  <footer style="text-align:center;font-size:12px;color:var(--muted);padding:24px 0">
+    <a href="terms.html" style="color:var(--muted)">Terms</a> ·
+    <a href="privacy.html" style="color:var(--muted)">Privacy</a>
+  </footer>
+</main>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/settings.js"></script>
+<script>
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+function timeAgo(iso){
+  const s = Math.floor((Date.now() - new Date(iso).getTime())/1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  return Math.floor(s/86400) + 'd ago';
+}
+
+(async () => {
+  const { data } = await db.auth.getSession();
+  if (!data.session){ location.href = 'auth.html'; return; }
+
+  const { data: me } = await db
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', data.session.user.id)
+    .maybeSingle();
+
+  if (!me?.is_admin){
+    document.querySelector('main').innerHTML =
+      '<div class="empty"><h3>Not allowed</h3><p>You are not an admin.</p></div>';
+    return;
+  }
+
+  const { count: uCount } = await db
+    .from('profiles').select('*', { count: 'exact', head: true });
+  document.getElementById('sUsers').textContent = uCount || 0;
+
+  const { count: pCount } = await db
+    .from('projects').select('*', { count: 'exact', head: true });
+  document.getElementById('sProjects').textContent = pCount || 0;
+
+  const { count: pubCount } = await db
+    .from('projects').select('*', { count: 'exact', head: true })
+    .eq('is_published', true);
+  document.getElementById('sPublished').textContent = pubCount || 0;
+
+  const { count: proCount } = await db
+    .from('profiles').select('*', { count: 'exact', head: true })
+    .eq('plan', 'pro');
+  document.getElementById('sPro').textContent = proCount || 0;
+
+  const { data: users } = await db
+    .from('profiles')
+    .select('id, email, username, plan, is_admin, created_at')
+    .order('created_at', { ascending: false })
+    .limit(30);
+
+  const wrap = document.getElementById('users');
+  if (!users || !users.length){
+    wrap.innerHTML = '<p style="color:var(--muted)">No users yet.</p>';
+    return;
+  }
+
+  wrap.innerHTML = users.map(u => `
+    <div class="u-row">
+      <div class="top">
+        <div class="email">${u.email || u.username || 'unknown'}</div>
+        <div style="display:flex;gap:6px">
+          ${u.is_admin ? '<span class="badge admin">ADMIN</span>' : ''}
+          <span class="badge ${u.plan === 'pro' ? 'pro' : ''}">${u.plan || 'free'}</span>
+        </div>
+      </div>
+      <div class="meta">@${u.username || '—'} · joined ${timeAgo(u.created_at)}</div>
+    </div>
+  `).join('');
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>

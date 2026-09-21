@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="theme-color" content="#0A0A0A">
+<title>Verify your age — KUMG Forge</title>
+<script>
+(function(){
+  var t = localStorage.getItem('kumg_theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme','light');
+  var l = localStorage.getItem('kumg_lang') || 'en';
+  document.documentElement.setAttribute('lang', l);
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="KUMG">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .dob-row{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.4fr;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .dob-field label{
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin: 0 0 6px;
+    font-weight: 700;
+  }
+  .dob-field input{
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 18px;
+    letter-spacing: 2px;
+    padding: 14px 8px;
+    width: 100%;
+  }
+  .hint{
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+  .age-badge{
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--deep);
+    color: var(--mint);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">K</div>
+    <div>KUMG <span class="accent">Forge</span></div>
+  </div>
+</header>
+
+<main class="container" style="max-width:460px">
+  <span class="age-badge">Required</span>
+  <h1 class="page-title">Confirm your age</h1>
+  <p class="page-sub">KUMG Forge is for users 13 and older. Enter your date of birth.</p>
+
+  <form id="dobForm" autocomplete="off">
+    <div class="dob-row">
+      <div class="dob-field">
+        <label for="dd">Day</label>
+        <input id="dd" type="text" inputmode="numeric" pattern="[0-9]*"
+               maxlength="2" placeholder="DD" autocapitalize="off" autocorrect="off">
+      </div>
+      <div class="dob-field">
+        <label for="mm">Month</label>
+        <input id="mm" type="text" inputmode="numeric" pattern="[0-9]*"
+               maxlength="2" placeholder="MM" autocapitalize="off" autocorrect="off">
+      </div>
+      <div class="dob-field">
+        <label for="yyyy">Year</label>
+        <input id="yyyy" type="text" inputmode="numeric" pattern="[0-9]*"
+               maxlength="4" placeholder="YYYY" autocapitalize="off" autocorrect="off">
+      </div>
+    </div>
+
+    <p class="hint">
+      Example: 07 | 03 | 2005 for 7 March 2005.<br>
+      We only store your birth date — nothing else. See our
+      <a href="privacy.html">Privacy Policy</a>.
+    </p>
+
+    <button class="btn btn-block" id="submitBtn" type="submit" style="margin-top:18px">
+      Confirm
+    </button>
+
+    <p id="msg" style="text-align:center;font-size:13px;margin-top:14px;min-height:20px"></p>
+
+    <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:20px">
+      <a href="terms.html">Terms</a> ·
+      <a href="privacy.html">Privacy</a>
+    </p>
+  </form>
+</main>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/verify.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="theme-color" content="#0A0A0A">
+<title>KUMG AI — KUMG Forge</title>
+<script>
+(function(){
+  var t = localStorage.getItem('kumg_theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme','light');
+  var l = localStorage.getItem('kumg_lang') || 'en';
+  document.documentElement.setAttribute('lang', l);
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="KUMG">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  body.ai-page{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+  .ai-top{
+    display:flex;align-items:center;gap:8px;
+    padding:10px 12px;background:#0A0A0A;
+    border-bottom:1px solid var(--line);
+  }
+  [data-theme="light"] .ai-top{background:#FFFFFF}
+  .ai-top .logo{
+    width:32px;height:32px;border-radius:9px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--deep),var(--green));
+    display:grid;place-items:center;color:#04140C;font-weight:900;font-size:15px;
+    text-decoration:none;
+  }
+  .ai-top .title{font-weight:800;font-size:15px;flex:1}
+  .ai-top .title span{color:var(--green)}
+  .ai-top .usage{
+    font-size:11px;color:var(--muted);
+    background:var(--card);border:1px solid var(--line);
+    padding:4px 10px;border-radius:999px;font-weight:700;
+  }
+
+  .chat{
+    flex:1;overflow-y:auto;padding:14px 12px 20px;
+    display:flex;flex-direction:column;gap:12px;
+    scroll-behavior:smooth;
+  }
+
+  .msg{
+    max-width:88%;
+    border-radius:16px;
+    padding:12px 14px;
+    font-size:14.5px;
+    line-height:1.55;
+    word-wrap:break-word;
+    white-space:pre-wrap;
+  }
+  .msg.user{
+    align-self:flex-end;
+    background:var(--green);color:#04140C;
+    border-bottom-right-radius:4px;
+    font-weight:600;
+  }
+  .msg.assistant{
+    align-self:flex-start;
+    background:var(--card);color:var(--mint);
+    border:1px solid var(--line);
+    border-bottom-left-radius:4px;
+  }
+  .msg.assistant code{
+    font-family:var(--mono);font-size:12.5px;
+    background:rgba(31,157,98,.12);
+    padding:1px 5px;border-radius:4px;
+  }
+  .msg.assistant .code-block{
+    margin:10px 0;
+    background:#0A0A0A;
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  [data-theme="light"] .msg.assistant .code-block{background:#F3F7F4}
+  .msg.assistant .code-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:6px 10px;background:rgba(31,157,98,.15);
+    font-size:10.5px;font-family:var(--mono);
+    text-transform:uppercase;letter-spacing:1px;
+    color:var(--green);font-weight:800;
+  }
+  .msg.assistant .code-head button{
+    background:var(--green);color:#04140C;
+    border:0;padding:4px 10px;border-radius:6px;
+    font-size:10px;font-weight:800;letter-spacing:.5px;
+    cursor:pointer;font-family:var(--font);
+  }
+  .msg.assistant pre{
+    margin:0;padding:10px 12px;
+    font-family:var(--mono);font-size:12.5px;
+    line-height:1.5;overflow-x:auto;
+    white-space:pre;color:var(--mint);
+  }
+  [data-theme="light"] .msg.assistant pre{color:#0A1F17}
+  .msg.assistant p{margin:0 0 8px}
+  .msg.assistant p:last-child{margin:0}
+
+  .msg.typing{
+    display:inline-block;
+    width:6px;height:14px;background:var(--green);
+    animation:blink 1s infinite;
+    vertical-align:middle;margin-left:2px;
+  }
+  @keyframes blink{50%{opacity:0}}
+
+  .suggestions{
+    display:flex;gap:8px;padding:0 12px 10px;overflow-x:auto;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+    flex-shrink:0;
+  }
+  .suggestions::-webkit-scrollbar{display:none}
+  .suggestions button{
+    flex-shrink:0;
+    background:var(--card);color:var(--mint);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 14px;font-size:12.5px;font-weight:600;
+    white-space:nowrap;
+  }
+  [data-theme="light"] .suggestions button{color:#0A1F17}
+  .suggestions button:active{background:var(--deep);border-color:var(--green);color:var(--mint)}
+
+  .composer{
+    display:flex;gap:8px;align-items:flex-end;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+    background:#0A0A0A;border-top:1px solid var(--line);
+    flex-shrink:0;
+  }
+  [data-theme="light"] .composer{background:#FFFFFF}
+  .composer textarea{
+    flex:1;resize:none;min-height:44px;max-height:140px;
+    padding:11px 14px;font-size:14.5px;
+    font-family:var(--font);line-height:1.4;
+    background:var(--card);color:var(--mint);
+    border:1px solid var(--line);border-radius:14px;
+  }
+  [data-theme="light"] .composer textarea{color:#0A1F17}
+  .composer textarea:focus{outline:none;border-color:var(--green)}
+  .composer button{
+    width:44px;height:44px;flex-shrink:0;
+    border-radius:14px;background:var(--green);color:#04140C;
+    display:grid;place-items:center;font-size:18px;font-weight:900;
+    padding:0;
+  }
+  .composer button:disabled{opacity:.4}
+
+  .empty-chat{
+    flex:1;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    padding:40px 24px;text-align:center;color:var(--muted);
+  }
+  .empty-chat .badge{
+    width:64px;height:64px;border-radius:18px;
+    background:linear-gradient(135deg,var(--deep),var(--green));
+    display:grid;place-items:center;color:#04140C;
+    font-size:28px;font-weight:900;margin-bottom:16px;
+  }
+  .empty-chat h3{color:var(--mint);margin:0 0 8px;font-size:18px}
+  .empty-chat p{margin:0;font-size:13.5px;max-width:280px;line-height:1.6}
+</style>
+</head>
+<body class="ai-page">
+
+<header class="ai-top">
+  <a href="index.html" class="logo" id="backBtn">K</a>
+  <div class="title">KUMG <span>AI</span></div>
+  <div class="usage" id="usage">—</div>
+</header>
+
+<div class="chat" id="chat">
+  <div class="empty-chat" id="emptyChat">
+    <div class="badge">AI</div>
+    <h3>Ask me anything</h3>
+    <p>I can write HTML, CSS, and JavaScript. I can fix errors, explain code, or build a whole page for you.</p>
+  </div>
+</div>
+
+<div class="suggestions" id="suggestions">
+  <button data-prompt="Make me a hero section with a headline, subtext, and a green button.">Hero section</button>
+  <button data-prompt="Create a link-in-bio page with 5 buttons.">Link in bio</button>
+  <button data-prompt="Build a contact form with name, email, and message fields.">Contact form</button>
+  <button data-prompt="Give me a dark-themed pricing page with 3 plans.">Pricing page</button>
+</div>
+
+<div class="composer">
+  <textarea id="input" rows="1" placeholder="Ask KUMG AI…" autocapitalize="sentences" autocorrect="on"></textarea>
+  <button id="sendBtn" title="Send">→</button>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/settings.js"></script>
+<script>
+// ================== CONFIG ==================
+const AI_API = 'https://kumg-forge.onrender.com';
+
+// ================== STATE ==================
+let userId = null;
+let projectContext = null;
+let messages = [];
+let sending = false;
+
+const returnId = new URLSearchParams(location.search).get('return');
+
+const chatEl = document.getElementById('chat');
+const emptyEl = document.getElementById('emptyChat');
+const inputEl = document.getElementById('input');
+const sendBtn = document.getElementById('sendBtn');
+const usageEl = document.getElementById('usage');
+const suggestionsEl = document.getElementById('suggestions');
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+function renderMessage(m){
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + m.role;
+
+  if (m.role === 'user'){
+    wrap.textContent = m.content;
+    return wrap;
+  }
+
+  const raw = m.content;
+  const parts = [];
+  const re = /```(\w*)\n?([\s\S]*?)```/g;
+  let last = 0, match;
+
+  while ((match = re.exec(raw)) !== null){
+    if (match.index > last){
+      parts.push({ type: 'text', content: raw.slice(last, match.index) });
+    }
+    parts.push({ type: 'code', lang: match[1] || 'code', content: match[2] });
+    last = match.index + match[0].length;
+  }
+  if (last < raw.length) parts.push({ type: 'text', content: raw.slice(last) });
+
+  parts.forEach(p => {
+    if (p.type === 'text'){
+      const text = escapeHtml(p.content).replace(/\n/g, '<br>');
+      const div = document.createElement('div');
+      div.innerHTML = text;
+      wrap.appendChild(div);
+    } else {
+      const box = document.createElement('div');
+      box.className = 'code-block';
+      box.innerHTML = `
+        <div class="code-head">
+          <span>${escapeHtml(p.lang)}</span>
+          <button type="button">Insert</button>
+        </div>
+        <pre>${escapeHtml(p.content.replace(/^\n+|\n+$/g,''))}</pre>
+      `;
+      box.querySelector('button').addEventListener('click', () => insertCode(p.content, p.lang));
+      wrap.appendChild(box);
+    }
+  });
+
+  return wrap;
+}
+
+function insertCode(code, lang){
+  if (!returnId){
+    navigator.clipboard.writeText(code).then(
+      () => toast('Copied — paste in the editor'),
+      () => toast('Copy failed')
+    );
+    return;
+  }
+  const b64 = btoa(unescape(encodeURIComponent(JSON.stringify({ code, lang }))));
+  location.href = 'editor.html?id=' + encodeURIComponent(returnId) + '&aiInsert=' + b64;
+}
+
+function addMessage(m){
+  emptyEl.style.display = 'none';
+  messages.push(m);
+  const el = renderMessage(m);
+  chatEl.appendChild(el);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+function addTyping(){
+  const t = document.createElement('div');
+  t.className = 'msg assistant';
+  t.id = 'typingIndicator';
+  t.innerHTML = '<span class="typing"></span>';
+  chatEl.appendChild(t);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+function removeTyping(){
+  document.getElementById('typingIndicator')?.remove();
+}
+
+async function refreshUsage(){
+  try {
+    const res = await fetch(AI_API + '/api/ai/usage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId })
+    });
+    const json = await res.json();
+    if (!json.ok) return;
+    if (json.limit === null){
+      usageEl.textContent = 'Pro · ∞';
+      usageEl.style.color = 'var(--green)';
+    } else {
+      usageEl.textContent = `${json.used}/${json.limit}`;
+      usageEl.style.color = json.used >= json.limit ? 'var(--danger)' : '';
+    }
+  } catch {}
+}
+
+async function send(text){
+  if (sending || !text.trim()) return;
+  sending = true;
+  sendBtn.disabled = true;
+
+  addMessage({ role: 'user', content: text });
+  inputEl.value = '';
+  inputEl.style.height = 'auto';
+  addTyping();
+
+  try {
+    const res = await fetch(AI_API + '/api/ai/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        messages: messages.slice(-10),
+        projectContext
+      })
+    });
+
+    const json = await res.json();
+    removeTyping();
+
+    if (!res.ok){
+      if (json.upgrade){
+        addMessage({
+          role: 'assistant',
+          content: 'You have used all 5 free AI messages for today. Upgrade to Pro for unlimited messages. (Upgrade is coming very soon — check Settings.)'
+        });
+      } else {
+        addMessage({ role: 'assistant', content: '⚠️ ' + (json.error || 'Something went wrong.') });
+      }
+      return;
+    }
+
+    addMessage({ role: 'assistant', content: json.reply });
+    refreshUsage();
+  } catch(err){
+    removeTyping();
+    addMessage({ role: 'assistant', content: '⚠️ Network error. Check your internet and try again.' });
+  } finally {
+    sending = false;
+    sendBtn.disabled = false;
+    refreshUsage();
+  }
+}
+
+sendBtn.addEventListener('click', () => send(inputEl.value));
+
+inputEl.addEventListener('input', () => {
+  inputEl.style.height = 'auto';
+  inputEl.style.height = Math.min(inputEl.scrollHeight, 140) + 'px';
+});
+
+inputEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    send(inputEl.value);
+  }
+});
+
+suggestionsEl.addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-prompt]');
+  if (btn) send(btn.dataset.prompt);
+});
+
+document.getElementById('backBtn').addEventListener('click', () => {
+  if (returnId) location.href = 'editor.html?id=' + encodeURIComponent(returnId);
+  else location.href = 'index.html';
+});
+
+(async () => {
+  const { data } = await db.auth.getSession();
+  if (!data.session){ location.href = 'auth.html'; return; }
+  userId = data.session.user.id;
+
+  if (returnId){
+    const { data: proj } = await db
+      .from('projects')
+      .select('name, html, css, js')
+      .eq('id', returnId)
+      .maybeSingle();
+    if (proj){
+      projectContext = proj;
+      emptyEl.innerHTML = `
+        <div class="badge">AI</div>
+        <h3>Working on "${escapeHtml(proj.name)}"</h3>
+        <p>Ask me to add, fix, or explain code. Generated code has an <strong>Insert</strong> button.</p>
+      `;
+    }
+  }
+
+  refreshUsage();
+  setTimeout(() => inputEl.focus(), 300);
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>

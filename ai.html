@@ -361,7 +361,7 @@ async function send(text){
       if (json.upgrade){
         addMessage({
           role: 'assistant',
-          content: 'You have used all 5 free AI messages for today. Upgrade to Pro for unlimited messages. (Upgrade is coming very soon — check Settings.)'
+          content: 'You have used all 250 free AI messages for today. Upgrade to Pro for unlimited messages. (Upgrade is coming very soon — check Settings.)'
         });
       } else {
         addMessage({ role: 'assistant', content: '⚠️ ' + (json.error || 'Something went wrong.') });

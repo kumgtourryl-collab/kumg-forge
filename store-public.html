@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0A">
+<title>Shop</title>
+<script>
+(function(){
+  var t = localStorage.getItem('kumg_theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme','light');
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  :root{
+    --s-bg: #0A0A0A;
+    --s-accent: #1F9D62;
+    --s-accent-dark: #0B3D2E;
+    --s-text: #E8F5EE;
+    --s-muted: #7A8C84;
+  }
+  body.public-shop{
+    background: var(--s-bg);
+    color: var(--s-text);
+    min-height:100vh;
+    margin:0;
+    padding:0;
+    display:block;
+    font-family:var(--font);
+  }
+  .shop-top{
+    padding:22px 20px 26px;
+    background:linear-gradient(160deg, var(--s-accent-dark), var(--s-accent));
+    color:#fff;
+    border-radius:0 0 24px 24px;
+    text-align:center;
+  }
+  .shop-logo{
+    width:80px;height:80px;border-radius:20px;
+    background:rgba(255,255,255,.15);
+    display:grid;place-items:center;margin:0 auto 12px;
+    font-size:32px;font-weight:900;color:#fff;
+    overflow:hidden;border:2px solid rgba(255,255,255,.3);
+  }
+  .shop-logo img{width:100%;height:100%;object-fit:cover}
+  .shop-top h1{margin:0 0 6px;font-size:22px;font-weight:800;color:#fff;letter-spacing:-.4px}
+  .shop-top .tagline{margin:0 0 16px;font-size:13.5px;color:rgba(255,255,255,.85);line-height:1.5}
+  .wa-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    background:#25D366;color:#04140C;
+    padding:12px 20px;border-radius:999px;
+    font-weight:800;font-size:14px;text-decoration:none;
+    border:0;cursor:pointer;
+  }
+  .delivery-info{
+    background:rgba(0,0,0,.2);border-radius:12px;
+    padding:10px 14px;margin:14px 0 0;
+    font-size:12.5px;color:rgba(255,255,255,.9);line-height:1.5;
+  }
+
+  .shop-body{padding:20px 16px 120px;max-width:640px;margin:0 auto}
+
+  .prod-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;
+  }
+  @media(min-width:560px){ .prod-grid{grid-template-columns:1fr 1fr 1fr} }
+
+  .pcard{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:14px;overflow:hidden;
+    cursor:pointer;transition:border-color .15s, transform .05s;
+  }
+  .pcard:active{transform:scale(.98)}
+  .pcard:hover{border-color:var(--s-accent)}
+  .pcard .pic{
+    width:100%;aspect-ratio:1/1;
+    background:linear-gradient(135deg,var(--deep),var(--green));
+    display:grid;place-items:center;color:#fff;
+    font-weight:900;font-size:36px;overflow:hidden;
+  }
+  .pcard .pic img{width:100%;height:100%;object-fit:cover}
+  .pcard .info{padding:10px 12px}
+  .pcard .nm{font-weight:700;font-size:13.5px;margin-bottom:4px;line-height:1.3}
+  .pcard .pr{font-weight:800;color:var(--s-accent);font-size:14px}
+  .pcard .out{font-size:10px;font-weight:800;letter-spacing:.5px;
+    text-transform:uppercase;background:var(--danger);color:#fff;
+    padding:2px 6px;border-radius:6px;margin-left:6px}
+
+  .empty-shop{
+    text-align:center;padding:40px 20px;color:var(--s-muted);
+  }
+
+  /* Cart bar */
+  .cart-bar{
+    position:fixed;left:12px;right:12px;bottom:12px;z-index:40;
+    background:var(--s-accent);color:#04140C;
+    border-radius:16px;padding:14px 18px;
+    display:none;align-items:center;justify-content:space-between;
+    box-shadow:0 8px 24px rgba(0,0,0,.4);
+    font-weight:800;
+  }
+  .cart-bar.show{display:flex}
+  .cart-bar .count{font-size:13px;opacity:.85}
+  .cart-bar .total{font-size:16px}
+  .cart-bar button{
+    background:#04140C;color:#fff;border:0;
+    padding:10px 16px;border-radius:12px;
+    font-weight:800;font-size:13.5px;
+  }
+
+  /* Cart sheet */
+  .cart-bg{
+    position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:60;
+    display:none;align-items:flex-end;justify-content:center;
+  }
+  .cart-bg.show{display:flex}
+  .cart-sheet{
+    background:var(--card);border-top-left-radius:20px;border-top-right-radius:20px;
+    width:100%;max-width:560px;
+    padding:16px 16px calc(16px + env(safe-area-inset-bottom));
+    max-height:85vh;overflow-y:auto;
+  }
+  .cart-sheet h3{margin:0 0 12px;font-size:18px}
+  .ci{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:12px 0;border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .ci:last-of-type{border-bottom:0}
+  .ci .qty-ctrl{display:flex;align-items:center;gap:8px}
+  .ci .qty-ctrl button{
+    width:30px;height:30px;border-radius:8px;
+    background:var(--card);border:1px solid var(--line);
+    color:var(--text);font-weight:800;padding:0;
+  }
+  .ci .qty-ctrl .q{font-weight:800;min-width:22px;text-align:center}
+
+  .cart-total{
+    display:flex;justify-content:space-between;
+    padding:14px 0;margin-top:8px;
+    border-top:2px solid var(--line);
+    font-weight:800;font-size:16px;
+  }
+  .cart-actions{display:flex;gap:8px;margin-top:8px}
+  .cart-actions button{flex:1}
+
+  .loading{
+    text-align:center;padding:60px 20px;
+    color:var(--s-muted);font-size:14px;
+  }
+</style>
+</head>
+<body class="public-shop">
+
+<div id="root">
+  <div class="loading">Loading shop…</div>
+</div>
+
+<div class="cart-bar" id="cartBar">
+  <div>
+    <div class="count" id="cartCount">0 items</div>
+    <div class="total" id="cartTotal">$0.00</div>
+  </div>
+  <button id="viewCartBtn">View cart →</button>
+</div>
+
+<div class="cart-bg" id="cartBg">
+  <div class="cart-sheet" id="cartSheet">
+    <h3>Your cart</h3>
+    <div id="cartItems"></div>
+    <div class="cart-total">
+      <span>Total</span>
+      <span id="cartTotalSheet">$0.00</span>
+    </div>
+    <div class="cart-actions">
+      <button class="btn-ghost" id="closeCart">Keep shopping</button>
+      <button id="checkoutBtn">Order on WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/store.js"></script>
+<script>
+let shop = null;
+let products = [];
+let cart = {}; // { productId: qty }
+
+const rootEl = document.getElementById('root');
+const cartBar = document.getElementById('cartBar');
+const cartBg = document.getElementById('cartBg');
+const cartItemsEl = document.getElementById('cartItems');
+const cartCountEl = document.getElementById('cartCount');
+const cartTotalEl = document.getElementById('cartTotal');
+const cartTotalSheetEl = document.getElementById('cartTotalSheet');
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+function cartTotal(){
+  let total = 0;
+  Object.entries(cart).forEach(([pid, qty]) => {
+    const p = products.find(x => x.id === pid);
+    if (p) total += p.price * qty;
+  });
+  return total;
+}
+
+function cartCount(){
+  return Object.values(cart).reduce((a,b) => a+b, 0);
+}
+
+function updateCartBar(){
+  const c = cartCount();
+  if (c === 0){ cartBar.classList.remove('show'); return; }
+  cartBar.classList.add('show');
+  cartCountEl.textContent = c + (c === 1 ? ' item' : ' items');
+  const cur = products[0]?.currency || 'USD';
+  const t = fmtMoney(cartTotal(), cur);
+  cartTotalEl.textContent = t;
+  cartTotalSheetEl.textContent = t;
+}
+
+function renderCartItems(){
+  const items = Object.entries(cart);
+  if (!items.length){
+    cartItemsEl.innerHTML = '<p style="color:var(--muted);font-size:14px;padding:12px 0">Your cart is empty.</p>';
+    return;
+  }
+  cartItemsEl.innerHTML = items.map(([pid, qty]) => {
+    const p = products.find(x => x.id === pid);
+    if (!p) return '';
+    return `
+      <div class="ci">
+        <div>
+          <div style="font-weight:700">${escHtml(p.name)}</div>
+          <div style="color:var(--muted);font-size:12.5px">${fmtMoney(p.price, p.currency)} each</div>
+        </div>
+        <div class="qty-ctrl">
+          <button data-dec="${p.id}">−</button>
+          <span class="q">${qty}</span>
+          <button data-inc="${p.id}">+</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  cartItemsEl.querySelectorAll('[data-inc]').forEach(b => {
+    b.addEventListener('click', () => {
+      cart[b.dataset.inc] = (cart[b.dataset.inc] || 0) + 1;
+      renderCartItems(); updateCartBar();
+    });
+  });
+  cartItemsEl.querySelectorAll('[data-dec]').forEach(b => {
+    b.addEventListener('click', () => {
+      const id = b.dataset.dec;
+      cart[id] = (cart[id] || 0) - 1;
+      if (cart[id] <= 0) delete cart[id];
+      renderCartItems(); updateCartBar();
+      if (!Object.keys(cart).length) cartBg.classList.remove('show');
+    });
+  });
+}
+
+function addToCart(id){
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  if (!p.in_stock){ toast('Out of stock'); return; }
+  cart[id] = (cart[id] || 0) + 1;
+  updateCartBar();
+  toast(p.name + ' added');
+}
+
+function render(){
+  const theme = themeFor(shop.theme);
+  document.documentElement.style.setProperty('--s-bg', theme.bg);
+  document.documentElement.style.setProperty('--s-accent', theme.accent);
+  document.documentElement.style.setProperty('--s-accent-dark', theme.accentDark);
+  document.documentElement.style.setProperty('--s-text', theme.text);
+  document.documentElement.style.setProperty('--s-muted', theme.muted);
+
+  const waNum = waNumber(shop.whatsapp);
+  const waLink = waNum ? `https://wa.me/${waNum}` : '#';
+  const initial = (shop.name || '?')[0].toUpperCase();
+  const logo = shop.logo_url ? `<img src="${escHtml(shop.logo_url)}" alt="">` : initial;
+
+  const productsHtml = products.length
+    ? `<div class="prod-grid">${products.map(p => {
+        const pInit = (p.name || '?')[0].toUpperCase();
+        const pic = p.image_url ? `<img src="${escHtml(p.image_url)}" alt="">` : pInit;
+        return `
+          <div class="pcard" data-id="${p.id}">
+            <div class="pic">${pic}</div>
+            <div class="info">
+              <div class="nm">${escHtml(p.name)}</div>
+              <div class="pr">
+                ${fmtMoney(p.price, p.currency)}
+                ${p.in_stock ? '' : '<span class="out">Out</span>'}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('')}</div>`
+    : `<div class="empty-shop"><h3>No products yet</h3><p>The shop owner hasn't added products.</p></div>`;
+
+  rootEl.innerHTML = `
+    <div class="shop-top">
+      <div class="shop-logo">${logo}</div>
+      <h1>${escHtml(shop.name)}</h1>
+      ${shop.tagline ? `<p class="tagline">${escHtml(shop.tagline)}</p>` : ''}
+      <a class="wa-btn" href="${waLink}" target="_blank" rel="noopener">💬 Chat on WhatsApp</a>
+      ${shop.delivery_info ? `<div class="delivery-info">🚚 ${escHtml(shop.delivery_info)}</div>` : ''}
+    </div>
+    <div class="shop-body">${productsHtml}</div>
+  `;
+
+  rootEl.querySelectorAll('.pcard').forEach(card => {
+    card.addEventListener('click', () => addToCart(card.dataset.id));
+  });
+}
+
+document.getElementById('viewCartBtn').addEventListener('click', () => {
+  renderCartItems();
+  cartBg.classList.add('show');
+});
+
+document.getElementById('closeCart').addEventListener('click', () => {
+  cartBg.classList.remove('show');
+});
+
+document.getElementById('checkoutBtn').addEventListener('click', () => {
+  const items = Object.entries(cart).map(([pid, qty]) => {
+    const p = products.find(x => x.id === pid);
+    return { name: p.name, price: p.price, currency: p.currency, qty };
+  });
+  if (!items.length){ toast('Cart empty'); return; }
+  const url = buildWhatsAppOrder(shop, items);
+  if (!url){ toast('Shop has no WhatsApp number'); return; }
+
+  // Optional: log order
+  db.from('shop_orders').insert({
+    shop_id: shop.id,
+    customer_whatsapp: 'pending',
+    items: items,
+    total: cartTotal()
+  }).then(() => {}).catch(()=>{});
+
+  location.href = url;
+});
+
+(async () => {
+  const slug = new URLSearchParams(location.search).get('slug');
+  if (!slug){
+    rootEl.innerHTML = '<div class="loading">No shop specified.</div>';
+    return;
+  }
+
+  const { data: s, error } = await db
+    .from('shops')
+    .select('*')
+    .eq('slug', slug)
+    .eq('is_published', true)
+    .maybeSingle();
+
+  if (error || !s){
+    rootEl.innerHTML = '<div class="loading">Shop not found or not published.</div>';
+    return;
+  }
+
+  shop = s;
+
+  const { data: prods } = await db
+    .from('shop_products')
+    .select('*')
+    .eq('shop_id', shop.id)
+    .order('sort_order', { ascending: true });
+
+  products = prods || [];
+  render();
+})();
+</script>
+</body>
+</html>

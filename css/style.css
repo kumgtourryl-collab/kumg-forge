@@ -180,3 +180,141 @@ textarea{font-family:var(--mono);font-size:14px;line-height:1.5;resize:vertical}
 }
 [data-theme="light"] .empty h3{color:#0A1F17}
 [data-theme="light"] .empty{color:#5F6E66}
+/* ============================================================
+   Bottom navigation bar + icon system
+   ============================================================ */
+.bottom-nav{
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: rgba(10,10,10,.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: stretch;
+  padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+  z-index: 30;
+}
+[data-theme="light"] .bottom-nav{
+  background: rgba(255,255,255,.96);
+}
+.bottom-nav .nav-item{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 2px;
+  color: var(--muted);
+  text-decoration: none;
+  background: transparent;
+  border: 0;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .2px;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: color .15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.bottom-nav .nav-item svg{
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.9;
+  stroke: currentColor;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.bottom-nav .nav-item.active{
+  color: var(--green);
+}
+.bottom-nav .nav-item.active svg{
+  stroke-width: 2.4;
+}
+.bottom-nav .nav-item:active{
+  background: rgba(31,157,98,.12);
+}
+[data-theme="light"] .bottom-nav .nav-item:active{
+  background: rgba(20,138,86,.1);
+}
+
+/* Prevent content hiding behind the fixed bottom nav */
+body.has-bottom-nav{
+  padding-bottom: 0;
+}
+body.has-bottom-nav .container{
+  padding-bottom: 100px;
+}
+
+/* Generic icon button (used in editor, modals, sheets) */
+.icon-btn{
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  color: var(--mint);
+  flex-shrink: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+[data-theme="light"] .icon-btn{
+  color: #0A1F17;
+}
+.icon-btn svg{
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icon-btn:active{
+  background: var(--deep);
+  border-color: var(--green);
+  color: var(--green);
+}
+.icon-btn.icon-btn-accent{
+  background: var(--green);
+  border-color: var(--green);
+  color: #04140C;
+}
+.icon-btn.icon-btn-accent svg{
+  stroke-width: 2.2;
+}
+.icon-btn.icon-btn-accent:active{
+  background: #25B874;
+}
+
+/* More sheet — icon list */
+.sheet-icon{
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--deep);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.sheet-icon svg{
+  width: 17px;
+  height: 17px;
+  stroke: #E8F5EE;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sheet-icon.danger{
+  background: #C43D3D;
+}
+.sheet-icon.danger svg{
+  stroke: #fff;
+}

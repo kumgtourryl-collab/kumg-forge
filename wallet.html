@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0A">
+<title>Wallet — KUMG</title>
+<script>
+(function(){
+  var t = localStorage.getItem('kumg_theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme','light');
+  var l = localStorage.getItem('kumg_lang') || 'en';
+  document.documentElement.setAttribute('lang', l);
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .balance-card{
+    background:linear-gradient(135deg,var(--deep),var(--green));
+    border-radius:var(--radius);padding:24px 20px;
+    color:#E8F5EE;text-align:center;margin-bottom:16px;
+  }
+  .balance-card .lbl{font-size:12px;text-transform:uppercase;letter-spacing:1.5px;opacity:.85}
+  .balance-card .bal{font-size:44px;font-weight:900;margin:6px 0;letter-spacing:-1px}
+  .balance-card .sub{font-size:12.5px;opacity:.85}
+
+  .redeem-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+  .redeem{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:14px;text-align:center;cursor:pointer;
+  }
+  .redeem:active{background:var(--deep)}
+  .redeem .ic{font-size:22px;margin-bottom:6px}
+  .redeem .nm{font-weight:700;font-size:13.5px}
+  .redeem .pr{font-size:11.5px;color:var(--muted);margin-top:2px}
+
+  .tap-row{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:12px 14px;margin-bottom:8px;
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:13.5px;
+  }
+  .tap-row .who{color:var(--muted);font-size:12px;margin-top:2px}
+  .tap-row .amt{color:var(--green);font-weight:800}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <a href="index.html" style="display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none">
+      <div class="logo">K</div>
+      <div>KUMG <span class="accent">Wallet</span></div>
+    </a>
+  </div>
+  <div class="actions">
+    <button class="btn-ghost" onclick="location.href='index.html'" style="font-size:13px;padding:8px 12px">Back</button>
+  </div>
+</header>
+
+<main class="container" style="max-width:520px">
+  <div class="balance-card">
+    <div class="lbl">Your balance</div>
+    <div class="bal" id="balance">$0.00</div>
+    <div class="sub">Earned by tapping sponsored cards</div>
+  </div>
+
+  <h3 style="font-size:14px;margin:20px 0 10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Redeem</h3>
+  <div class="redeem-grid">
+    <div class="redeem" data-redeem="ai">
+      <div class="ic">✨</div>
+      <div class="nm">100 AI messages</div>
+      <div class="pr">$0.10</div>
+    </div>
+    <div class="redeem" data-redeem="pro_day">
+      <div class="ic">⭐</div>
+      <div class="nm">1 Pro day</div>
+      <div class="pr">$0.20</div>
+    </div>
+    <div class="redeem" data-redeem="cash">
+      <div class="ic">💵</div>
+      <div class="nm">EcoCash payout</div>
+      <div class="pr">$5.00 min</div>
+    </div>
+    <div class="redeem" data-redeem="help">
+      <div class="ic">❓</div>
+      <div class="nm">How it works</div>
+      <div class="pr">Learn</div>
+    </div>
+  </div>
+
+  <h3 style="font-size:14px;margin:24px 0 10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Recent earnings</h3>
+  <div id="history"></div>
+</main>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/settings.js"></script>
+<script>
+let userId = null;
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+function centsToUsd(c){
+  return '$' + (c / 100).toFixed(2);
+}
+
+async function load(){
+  const { data: w } = await db.from('wallets').select('*').eq('user_id', userId).maybeSingle();
+  const bal = w?.balance_cents || 0;
+  document.getElementById('balance').textContent = centsToUsd(bal);
+
+  const { data: taps } = await db
+    .from('taps')
+    .select('id, amount_cents, created_at, sponsor_id')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(30);
+
+  const el = document.getElementById('history');
+  if (!taps || !taps.length){
+    el.innerHTML = '<p style="color:var(--muted);font-size:13.5px;text-align:center;padding:20px">No earnings yet. Tap sponsored cards on your dashboard.</p>';
+    return;
+  }
+
+  // Fetch sponsor names
+  const sponsorIds = [...new Set(taps.map(t => t.sponsor_id))];
+  const { data: sponsors } = await db
+    .from('sponsors')
+    .select('id, business_name')
+    .in('id', sponsorIds);
+  const nameMap = {};
+  (sponsors || []).forEach(s => nameMap[s.id] = s.business_name);
+
+  el.innerHTML = taps.map(t => `
+    <div class="tap-row">
+      <div>
+        <div>${escapeHtml(nameMap[t.sponsor_id] || 'Sponsor')}</div>
+        <div class="who">${new Date(t.created_at).toLocaleString()}</div>
+      </div>
+      <div class="amt">+${centsToUsd(t.amount_cents)}</div>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(s){
+  return String(s || '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+document.querySelectorAll('.redeem').forEach(el => {
+  el.addEventListener('click', () => {
+    const kind = el.dataset.redeem;
+    if (kind === 'help'){
+      alert('Tap sponsored cards on your dashboard to earn money.\n\nEvery tap earns you half the sponsor\'s bid.\n\nRedeem for AI messages, Pro days, or EcoCash.');
+      return;
+    }
+    if (kind === 'cash'){
+      toast('EcoCash payout coming soon');
+      return;
+    }
+    toast('Redemption coming soon');
+  });
+});
+
+(async () => {
+  const { data } = await db.auth.getSession();
+  if (!data.session){ location.href = 'auth.html'; return; }
+  userId = data.session.user.id;
+  load();
+})();
+</script>
+</body>
+</html>

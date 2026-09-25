@@ -19,6 +19,8 @@ const ASSETS = [
   './store-edit.html',
   './store-products.html',
   './store-public.html',
+  './wallet.html',
+  './js/tap.js',
   './manifest.json',
   './css/style.css',
   './js/supabase.js',

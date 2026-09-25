@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="theme-color" content="#0A0A0A">
+<title>Editor — KUMG Forge</title>
+<script>
+(function(){
+  var t = localStorage.getItem('kumg_theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme','light');
+  var l = localStorage.getItem('kumg_lang') || 'en';
+  document.documentElement.setAttribute('lang', l);
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="KUMG">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  body.editor{overflow:hidden;height:100vh}
+  .editor-top{
+    display:flex;align-items:center;gap:6px;
+    padding:10px 12px;background:#0A0A0A;
+    border-bottom:1px solid var(--line);
+  }
+  [data-theme="light"] .editor-top{background:#FFFFFF}
+
+  .editor-top .home-btn{
+    width:38px;height:38px;border-radius:10px;flex-shrink:0;
+    background:var(--card);
+    border:1px solid var(--line);
+    display:grid;place-items:center;
+    color:var(--mint);
+    text-decoration:none;
+  }
+  [data-theme="light"] .editor-top .home-btn{color:#0A1F17}
+  .editor-top .home-btn svg{
+    width:20px;height:20px;
+    stroke:currentColor;fill:none;
+    stroke-width:1.9;
+    stroke-linecap:round;stroke-linejoin:round;
+  }
+  .editor-top .home-btn:active{
+    background:var(--deep);
+    border-color:var(--green);
+    color:var(--green);
+  }
+
+  .editor-top input#nameInput{
+    flex:1;min-width:0;background:transparent;border:0;
+    font-size:15px;font-weight:700;padding:6px 4px;
+    color:var(--mint);
+  }
+  .editor-top input#nameInput:focus{outline:none;background:var(--card);border-radius:8px}
+
+  .save-status{
+    font-size:11px;color:var(--muted);white-space:nowrap;
+    padding:2px 6px;border-radius:6px;
+  }
+  .save-status.saved{color:var(--green)}
+  .save-status.dirty{color:#E5A93D}
+  .save-status.saving{color:var(--muted)}
+  .save-status.error{color:var(--danger)}
+
+  .editor-actions{display:flex;gap:4px;flex-wrap:nowrap;align-items:center}
+  .editor-actions .icon-btn{
+    width:34px;height:34px;
+    background:transparent;
+    border:1px solid var(--line);
+  }
+  .editor-actions .icon-btn svg{
+    width:18px;height:18px;
+  }
+  .editor-actions .icon-btn.ai{
+    border-color:var(--green);
+    color:var(--green);
+  }
+  .editor-actions .txt-btn{
+    font-size:12px;padding:8px 10px;border-radius:10px;
+    font-weight:700;
+  }
+
+  .tab-row{
+    display:flex;gap:4px;padding:6px 8px;background:#0D1210;
+    border-bottom:1px solid var(--line);
+  }
+  [data-theme="light"] .tab-row{background:#EEF3EF}
+  .tab-btn{
+    flex:1;background:transparent;color:var(--muted);
+    border-radius:8px;padding:8px 6px;font-size:13px;font-weight:700;
+  }
+  .tab-btn.active{background:var(--deep);color:var(--mint)}
+  [data-theme="light"] .tab-btn.active{background:var(--green);color:#FFFFFF}
+
+  .find-bar{
+    display: none;
+    background: #0D1210;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 10px;
+  }
+  [data-theme="light"] .find-bar{background:#EEF3EF}
+  .find-bar.show{ display: block; }
+  .find-row{ display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+  .find-row:last-child{ margin-bottom: 0; }
+  .find-row input{
+    flex: 1; padding: 8px 10px; font-size: 13px;
+    background: #0A0A0A; border: 1px solid var(--line);
+    border-radius: 8px; color: var(--mint); font-family: var(--mono);
+  }
+  [data-theme="light"] .find-row input{background:#FFFFFF;color:#0A1F17}
+  .find-row input:focus{ outline: none; border-color: var(--green); }
+  .find-row button{
+    padding: 8px 10px; font-size: 13px; border-radius: 8px;
+    background: #0A0A0A; color: var(--mint); border: 1px solid var(--line);
+    font-weight: 700;
+  }
+  [data-theme="light"] .find-row button{background:#FFFFFF;color:#0A1F17}
+  .find-row button:active{ background: var(--deep); border-color: var(--green); }
+  .find-row .count{
+    font-size: 11px; color: var(--muted); min-width: 48px; text-align: right;
+    font-family: var(--mono);
+  }
+
+  .work-area{display:flex;flex-direction:column;flex:1;min-height:0}
+  .code-pane{flex:1;min-height:0;display:flex;flex-direction:column}
+  .code-pane textarea{
+    flex:1;border:0;border-radius:0;background:#0A0A0A;
+    font-family:var(--mono);font-size:13.5px;line-height:1.6;
+    padding:14px;color:var(--mint);
+    -webkit-text-size-adjust:100%;
+    padding-bottom:70px;
+  }
+  [data-theme="light"] .code-pane textarea{background:#FFFFFF;color:#0A1F17}
+  .preview-pane{
+    flex:1;min-height:0;display:flex;flex-direction:column;
+    border-top:1px solid var(--line);
+  }
+  .preview-pane .ph{
+    font-size:11px;text-transform:uppercase;letter-spacing:.8px;
+    color:var(--muted);padding:6px 14px;background:#0D1210;
+    border-bottom:1px solid var(--line);
+  }
+  [data-theme="light"] .preview-pane .ph{background:#EEF3EF}
+  .preview-pane iframe{flex:1;border:0;background:#fff;width:100%}
+
+  .code-keys{
+    display: none;
+    position: fixed;
+    left: 0; right: 0;
+    bottom: 0;
+    z-index: 40;
+    background: #0D1210;
+    border-top: 1px solid var(--line);
+    padding: 8px 8px 8px;
+    box-shadow: 0 -8px 20px rgba(0,0,0,.4);
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+    transition: transform .12s ease-out;
+  }
+  [data-theme="light"] .code-keys{
+    background:#EEF3EF;
+    box-shadow: 0 -8px 20px rgba(0,0,0,.08);
+  }
+  .code-keys.show{ display: block; }
+  .ck-scroll{
+    display: flex; gap: 6px; overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; padding-bottom: 2px;
+  }
+  .ck-scroll::-webkit-scrollbar{ display: none; }
+  .ck-key{
+    flex-shrink: 0;
+    background: #0A0A0A; color: var(--mint);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: var(--mono); font-size: 13px; font-weight: 700;
+    min-width: 42px; text-align: center;
+    user-select: none; -webkit-user-select: none;
+    touch-action: manipulation; cursor: pointer;
+  }
+  [data-theme="light"] .ck-key{ background:#FFFFFF; color:#0A1F17; }
+  .ck-key:active, .ck-key.pressed{
+    background: var(--deep); border-color: var(--green); color: var(--mint);
+  }
+
+  .sheet-bg{
+    position: fixed; inset: 0; background: rgba(0,0,0,.6);
+    z-index: 90; display: none;
+    align-items: flex-end; justify-content: center;
+  }
+  .sheet-bg.show{ display: flex; }
+  .sheet{
+    background: var(--card);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-top: 1px solid var(--line);
+    width: 100%; max-width: 560px;
+    padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+    animation: sheetUp .22s ease-out;
+  }
+  @keyframes sheetUp{
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+  .sheet-grip{
+    width: 40px; height: 4px; border-radius: 999px;
+    background: var(--line); margin: 0 auto 10px;
+  }
+  .sheet h3{
+    font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--muted); margin: 8px 8px 6px; font-weight: 800;
+  }
+  .sheet-item{
+    display: flex; align-items: center; gap: 12px;
+    width: 100%;
+    background: transparent; color: var(--mint);
+    border: 0; border-radius: 12px;
+    padding: 14px 12px;
+    font-size: 15px; font-weight: 700;
+    text-align: left; font-family: var(--font);
+  }
+  [data-theme="light"] .sheet-item{ color:#0A1F17; }
+  .sheet-item:active{ background: var(--deep); color: var(--mint); }
+  .sheet-item .sub{
+    display: block; font-size: 11px; font-weight: 500;
+    color: var(--muted); margin-top: 2px;
+  }
+  .sheet-sep{ height: 1px; background: var(--line); margin: 6px 8px; }
+  .sheet-icon{
+    width: 32px; height: 32px; border-radius: 9px;
+    background: var(--deep);
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+  .sheet-icon svg{
+    width: 17px; height: 17px;
+    stroke: #E8F5EE; fill: none;
+    stroke-width: 2;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+  .sheet-icon.danger{ background: #C43D3D; }
+  .sheet-icon.danger svg{ stroke: #fff; }
+
+  @media(max-width:819px){
+    body.editor .preview-pane{display:none}
+    body.editor.preview-on .code-pane{display:none}
+    body.editor.preview-on .preview-pane{display:flex}
+    body.editor.preview-on .code-keys{display:none !important}
+    body.editor.preview-on .find-bar{display:none !important}
+  }
+  @media(min-width:820px){
+    .work-area{flex-direction:row}
+    .code-pane,.preview-pane{flex:1;border-top:0}
+    .preview-pane{border-left:1px solid var(--line)}
+    #previewToggle{display:none}
+    .code-keys{display:none !important}
+  }
+</style>
+</head>
+<body class="editor">
+
+<header class="editor-top">
+  <a href="index.html" class="home-btn" id="backBtn" title="Home" aria-label="Home">
+    <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg>
+  </a>
+  <input id="nameInput" type="text" placeholder="Untitled" maxlength="60">
+  <span class="save-status" id="saveStatus">Saved</span>
+  <div class="editor-actions">
+    <button class="icon-btn ai" id="aiBtn" title="KUMG AI" aria-label="KUMG AI">
+      <svg viewBox="0 0 24 24"><path d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7z"/><path d="M19 15.5l.5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5z"/></svg>
+    </button>
+    <button class="icon-btn" id="findBtn" title="Find" aria-label="Find">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    </button>
+    <button class="icon-btn" id="moreBtn" title="More" aria-label="More">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.6"/><circle cx="5" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
+    </button>
+    <button class="btn-ghost txt-btn" id="previewToggle">Preview</button>
+    <button class="btn-ghost txt-btn" id="saveBtn">Save</button>
+    <button class="txt-btn" id="publishBtn">Publish</button>
+  </div>
+</header>
+
+<div class="tab-row">
+  <button class="tab-btn active" data-tab="html">HTML</button>
+  <button class="tab-btn" data-tab="css">CSS</button>
+  <button class="tab-btn" data-tab="js">JS</button>
+</div>
+
+<div class="find-bar" id="findBar">
+  <div class="find-row">
+    <input id="findInput" type="text" placeholder="Find…" autocapitalize="off" autocorrect="off">
+    <span class="count" id="findCount">0/0</span>
+    <button id="findPrev" type="button">↑</button>
+    <button id="findNext" type="button">↓</button>
+    <button id="findClose" type="button">✕</button>
+  </div>
+  <div class="find-row">
+    <input id="replaceInput" type="text" placeholder="Replace with…" autocapitalize="off" autocorrect="off">
+    <button id="replaceOne" type="button">Replace</button>
+    <button id="replaceAll" type="button">All</button>
+  </div>
+</div>
+
+<div class="work-area">
+  <div class="code-pane">
+    <textarea id="editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off"></textarea>
+  </div>
+  <div class="preview-pane">
+    <div class="ph">Preview</div>
+    <iframe id="preview" sandbox="allow-scripts allow-forms allow-modals"></iframe>
+  </div>
+</div>
+
+<div class="code-keys" id="codeKeys">
+  <div class="ck-scroll" id="ckScroll"></div>
+</div>
+
+<!-- More sheet -->
+<div class="sheet-bg" id="sheetBg">
+  <div class="sheet" id="sheet">
+    <div class="sheet-grip"></div>
+
+    <h3>Edit</h3>
+    <button class="sheet-item" data-act="copy">
+      <span class="sheet-icon"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"/></svg></span>
+      <div>Copy<span class="sub">Copy selection or whole tab</span></div>
+    </button>
+    <button class="sheet-item" data-act="paste">
+      <span class="sheet-icon"><svg viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg></span>
+      <div>Paste<span class="sub">Insert clipboard at cursor</span></div>
+    </button>
+    <button class="sheet-item" data-act="selectAll">
+      <span class="sheet-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8"/></svg></span>
+      <div>Select all<span class="sub">Select the whole tab</span></div>
+    </button>
+
+    <div class="sheet-sep"></div>
+    <h3>Save &amp; export</h3>
+    <button class="sheet-item" data-act="duplicate">
+      <span class="sheet-icon"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 4H6a2 2 0 0 0-2 2v10"/></svg></span>
+      <div>Save as…<span class="sub">Duplicate this project</span></div>
+    </button>
+    <button class="sheet-item" data-act="downloadHtml">
+      <span class="sheet-icon"><svg viewBox="0 0 24 24"><path d="M12 3v14"/><path d="M7 12l5 5 5-5"/><path d="M5 21h14"/></svg></span>
+      <div>Download .html<span class="sub">Single file, ready to open</span></div>
+    </button>
+    <button class="sheet-item" data-act="downloadZip">
+      <span class="sheet-icon"><svg viewBox="0 0 24 24"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg></span>
+      <div>Download .zip<span class="sub">Separate index, style, script</span></div>
+    </button>
+
+    <div class="sheet-sep"></div>
+    <button class="sheet-item" data-act="close">
+      <span class="sheet-icon danger"><svg viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg></span>
+      <div>Cancel</div>
+    </button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/projects.js"></script>
+<script src="js/editor.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>

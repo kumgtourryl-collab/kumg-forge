@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0A">
+<title>TouRryl Store — KUMG</title>
+<script>
+(function(){
+  var t = localStorage.getItem('kumg_theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme','light');
+  var l = localStorage.getItem('kumg_lang') || 'en';
+  document.documentElement.setAttribute('lang', l);
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="icon" type="image/svg+xml" href="assets/store-icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="KUMG">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .hero{
+    background:linear-gradient(135deg,var(--deep),var(--green));
+    border-radius:var(--radius);
+    padding:24px 20px;margin-bottom:20px;
+    color:#E8F5EE;
+  }
+  .hero-head{
+    display:flex;align-items:center;gap:12px;margin-bottom:10px;
+  }
+  .hero-icon{
+    width:44px;height:44px;border-radius:12px;
+    background:rgba(255,255,255,.15);
+    display:grid;place-items:center;flex-shrink:0;
+  }
+  .hero-icon svg{
+    width:22px;height:22px;
+    stroke:#E8F5EE;fill:none;
+    stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;
+  }
+  .hero h2{margin:0;font-size:20px;font-weight:800;letter-spacing:-.4px;color:#E8F5EE}
+  .hero p{margin:0;font-size:13.5px;opacity:.9;line-height:1.55}
+
+  .shop-card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 16px;margin-bottom:10px;
+    cursor:pointer;transition:border-color .15s ease;
+    display:flex;gap:14px;align-items:center;
+  }
+  .shop-card:hover{border-color:var(--green)}
+  .shop-card .logo{
+    width:52px;height:52px;border-radius:12px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--deep),var(--green));
+    display:grid;place-items:center;color:#04140C;
+    font-weight:900;font-size:20px;overflow:hidden;
+  }
+  .shop-card .logo img{width:100%;height:100%;object-fit:cover}
+  .shop-card .meta{flex:1;min-width:0}
+  .shop-card .name{
+    font-weight:800;font-size:15.5px;margin-bottom:3px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .shop-card .sub{font-size:12px;color:var(--muted)}
+  .shop-card .status{
+    font-size:10px;font-weight:800;letter-spacing:.5px;
+    text-transform:uppercase;
+    padding:3px 8px;border-radius:999px;
+    background:var(--deep);color:var(--mint);
+    flex-shrink:0;
+  }
+  .shop-card .status.live{background:var(--green);color:#04140C}
+</style>
+</head>
+<body class="has-bottom-nav">
+
+<header class="topbar">
+  <div class="brand">
+    <a href="index.html" style="display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none">
+      <div class="logo">K</div>
+      <div>KUMG <span class="accent">Store</span></div>
+    </a>
+  </div>
+  <div class="actions">
+    <button class="btn-ghost" onclick="location.href='index.html'" style="font-size:13px;padding:8px 12px">Home</button>
+  </div>
+</header>
+
+<main class="container">
+  <div class="hero">
+    <div class="hero-head">
+      <div class="hero-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M 4 8 h 16 l -1.5 12 a 1.6 1.6 0 0 1 -1.6 1.4 h -9.8 a 1.6 1.6 0 0 1 -1.6 -1.4 z"/>
+          <path d="M 8.5 8 V 6.5 a 3.5 3.5 0 0 1 7 0 V 8"/>
+        </svg>
+      </div>
+      <h2>TouRryl Store</h2>
+    </div>
+    <p>Turn your business into an online shop in 5 minutes. Share one link. Take orders on WhatsApp.</p>
+  </div>
+
+  <h1 class="page-title" style="font-size:18px">Your shops</h1>
+  <p class="page-sub" style="margin-bottom:14px">Free plan: 1 shop · 5 products</p>
+
+  <div id="list"></div>
+
+  <button class="btn btn-block" id="newBtn" style="margin-top:20px">+ Create a shop</button>
+
+  <footer class="legal" style="text-align:center;font-size:12px;color:var(--muted);padding:24px 0">
+    <a href="terms.html" style="color:var(--muted)">Terms</a> ·
+    <a href="privacy.html" style="color:var(--muted)">Privacy</a>
+  </footer>
+</main>
+
+<nav class="bottom-nav">
+  <a class="nav-item" href="index.html">
+    <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg>
+    <span>Home</span>
+  </a>
+  <a class="nav-item" href="discover.html">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18z"/><path d="M3 12h18"/></svg>
+    <span>Discover</span>
+  </a>
+  <a class="nav-item active" href="store.html">
+    <svg viewBox="0 0 24 24">
+      <path d="M 4 8 h 16 l -1.5 12 a 1.6 1.6 0 0 1 -1.6 1.4 h -9.8 a 1.6 1.6 0 0 1 -1.6 -1.4 z"/>
+      <path d="M 8.5 8 V 6.5 a 3.5 3.5 0 0 1 7 0 V 8"/>
+    </svg>
+    <span>Store</span>
+  </a>
+  <a class="nav-item" href="wallet.html">
+    <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><circle cx="16" cy="15" r="1"/></svg>
+    <span>Wallet</span>
+  </a>
+  <a class="nav-item" href="ai.html">
+    <svg viewBox="0 0 24 24"><path d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7z"/><path d="M19 15.5l.5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5z"/></svg>
+    <span>AI</span>
+  </a>
+</nav>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/settings.js"></script>
+<script>
+let userId = null;
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+async function render(){
+  const { data: shops, error } = await db
+    .from('shops')
+    .select('id, name, tagline, slug, logo_url, is_published, created_at')
+    .order('created_at', { ascending: false });
+
+  const listEl = document.getElementById('list');
+
+  if (error){
+    listEl.innerHTML = '<div class="empty"><h3>Could not load shops</h3></div>';
+    return;
+  }
+
+  if (!shops || !shops.length){
+    listEl.innerHTML = `
+      <div class="empty">
+        <h3>No shops yet</h3>
+        <p>Create your first shop to start selling.</p>
+      </div>`;
+    return;
+  }
+
+  listEl.innerHTML = shops.map(s => {
+    const initial = (s.name || '?')[0].toUpperCase();
+    const logo = s.logo_url
+      ? `<img src="${escapeHtml(s.logo_url)}" alt="">`
+      : initial;
+    return `
+      <div class="shop-card" data-id="${s.id}">
+        <div class="logo">${logo}</div>
+        <div class="meta">
+          <div class="name">${escapeHtml(s.name)}</div>
+          <div class="sub">${escapeHtml(s.tagline || 'No tagline yet')} · /store/${escapeHtml(s.slug)}</div>
+        </div>
+        <span class="status ${s.is_published ? 'live' : ''}">
+          ${s.is_published ? 'Live' : 'Draft'}
+        </span>
+      </div>
+    `;
+  }).join('');
+
+  listEl.querySelectorAll('.shop-card').forEach(card => {
+    card.addEventListener('click', () => {
+      location.href = 'store-edit.html?id=' + card.dataset.id;
+    });
+  });
+}
+
+document.getElementById('newBtn').addEventListener('click', () => {
+  location.href = 'store-edit.html';
+});
+
+(async () => {
+  const { data } = await db.auth.getSession();
+  if (!data.session){ location.href = 'auth.html'; return; }
+  userId = data.session.user.id;
+
+  const { data: profile } = await db
+    .from('profiles')
+    .select('dob')
+    .eq('id', userId)
+    .maybeSingle();
+  if (!profile?.dob){ location.href = 'verify.html'; return; }
+
+  render();
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>

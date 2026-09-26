@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0A">
+<title>Privacy Policy — KUMG Forge</title>
+<script>
+(function(){
+  var t = localStorage.getItem('kumg_theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme','light');
+  var l = localStorage.getItem('kumg_lang') || 'en';
+  document.documentElement.setAttribute('lang', l);
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .legal-body h2{
+    font-size: 17px;
+    margin: 30px 0 10px;
+    color: var(--mint);
+    font-weight: 800;
+    letter-spacing: -0.2px;
+  }
+  .legal-body h2:first-child{ margin-top: 0; }
+  .legal-body h3{
+    font-size: 14px;
+    margin: 18px 0 6px;
+    color: var(--mint);
+    font-weight: 700;
+  }
+  .legal-body p,
+  .legal-body li{
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.75;
+  }
+  .legal-body p{ margin: 0 0 12px; }
+  .legal-body ul{
+    padding-left: 20px;
+    margin: 6px 0 14px;
+  }
+  .legal-body li{ margin-bottom: 6px; }
+  .legal-body a{ color: var(--green); }
+  .legal-body strong{ color: var(--mint); font-weight: 700; }
+
+  .updated{
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 26px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .pill{
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+    background: var(--deep);
+    color: var(--mint);
+    padding: 3px 8px;
+    border-radius: 999px;
+    margin-left: 6px;
+  }
+  .pill.public{ background: var(--green); color: #04140C; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <a href="index.html" style="display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none">
+      <div class="logo">K</div>
+      <div>KUMG <span class="accent">Forge</span></div>
+    </a>
+  </div>
+  <div class="actions">
+    <button class="btn-ghost" onclick="history.back()" style="font-size:13px;padding:8px 12px">Back</button>
+  </div>
+</header>
+
+<main class="container legal-body" style="max-width:640px">
+  <h1 class="page-title">Privacy Policy</h1>
+  <p class="updated">Last updated: 26 September 2026</p>
+
+  <p>This policy explains what we collect, why, and how you control it. We keep it simple and honest. If something is unclear, email us and we will explain.</p>
+
+  <h2>1. What we collect</h2>
+
+  <h3>Account data</h3>
+  <ul>
+    <li>Your email address</li>
+    <li>Your username (auto-generated, editable)</li>
+    <li>A hashed password (we never see it in plain text)</li>
+    <li>Your date of birth (to verify you are 13+)</li>
+    <li>A timestamp of when you signed up</li>
+  </ul>
+
+  <h3>Content you create</h3>
+  <ul>
+    <li>Projects — the HTML, CSS, and JavaScript you write</li>
+    <li>Shop data — shop name, tagline, products, prices, delivery notes</li>
+    <li>Uploaded files — avatars, shop logos, product photos, chat attachments</li>
+    <li>AI chats — your prompts and the AI's replies</li>
+  </ul>
+
+  <h3>Activity data</h3>
+  <ul>
+    <li>Which sponsored cards you tap (to credit your wallet)</li>
+    <li>When you use AI and how many messages you've sent today (to enforce limits)</li>
+    <li>Payment references when you upgrade to Pro</li>
+  </ul>
+
+  <h3>Device data (minimal)</h3>
+  <ul>
+    <li>Your theme preference (dark / light) — stored locally in your browser</li>
+    <li>Your language preference — stored locally in your browser</li>
+    <li>Your login session — stored locally in your browser</li>
+  </ul>
+
+  <h2>2. What we do NOT collect</h2>
+  <ul>
+    <li>Your location</li>
+    <li>Your contacts, SMS, phone log, or gallery (unless you actively pick a file to upload)</li>
+    <li>Your browsing history outside KUMG</li>
+    <li>Advertising trackers or third-party analytics</li>
+  </ul>
+
+  <h2>3. What is public vs private</h2>
+
+  <h3>Public <span class="pill public">anyone can see</span></h3>
+  <ul>
+    <li>Any website you publish (at its URL)</li>
+    <li>Any TouRryl Store you publish (name, tagline, products, prices, WhatsApp number)</li>
+    <li>Your avatar image (if you upload one)</li>
+    <li>Sponsored cards you create if you are a business</li>
+  </ul>
+
+  <h3>Private <span class="pill">only you</span></h3>
+  <ul>
+    <li>Your projects while unpublished</li>
+    <li>Your AI chat history</li>
+    <li>Your KUMG Wallet balance and earnings</li>
+    <li>Your payment history</li>
+    <li>Your date of birth</li>
+    <li>Your email address</li>
+  </ul>
+
+  <p>Site administrators can see aggregate counts and, for support purposes, your email and username. Admins cannot read your chat history, wallet contents, or unpublished projects.</p>
+
+  <h2>4. Where your data lives</h2>
+  <ul>
+    <li><strong>Authentication, database, files:</strong> Supabase (EU region)</li>
+    <li><strong>Backend API:</strong> Render (EU region)</li>
+    <li><strong>Frontend hosting:</strong> GitHub Pages (global CDN)</li>
+    <li><strong>AI processing:</strong> Groq (USA) — your prompts are sent to their API for a reply and are not retained by Groq beyond the request</li>
+    <li><strong>Image generation:</strong> Pollinations.ai — your prompt is sent to their service to generate the image</li>
+    <li><strong>Payments:</strong> Paynow (Zimbabwe)</li>
+  </ul>
+
+  <h2>5. Payments</h2>
+  <p>When you upgrade to Pro, payment is processed by <strong>Paynow</strong>. We receive a payment reference and confirmation. We never receive your card number, CVV, or mobile money PIN.</p>
+
+  <h2>6. How long we keep your data</h2>
+  <ul>
+    <li>Account and content data is kept until you delete your account.</li>
+    <li>AI chat history and image logs are kept for the life of your account, so you can review past conversations.</li>
+    <li>Payment records are kept for 5 years, as required by Zimbabwean financial regulations.</li>
+    <li>When you delete your account, personal data is removed within 30 days. Aggregated anonymous data (e.g. total user count) is kept.</li>
+  </ul>
+
+  <h2>7. Cookies and local storage</h2>
+  <p>We use your browser's local storage for your theme, language, and login session only. We do not use third-party cookies. We do not track you across other websites.</p>
+
+  <h2>8. Your rights</h2>
+  <ul>
+    <li>You can view and edit your profile at any time.</li>
+    <li>You can download your projects from the editor (Download HTML / ZIP).</li>
+    <li>You can delete any project, shop, or product yourself.</li>
+    <li>You can remove your avatar from the Profile page.</li>
+    <li>You can delete your entire account from Settings. This removes all your personal data as described in section 6.</li>
+    <li>You can email us for a copy of your data.</li>
+  </ul>
+
+  <h2>9. Children</h2>
+  <p>KUMG Forge is not intended for children under 13. We ask for your date of birth at signup and refuse accounts under 13. If we learn that a child under 13 has signed up, we delete the account.</p>
+
+  <h2>10. Security</h2>
+  <p>Passwords are hashed. All data travels over HTTPS. Our database uses row-level security so each user can only access their own data. However, no system is perfectly secure — protect your password and log out on shared devices.</p>
+
+  <h2>11. Changes to this policy</h2>
+  <p>If we make significant changes, we will notify you inside the app before they take effect. Continued use after that means you accept the updated policy.</p>
+
+  <h2>12. Contact</h2>
+  <p>Questions, data requests, or complaints? Email <a href="mailto:kumgtourryl@gmail.com">kumgtourryl@gmail.com</a>. We respond within 5 working days.</p>
+</main>
+
+<div id="toast"></div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
+</script>
+</body>
+</html>

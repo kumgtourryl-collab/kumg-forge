@@ -9,8 +9,6 @@
 (function(){
   var t = localStorage.getItem('kumg_theme');
   if (t === 'light') document.documentElement.setAttribute('data-theme','light');
-  var l = localStorage.getItem('kumg_lang') || 'en';
-  document.documentElement.setAttribute('lang', l);
 })();
 </script>
 <link rel="manifest" href="manifest.json">
@@ -18,120 +16,53 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="css/style.css">
 <style>
-  .tpl-grid{
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  @media(min-width:560px){ .tpl-grid{ grid-template-columns: 1fr 1fr; } }
-
+  .tpl-grid{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:560px){ .tpl-grid{grid-template-columns:1fr 1fr} }
   .tpl{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 0;
-    cursor: pointer;
-    transition: all .15s ease;
-    text-align: left;
-    color: inherit;
-    font-family: inherit;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:0;cursor:pointer;transition:all .15s ease;
+    text-align:left;color:inherit;font-family:inherit;overflow:hidden;
+    display:flex;flex-direction:column;
   }
-  .tpl:hover{ border-color: var(--green); }
-  .tpl:active{ transform: scale(.99); }
-
+  .tpl:hover{border-color:var(--green)}
+  .tpl:active{transform:scale(.99)}
   .tpl .preview{
-    height: 92px;
-    background: linear-gradient(135deg, var(--deep), var(--green));
-    display: grid;
-    place-items: center;
-    overflow: hidden;
+    height:92px;background:linear-gradient(135deg,var(--deep),var(--green));
+    display:grid;place-items:center;overflow:hidden;
   }
   .tpl .preview svg{
-    width: 40px;
-    height: 40px;
-    stroke: rgba(255,255,255,.85);
-    fill: none;
-    stroke-width: 1.6;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+    width:40px;height:40px;stroke:rgba(255,255,255,.85);fill:none;
+    stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;
   }
-
-  .tpl .body{
-    padding: 14px 16px 16px;
-  }
+  .tpl .body{padding:14px 16px 16px}
   .tpl .tag{
-    display: inline-block;
-    font-size: 9.5px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--green);
-    background: rgba(31,157,98,.12);
-    padding: 3px 8px;
-    border-radius: 999px;
-    margin-bottom: 8px;
+    display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:1px;
+    text-transform:uppercase;color:var(--green);background:rgba(31,157,98,.12);
+    padding:3px 8px;border-radius:999px;margin-bottom:8px;
   }
-  .tpl h3{
-    margin: 0 0 6px;
-    font-size: 15.5px;
-    font-weight: 800;
-    letter-spacing: -0.2px;
-  }
-  .tpl p{
-    margin: 0;
-    color: var(--muted);
-    font-size: 12.5px;
-    line-height: 1.5;
-  }
+  .tpl h3{margin:0 0 6px;font-size:15.5px;font-weight:800;letter-spacing:-0.2px}
+  .tpl p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.5}
   .tpl .use{
-    margin-top: 12px;
-    font-size: 12.5px;
-    color: var(--green);
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    margin-top:12px;font-size:12.5px;color:var(--green);font-weight:800;
+    display:flex;align-items:center;gap:6px;
   }
   .tpl .use svg{
-    width: 14px;
-    height: 14px;
-    stroke: var(--green);
-    fill: none;
-    stroke-width: 2.2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+    width:14px;height:14px;stroke:var(--green);fill:none;
+    stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
   }
-
   .modal-bg{
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.75);
-    z-index: 60;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+    position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:60;
+    display:none;align-items:center;justify-content:center;padding:20px;
   }
-  .modal-bg.show{ display: flex; }
+  .modal-bg.show{display:flex}
   .modal{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 22px;
-    width: 100%;
-    max-width: 400px;
+    background:var(--card);border:1px solid var(--line);
+    border-radius:16px;padding:22px;width:100%;max-width:400px;
   }
-  .modal h3{ margin: 0 0 4px; font-size: 17px; }
-  .modal p{ margin: 0 0 16px; color: var(--muted); font-size: 13px; line-height: 1.5; }
-  .modal-actions{
-    display: flex;
-    gap: 8px;
-    margin-top: 16px;
-  }
-  .modal-actions button{ flex: 1; }
+  .modal h3{margin:0 0 4px;font-size:17px}
+  .modal p{margin:0 0 16px;color:var(--muted);font-size:13px;line-height:1.5}
+  .modal-actions{display:flex;gap:8px;margin-top:16px}
+  .modal-actions button{flex:1}
 </style>
 </head>
 <body>
@@ -151,14 +82,13 @@
 <main class="container">
   <h1 class="page-title">Start from a template</h1>
   <p class="page-sub">Pick one. Give it a name. Edit in seconds.</p>
-
   <div class="tpl-grid" id="grid"></div>
 </main>
 
 <div class="modal-bg" id="modalBg">
   <div class="modal">
     <h3 id="modalTitle">New project</h3>
-    <p id="modalSub">Give your new project a name.</p>
+    <p>Give your new project a name.</p>
     <label for="projName">Project name</label>
     <input id="projName" type="text" placeholder="My Site" maxlength="60">
     <div class="modal-actions">
@@ -174,15 +104,64 @@
 <script src="js/supabase.js"></script>
 <script src="js/settings.js"></script>
 <script src="js/projects.js"></script>
-<script src="js/templates-data.js"></script>
-<script>
-let picked = null;
 
-const gridEl = document.getElementById('grid');
-const modalBg = document.getElementById('modalBg');
-const nameEl = document.getElementById('projName');
-const modalTitle = document.getElementById('modalTitle');
-const modalSub = document.getElementById('modalSub');
+<script>
+// ==========================================================
+// TEMPLATES — inline, cannot fail
+// ==========================================================
+var TEMPLATES = [
+  {
+    id: 'hero', name: 'Hero Landing', tag: 'Landing',
+    desc: 'Bold headline, subtext, call-to-action. For products, waitlists, or launches.',
+    html: '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Your Product</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,-apple-system,sans-serif;background:#0A0A0A;color:#E8F5EE;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px;line-height:1.5}.wrap{max-width:560px;text-align:center}.eyebrow{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#1F9D62;margin-bottom:22px}h1{font-size:clamp(34px,7vw,52px);line-height:1.05;font-weight:800;letter-spacing:-1.2px;margin-bottom:22px}h1 em{font-style:normal;color:#1F9D62}p.lead{font-size:17px;line-height:1.6;color:#A8BAB1;margin-bottom:32px}.cta{display:inline-block;background:#1F9D62;color:#04140C;font-weight:800;padding:16px 32px;border-radius:14px;text-decoration:none;font-size:15.5px}.meta{margin-top:24px;font-size:13px;color:#5A6E65}</style></head><body><div class="wrap"><div class="eyebrow">Now Live</div><h1>Build the web from your <em>pocket</em>.</h1><p class="lead">The mobile-first editor that lets anyone design, preview, and publish real websites.</p><a class="cta" href="#">Get started free</a><div class="meta">No credit card required</div></div></body></html>'
+  },
+  {
+    id: 'portfolio', name: 'Portfolio', tag: 'Personal',
+    desc: 'Show your work with a photo, bio, and a clean grid of projects.',
+    html: '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Your Name</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;background:#0A0A0A;color:#E8F5EE;padding:36px 20px;line-height:1.6}.wrap{max-width:760px;margin:0 auto}header{display:flex;align-items:center;gap:18px;margin-bottom:44px}.avatar{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#0B3D2E,#1F9D62);display:grid;place-items:center;font-weight:900;font-size:26px;color:#04140C}h1{font-size:28px;font-weight:800}.role{color:#1F9D62;font-size:13.5px;font-weight:700;margin-top:4px}.about{color:#A8BAB1;font-size:16px;margin-bottom:44px}h2{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:#7A8C84;margin-bottom:18px;font-weight:800}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}.card{background:#0F1512;border:1px solid #1B2A24;border-radius:14px;padding:22px}.card h3{font-size:16.5px;margin-bottom:6px}.card p{font-size:13.5px;color:#7A8C84}footer{margin-top:60px;padding-top:24px;border-top:1px solid #1B2A24;font-size:13px;color:#5A6E65}footer a{color:#1F9D62;text-decoration:none;margin-right:18px;font-weight:600}</style></head><body><div class="wrap"><header><div class="avatar">Y</div><div><h1>Your Name</h1><div class="role">Designer &amp; Developer</div></div></header><p class="about">I design and build clean, fast websites for small businesses and creators.</p><h2>Selected work</h2><div class="grid"><div class="card"><h3>Project One</h3><p>Brand identity for a coffee shop.</p></div><div class="card"><h3>Project Two</h3><p>Landing page for a mobile app.</p></div><div class="card"><h3>Project Three</h3><p>E-commerce site for a boutique.</p></div><div class="card"><h3>Project Four</h3><p>Portfolio for a photographer.</p></div></div><footer><a href="mailto:you@example.com">Email</a><a href="#">Twitter</a><a href="#">GitHub</a></footer></div></body></html>'
+  },
+  {
+    id: 'linkinbio', name: 'Link in Bio', tag: 'Social',
+    desc: 'One page with all your links. Perfect for Instagram or TikTok bio.',
+    html: '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>@yourhandle</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;background:#0A0A0A;color:#E8F5EE;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}.wrap{width:100%;max-width:400px;text-align:center}.avatar{width:92px;height:92px;border-radius:50%;background:linear-gradient(135deg,#0B3D2E,#1F9D62);display:grid;place-items:center;font-weight:900;font-size:34px;color:#04140C;margin:0 auto 16px}h1{font-size:22px;font-weight:800;margin-bottom:4px}.handle{color:#7A8C84;font-size:13.5px;margin-bottom:10px}.bio{color:#A8BAB1;font-size:14px;margin-bottom:28px}.links{display:flex;flex-direction:column;gap:10px}.link{display:block;background:#0F1512;border:1px solid #1B2A24;border-radius:14px;padding:16px;color:#E8F5EE;text-decoration:none;font-weight:700}.link.primary{background:#1F9D62;color:#04140C}.foot{margin-top:32px;font-size:12px;color:#5A6E65}</style></head><body><div class="wrap"><div class="avatar">Y</div><h1>Your Name</h1><div class="handle">@yourhandle</div><p class="bio">Creator. Designer. Building things on the internet.</p><div class="links"><a class="link primary" href="#">Latest video</a><a class="link" href="#">Instagram</a><a class="link" href="#">Twitter / X</a><a class="link" href="#">Hire me</a><a class="link" href="mailto:you@example.com">Email me</a></div><div class="foot">Made with KUMG Forge</div></div></body></html>'
+  },
+  {
+    id: 'service', name: 'Service Business', tag: 'Business',
+    desc: 'List your services, prices, and contact. For freelancers and studios.',
+    html: '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Your Business</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;background:#0A0A0A;color:#E8F5EE;line-height:1.6;padding:36px 20px}.wrap{max-width:720px;margin:0 auto}.eyebrow{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:#1F9D62;margin-bottom:16px}h1{font-size:clamp(28px,5.5vw,40px);font-weight:800;margin-bottom:14px}.lead{color:#A8BAB1;font-size:16.5px;margin-bottom:44px}h2{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:#7A8C84;margin-bottom:18px;font-weight:800}.services{display:grid;gap:12px;margin-bottom:44px}.service{background:#0F1512;border:1px solid #1B2A24;border-radius:14px;padding:22px;display:flex;justify-content:space-between;gap:20px}.service h3{font-size:17px;margin-bottom:5px}.service p{font-size:14px;color:#7A8C84}.price{color:#1F9D62;font-weight:800;font-size:16.5px}.cta{display:block;background:#1F9D62;color:#04140C;text-align:center;font-weight:800;padding:18px;border-radius:14px;text-decoration:none;font-size:16px}footer{margin-top:44px;padding-top:24px;border-top:1px solid #1B2A24;font-size:13px;color:#5A6E65;text-align:center}</style></head><body><div class="wrap"><div class="eyebrow">Now taking clients</div><h1>Clean websites, built fast.</h1><p class="lead">I build beautiful, mobile-friendly websites for small businesses and independent creators.</p><h2>Services</h2><div class="services"><div class="service"><div><h3>Landing Page</h3><p>One-page site, ready in 3 days.</p></div><div class="price">$150</div></div><div class="service"><div><h3>Full Website</h3><p>Up to 5 pages, SEO-ready.</p></div><div class="price">$450</div></div><div class="service"><div><h3>Redesign</h3><p>Give your old site a modern look.</p></div><div class="price">$250</div></div></div><a class="cta" href="mailto:you@example.com">Get a quote</a><footer>Available Mon-Fri</footer></div></body></html>'
+  },
+  {
+    id: 'product', name: 'Product Showcase', tag: 'Product',
+    desc: 'Features, price, buy button. For selling one product.',
+    html: '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Your Product</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;background:#0A0A0A;color:#E8F5EE;line-height:1.6;padding:36px 20px}.wrap{max-width:720px;margin:0 auto}.hero{text-align:center;margin-bottom:52px}.tag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:#1F9D62;margin-bottom:14px}h1{font-size:clamp(32px,6.5vw,46px);font-weight:800;line-height:1.1;margin-bottom:16px}.lead{color:#A8BAB1;font-size:17px;margin-bottom:28px}.buy{display:inline-block;background:#1F9D62;color:#04140C;font-weight:800;padding:16px 34px;border-radius:14px;text-decoration:none}.price{margin-top:12px;font-size:13px;color:#7A8C84}h2{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:#7A8C84;margin-bottom:18px;font-weight:800}.features{display:grid;gap:12px;margin-bottom:44px}.feature{background:#0F1512;border:1px solid #1B2A24;border-radius:14px;padding:20px;display:flex;gap:16px}.feature .ic{width:38px;height:38px;border-radius:10px;background:#0B3D2E;display:grid;place-items:center;color:#1F9D62;flex-shrink:0;font-weight:900}.feature h3{font-size:15.5px;margin-bottom:4px}.feature p{font-size:13.5px;color:#7A8C84}.quote{background:#0F1512;border-left:3px solid #1F9D62;padding:22px;border-radius:0 14px 14px 0;color:#A8BAB1;font-style:italic}</style></head><body><div class="wrap"><div class="hero"><div class="tag">New Release</div><h1>Your amazing product.</h1><p class="lead">A short, punchy description of what your product does.</p><a class="buy" href="#">Buy now</a><div class="price">$29 one-time</div></div><h2>What you get</h2><div class="features"><div class="feature"><div class="ic">01</div><div><h3>Fast setup</h3><p>Up and running in under 2 minutes.</p></div></div><div class="feature"><div class="ic">02</div><div><h3>Secure by default</h3><p>Your data stays yours. Always.</p></div></div><div class="feature"><div class="ic">03</div><div><h3>Works on mobile</h3><p>Designed for the phone in your hand.</p></div></div></div><h2>What people say</h2><div class="quote">"I built my whole business site in an afternoon." - Happy customer</div></div></body></html>'
+  },
+  {
+    id: 'event', name: 'Event Page', tag: 'Event',
+    desc: 'Date, location, RSVP button. For conferences, workshops, church events.',
+    html: '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Event Name</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;background:#0A0A0A;color:#E8F5EE;min-height:100vh;padding:36px 20px;display:flex;align-items:center;justify-content:center;line-height:1.6}.wrap{max-width:560px;width:100%}.tag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:#1F9D62;margin-bottom:16px}h1{font-size:clamp(32px,6.5vw,46px);font-weight:800;line-height:1.08;margin-bottom:20px}.meta{background:#0F1512;border:1px solid #1B2A24;border-radius:14px;padding:22px;margin-bottom:22px}.row{display:flex;align-items:center;gap:16px;padding:12px 0}.row+.row{border-top:1px solid #1B2A24}.row .dot{width:8px;height:8px;border-radius:50%;background:#1F9D62;flex-shrink:0}.row .label{font-size:10.5px;text-transform:uppercase;letter-spacing:1.2px;color:#7A8C84;font-weight:800}.row .value{font-size:15px;font-weight:700;margin-top:2px}.desc{color:#A8BAB1;margin-bottom:30px}.cta{display:block;background:#1F9D62;color:#04140C;text-align:center;font-weight:800;padding:18px;border-radius:14px;text-decoration:none;font-size:16px}.foot{margin-top:22px;text-align:center;font-size:13px;color:#5A6E65}</style></head><body><div class="wrap"><div class="tag">You are invited</div><h1>Event Name 2026</h1><p class="desc">A one-day gathering for builders, makers, and the curious.</p><div class="meta"><div class="row"><div class="dot"></div><div><div class="label">Date</div><div class="value">Sat, 14 March 2026</div></div></div><div class="row"><div class="dot"></div><div><div class="label">Time</div><div class="value">10:00 - 18:00</div></div></div><div class="row"><div class="dot"></div><div><div class="label">Location</div><div class="value">Harare, Zimbabwe</div></div></div></div><a class="cta" href="#">RSVP now</a><div class="foot">Limited to 100 seats</div></div></body></html>'
+  },
+  {
+    id: 'menu', name: 'Restaurant Menu', tag: 'Food',
+    desc: 'Prices, categories, WhatsApp order button. For restaurants and takeaways.',
+    html: '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Your Restaurant</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;background:#0A0A0A;color:#E8F5EE;padding:36px 20px;line-height:1.6}.wrap{max-width:680px;margin:0 auto}header{text-align:center;margin-bottom:44px}.logo{width:76px;height:76px;border-radius:20px;background:linear-gradient(135deg,#0B3D2E,#1F9D62);display:grid;place-items:center;font-weight:900;font-size:28px;color:#04140C;margin:0 auto 16px}h1{font-size:30px;font-weight:800;margin-bottom:6px}.sub{color:#A8BAB1;font-size:14.5px}h2{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:#1F9D62;margin:32px 0 14px;font-weight:800}.item{display:flex;justify-content:space-between;gap:20px;padding:16px 0;border-bottom:1px solid #1B2A24}.item .nm{font-weight:700;font-size:15.5px;margin-bottom:3px}.item .dsc{color:#7A8C84;font-size:13.5px}.item .pr{color:#1F9D62;font-weight:800;font-size:15.5px}.cta{display:block;background:#25D366;color:#04140C;text-align:center;font-weight:800;padding:18px;border-radius:14px;text-decoration:none;font-size:16px;margin-top:32px}footer{margin-top:24px;text-align:center;font-size:13px;color:#5A6E65}</style></head><body><div class="wrap"><header><div class="logo">Y</div><h1>Your Restaurant</h1><div class="sub">Home cooking, done right.</div></header><h2>Starters</h2><div class="item"><div><div class="nm">Sadza &amp; Greens</div><div class="dsc">Classic. Simple. Perfect.</div></div><div class="pr">$4</div></div><div class="item"><div><div class="nm">Beef Stew</div><div class="dsc">Slow-cooked, tender.</div></div><div class="pr">$7</div></div><h2>Mains</h2><div class="item"><div><div class="nm">Grilled Chicken</div><div class="dsc">With rice and salad.</div></div><div class="pr">$10</div></div><div class="item"><div><div class="nm">Beef Curry</div><div class="dsc">Served with pap.</div></div><div class="pr">$9</div></div><h2>Drinks</h2><div class="item"><div><div class="nm">Soft Drink</div><div class="dsc">Cold cans.</div></div><div class="pr">$2</div></div><a class="cta" href="https://wa.me/263771234567">Order on WhatsApp</a><footer>Open Mon-Sat 10:00-21:00</footer></div></body></html>'
+  },
+  {
+    id: 'community', name: 'Community Page', tag: 'Community',
+    desc: 'For churches, clubs, or community groups. Events, contact, giving.',
+    html: '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Community</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;background:#0A0A0A;color:#E8F5EE;padding:36px 20px;line-height:1.6}.wrap{max-width:680px;margin:0 auto}header{text-align:center;margin-bottom:44px}.badge{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#0B3D2E,#1F9D62);display:grid;place-items:center;margin:0 auto 18px;color:#04140C;font-weight:900;font-size:28px}h1{font-size:30px;font-weight:800;margin-bottom:8px}.sub{color:#A8BAB1;font-size:15px}h2{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:#1F9D62;margin:36px 0 14px;font-weight:800}.event{background:#0F1512;border:1px solid #1B2A24;border-radius:14px;padding:20px;margin-bottom:12px}.event h3{font-size:16.5px;font-weight:800;margin-bottom:4px}.event .when{font-size:13px;color:#7A8C84}.cta-row{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}.cta-row a{flex:1;min-width:140px;text-align:center;padding:16px;border-radius:14px;text-decoration:none;font-weight:800;font-size:14.5px}.cta-row .primary{background:#1F9D62;color:#04140C}.cta-row .ghost{background:transparent;border:1px solid #1B2A24;color:#E8F5EE}footer{margin-top:36px;padding-top:22px;border-top:1px solid #1B2A24;text-align:center;font-size:13px;color:#5A6E65}</style></head><body><div class="wrap"><header><div class="badge">C</div><h1>Your Community</h1><p class="sub">A place to belong. Weekly gatherings, service, and community.</p></header><h2>Upcoming</h2><div class="event"><h3>Sunday Service</h3><div class="when">Every Sunday 10:00 AM</div></div><div class="event"><h3>Mid-Week Study</h3><div class="when">Wednesdays 6:00 PM</div></div><div class="event"><h3>Youth Night</h3><div class="when">First Friday 5:30 PM</div></div><div class="cta-row"><a class="primary" href="#">Join us Sunday</a><a class="ghost" href="mailto:hello@example.com">Contact us</a></div><footer>Harare, Zimbabwe</footer></div></body></html>'
+  }
+];
+
+const ICONS = {
+  'Landing':'<svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>',
+  'Personal':'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>',
+  'Social':'<svg viewBox="0 0 24 24"><path d="M20 4H4a1 1 0 0 0-1 1v14l4-4h13a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z"/></svg>',
+  'Business':'<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  'Product':'<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7L12 12l8.7-5"/><path d="M12 22V12"/></svg>',
+  'Event':'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg>',
+  'Food':'<svg viewBox="0 0 24 24"><path d="M4 3v7a3 3 0 0 0 3 3v8"/><path d="M8 3v10"/><path d="M17 3c-1.5 2-2 3.5-2 5s.5 2.5 2 4v9"/></svg>',
+  'Community':'<svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7z"/><path d="M12 22V12"/><path d="M3 7l9 5 9-5"/></svg>'
+};
 
 function toast(msg){
   const t = document.getElementById('toast');
@@ -190,49 +169,39 @@ function toast(msg){
   setTimeout(function(){ t.classList.remove('show'); }, 2200);
 }
 
-const ICONS = {
-  'Landing':  '<svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>',
-  'Personal': '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>',
-  'Social':   '<svg viewBox="0 0 24 24"><path d="M20 4H4a1 1 0 0 0-1 1v14l4-4h13a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z"/></svg>',
-  'Business': '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
-  'Product':  '<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7L12 12l8.7-5"/><path d="M12 22V12"/></svg>',
-  'Event':    '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg>',
-  'Food':     '<svg viewBox="0 0 24 24"><path d="M4 3v7a3 3 0 0 0 3 3v8"/><path d="M8 3v10"/><path d="M17 3c-1.5 2-2 3.5-2 5s.5 2.5 2 4v9"/></svg>',
-  'Community':'<svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7z"/><path d="M12 22V12"/><path d="M3 7l9 5 9-5"/></svg>'
-};
-
-if (typeof KUMG_TEMPLATES === 'undefined'){
-  gridEl.innerHTML = '<div class="empty"><h3>Templates failed to load</h3><p>Check that js/templates-data.js is uploaded.</p></div>';
-} else {
-  gridEl.innerHTML = KUMG_TEMPLATES.map(function(t){
-    const icon = ICONS[t.tag] || ICONS['Landing'];
-    return `
-      <button class="tpl" data-id="${t.id}" type="button">
-        <div class="preview">${icon}</div>
-        <div class="body">
-          <span class="tag">${t.tag}</span>
-          <h3>${t.name}</h3>
-          <p>${t.desc}</p>
-          <div class="use">Use this template
-            <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
-          </div>
-        </div>
-      </button>
-    `;
-  }).join('');
-
-  gridEl.querySelectorAll('.tpl').forEach(function(card){
-    card.addEventListener('click', function(){
-      picked = findTemplate(card.dataset.id);
-      if (!picked) return;
-      modalTitle.textContent = picked.name;
-      modalSub.textContent = 'Give your new project a name.';
-      nameEl.value = picked.name;
-      modalBg.classList.add('show');
-      setTimeout(function(){ nameEl.focus(); }, 100);
-    });
-  });
+function findTpl(id){
+  for (var i=0;i<TEMPLATES.length;i++) if (TEMPLATES[i].id === id) return TEMPLATES[i];
+  return null;
 }
+
+var picked = null;
+var gridEl = document.getElementById('grid');
+var modalBg = document.getElementById('modalBg');
+var nameEl = document.getElementById('projName');
+
+gridEl.innerHTML = TEMPLATES.map(function(t){
+  var icon = ICONS[t.tag] || ICONS['Landing'];
+  return '<button class="tpl" data-id="' + t.id + '" type="button">' +
+    '<div class="preview">' + icon + '</div>' +
+    '<div class="body">' +
+    '<span class="tag">' + t.tag + '</span>' +
+    '<h3>' + t.name + '</h3>' +
+    '<p>' + t.desc + '</p>' +
+    '<div class="use">Use this template' +
+    '<svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>' +
+    '</div></div></button>';
+}).join('');
+
+gridEl.querySelectorAll('.tpl').forEach(function(card){
+  card.addEventListener('click', function(){
+    picked = findTpl(card.dataset.id);
+    if (!picked) return;
+    document.getElementById('modalTitle').textContent = picked.name;
+    nameEl.value = picked.name;
+    modalBg.classList.add('show');
+    setTimeout(function(){ nameEl.focus(); }, 100);
+  });
+});
 
 document.getElementById('cancelBtn').addEventListener('click', function(){
   modalBg.classList.remove('show');
@@ -247,15 +216,15 @@ document.getElementById('createBtn').addEventListener('click', async function(){
   if (!name){ toast('Name required'); return; }
   if (!picked){ toast('Pick a template first'); return; }
 
-  const btn = document.getElementById('createBtn');
+  var btn = document.getElementById('createBtn');
   btn.disabled = true;
   btn.textContent = 'Creating…';
 
   try {
-    const user = await getCurrentUser();
+    var user = await getCurrentUser();
     if (!user){ location.href = 'auth.html'; return; }
 
-    const p = await createProject(name);
+    var p = await createProject(name);
     await updateProject(p.id, { html: picked.html, css: '', js: '' });
 
     modalBg.classList.remove('show');
@@ -270,14 +239,15 @@ document.getElementById('createBtn').addEventListener('click', async function(){
 });
 
 (async function(){
-  const sess = await db.auth.getSession();
+  var sess = await db.auth.getSession();
   if (!sess.data.session) location.href = 'auth.html';
 })();
 </script>
+
 <script>
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
 }
 </script>
 </body>
-</html> 
+</html>

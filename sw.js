@@ -1,5 +1,5 @@
 // KUMG Forge — Service Worker
-const CACHE = 'kumg-v9';
+const CACHE = 'kumg-v10';
 
 const ASSETS = [
   './',
@@ -7,7 +7,6 @@ const ASSETS = [
   './auth.html',
   './verify.html',
   './editor.html',
-  './templates.html',
   './publish.html',
   './settings.html',
   './profile.html',
@@ -32,14 +31,12 @@ const ASSETS = [
   './js/verify.js',
   './js/projects.js',
   './js/editor.js',
-  './js/templates-data.js',
   './js/tools-data.js',
   './js/publish.js',
   './js/store.js',
   './js/tap.js',
   './assets/icon-192.png',
-  './assets/icon-512.png',
-  './assets/store-icon.svg'
+  './assets/icon-512.png'
 ];
 
 self.addEventListener('install', (e) => {

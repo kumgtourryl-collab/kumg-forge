@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="plate" x1="0.1" y1="0" x2="0.9" y2="1">
+    <linearGradient id="circle" x1="0.2" y1="0" x2="0.8" y2="1">
       <stop offset="0" stop-color="#4FE39B"/>
       <stop offset="0.55" stop-color="#1F9D62"/>
       <stop offset="1" stop-color="#0B3D2E"/>
@@ -10,14 +10,14 @@
   <!-- Black rounded square -->
   <rect width="512" height="512" rx="112" fill="#0A0A0A"/>
 
-  <!-- Green rounded plate -->
-  <rect x="76" y="146" width="360" height="220" rx="50" fill="url(#plate)"/>
+  <!-- Green circle -->
+  <circle cx="256" cy="256" r="176" fill="url(#circle)"/>
 
-  <!-- Code brackets carved in black -->
-  <g stroke="#0A0A0A" stroke-width="40"
+  <!-- </> carved in black -->
+  <g stroke="#0A0A0A" stroke-width="44"
      stroke-linecap="round" stroke-linejoin="round" fill="none">
-    <path d="M 196 196 L 140 256 L 196 316"/>
-    <line x1="272" y1="190" x2="240" y2="322"/>
-    <path d="M 316 196 L 372 256 L 316 316"/>
+    <path d="M 204 200 L 148 256 L 204 312"/>
+    <line x1="274" y1="194" x2="244" y2="318"/>
+    <path d="M 312 200 L 368 256 L 312 312"/>
   </g>
 </svg>

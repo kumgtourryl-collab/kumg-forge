@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0A">
+<title>Become a sponsor — KUMG</title>
+<script>
+(function(){
+  var t = localStorage.getItem('kumg_theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme','light');
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .hero{
+    background: linear-gradient(135deg, var(--deep), var(--green));
+    padding: 30px 20px 34px;
+    color: #E8F5EE;
+    border-radius: 0 0 24px 24px;
+    text-align: center;
+  }
+  .hero h1{
+    margin: 0 0 8px; font-size: 26px; font-weight: 800;
+    letter-spacing: -0.5px; line-height: 1.15;
+  }
+  .hero p{ margin: 0; font-size: 14px; opacity: .9; line-height: 1.55; }
+
+  .stats-row{
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+    max-width: 520px; margin: -20px auto 20px; padding: 0 16px;
+  }
+  .stat{
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 14px 8px; text-align: center;
+  }
+  .stat .num{ font-size: 20px; font-weight: 800; color: var(--green); }
+  .stat .lbl{ font-size: 10.5px; color: var(--muted); margin-top: 2px;
+    text-transform: uppercase; letter-spacing: .6px; }
+
+  .form-wrap{
+    max-width: 520px; margin: 0 auto; padding: 0 16px 40px;
+  }
+
+  .card{ margin-bottom: 16px; }
+
+  .field-help{
+    font-size: 11.5px; color: var(--muted);
+    margin: 4px 0 0; line-height: 1.5;
+  }
+
+  .img-pick{
+    display: flex; gap: 12px; align-items: center; margin: 8px 0;
+  }
+  .img-pick .box{
+    width: 68px; height: 68px; border-radius: 12px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--deep), var(--green));
+    display: grid; place-items: center;
+    color: #04140C; font-weight: 900; font-size: 22px;
+    overflow: hidden; cursor: pointer;
+    border: 2px solid var(--green);
+  }
+  .img-pick .box img{ width: 100%; height: 100%; object-fit: cover; }
+
+  .presets{
+    display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;
+  }
+  .preset{
+    background: rgba(31,157,98,.1);
+    border: 1px solid rgba(31,157,98,.25);
+    color: var(--green);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12.5px; font-weight: 700;
+    font-family: var(--font);
+    cursor: pointer;
+  }
+  .preset.active{ background: var(--green); color: #04140C; border-color: var(--green); }
+
+  /* Success state */
+  .success{
+    display: none;
+    max-width: 520px; margin: 0 auto; padding: 30px 20px 40px;
+    text-align: center;
+  }
+  .success.show{ display: block; }
+  .success .check{
+    width: 72px; height: 72px; border-radius: 24px;
+    background: linear-gradient(135deg, var(--deep), var(--green));
+    display: grid; place-items: center; margin: 0 auto 18px;
+  }
+  .success .check svg{
+    width: 36px; height: 36px; stroke: #04140C; fill: none;
+    stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .success h2{
+    margin: 0 0 10px; font-size: 22px; font-weight: 800; letter-spacing: -.4px;
+  }
+  .success p{
+    margin: 0 0 18px; font-size: 14px; color: var(--muted); line-height: 1.55;
+  }
+
+  .ref-box{
+    background: var(--card); border: 1px dashed var(--green);
+    border-radius: 12px; padding: 14px; margin-bottom: 16px;
+    font-family: var(--mono); font-size: 15px; font-weight: 800;
+    letter-spacing: 1px; color: var(--green);
+  }
+
+  .wa-cta{
+    display: block;
+    background: #25D366; color: #04140C;
+    padding: 16px; border-radius: 14px;
+    font-weight: 800; font-size: 15px; text-align: center;
+    text-decoration: none; margin-bottom: 10px;
+  }
+  .wa-cta:active{ opacity: .9; }
+
+  .price-row{
+    display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;
+  }
+</style>
+</head>
+<body>
+
+<div id="formView">
+  <div class="hero">
+    <h1>Get seen by<br>Zimbabwe's builders</h1>
+    <p>Put your business in front of real users on KUMG. Pay per tap. No minimum contracts.</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat">
+      <div class="num">$0.02</div>
+      <div class="lbl">Per tap</div>
+    </div>
+    <div class="stat">
+      <div class="num">$5</div>
+      <div class="lbl">Min deposit</div>
+    </div>
+    <div class="stat">
+      <div class="num">100%</div>
+      <div class="lbl">Local</div>
+    </div>
+  </div>
+
+  <div class="form-wrap">
+    <div class="card">
+      <h3 style="margin:0 0 4px">Your business</h3>
+      <p style="margin:0 0 12px;color:var(--muted);font-size:13px">Basic info. You can change everything later.</p>
+
+      <label for="bizName">Business name *</label>
+      <input id="bizName" type="text" maxlength="60" placeholder="e.g. Trendy Hair Salon">
+
+      <label for="wa">WhatsApp number *</label>
+      <input id="wa" type="tel" placeholder="+263 77 123 4567" autocapitalize="off">
+
+      <label for="email">Email (optional)</label>
+      <input id="email" type="email" placeholder="you@example.com" autocapitalize="off">
+
+      <label for="category">Category</label>
+      <select id="category">
+        <option value="">Pick one…</option>
+        <option value="food">Food &amp; drinks</option>
+        <option value="fashion">Fashion &amp; beauty</option>
+        <option value="tech">Tech &amp; electronics</option>
+        <option value="services">Services</option>
+        <option value="education">Education</option>
+        <option value="health">Health</option>
+        <option value="home">Home &amp; garden</option>
+        <option value="other">Other</option>
+      </select>
+
+      <label for="location">Where are you based?</label>
+      <input id="location" type="text" maxlength="60" placeholder="e.g. Harare, Avondale">
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 4px">Your card</h3>
+      <p style="margin:0 0 12px;color:var(--muted);font-size:13px">This is what users see on their dashboard.</p>
+
+      <div class="img-pick">
+        <div class="box" id="imgPreview"><span>📷</span></div>
+        <div style="flex:1;min-width:0">
+          <button class="btn-ghost" id="imgBtn" style="font-size:13px;padding:8px 12px;width:100%">Upload logo (optional)</button>
+          <input id="imgInput" type="file" accept="image/*" style="display:none">
+          <p class="field-help">Square image works best. Max 2MB.</p>
+        </div>
+      </div>
+
+      <label for="cardTitle">Headline *</label>
+      <input id="cardTitle" type="text" maxlength="60" placeholder="e.g. 20% off all braids this week">
+
+      <label for="cardDesc">Short description</label>
+      <textarea id="cardDesc" rows="2" maxlength="160" placeholder="e.g. Book on WhatsApp. Same-day service."></textarea>
+
+      <label for="targetUrl">Link to visit *</label>
+      <input id="targetUrl" type="url" placeholder="https://wa.me/263771234567" autocapitalize="off" autocorrect="off">
+      <p class="field-help">Where users go when they tap your card. Can be WhatsApp, Instagram, a website, anything.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 4px">Your budget</h3>
+      <p style="margin:0 0 12px;color:var(--muted);font-size:13px">You only pay when someone taps. Start small, top up any time.</p>
+
+      <label for="bid">Bid per tap (USD)</label>
+      <input id="bid" type="number" inputmode="decimal" step="0.01" min="0.01" value="0.02">
+      <p class="field-help">Higher bid = more visibility. Most businesses start at $0.02.</p>
+
+      <div class="presets">
+        <button type="button" class="preset" data-bid="0.01">$0.01 · Value</button>
+        <button type="button" class="preset active" data-bid="0.02">$0.02 · Recommended</button>
+        <button type="button" class="preset" data-bid="0.05">$0.05 · High</button>
+      </div>
+    </div>
+
+    <button class="btn btn-block" id="submitBtn" style="margin-top:8px">Submit &amp; choose deposit</button>
+
+    <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:16px;line-height:1.5">
+      By submitting you agree to our <a href="terms.html">Terms</a> and
+      <a href="privacy.html">Privacy</a>.
+    </p>
+  </div>
+</div>
+
+<div class="success" id="successView">
+  <div class="check">
+    <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+  </div>
+  <h2>Almost there!</h2>
+  <p>Save this reference code. Now deposit at least $5 via EcoCash and send us a WhatsApp with the code.</p>
+
+  <div class="ref-box" id="refBox">KUMG-XXXX-XX</div>
+
+  <a class="wa-cta" id="waLink" href="#" target="_blank" rel="noopener">
+    💬 Send payment on WhatsApp
+  </a>
+
+  <p style="font-size:12px;color:var(--muted);line-height:1.55">
+    We'll activate your card within a few minutes of receiving payment.<br>
+    Your balance is topped up and every tap starts spending it.
+  </p>
+
+  <a href="index.html" style="display:inline-block;margin-top:20px;color:var(--green);font-weight:700;font-size:13.5px">← Back to home</a>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const KUMG_WHATSAPP = '263773599014'; // your number — change later
+
+let logoUrl = null;
+let pendingFile = null;
+
+const $ = id => document.getElementById(id);
+
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
+
+// Logo upload
+$('imgBtn').addEventListener('click', () => $('imgInput').click());
+
+$('imgInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024){ toast('Max 2MB'); return; }
+  if (!file.type.startsWith('image/')){ toast('Must be an image'); return; }
+
+  pendingFile = file;
+  const url = URL.createObjectURL(file);
+  $('imgPreview').innerHTML = '<img src="' + url + '" alt="">';
+});
+
+// Bid presets
+document.querySelectorAll('.preset').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('.preset').forEach(function(x){ x.classList.remove('active'); });
+    b.classList.add('active');
+    $('bid').value = b.dataset.bid;
+  });
+});
+
+// Submit
+$('submitBtn').addEventListener('click', async () => {
+  const bizName = $('bizName').value.trim();
+  const wa = $('wa').value.trim();
+  const email = $('email').value.trim();
+  const category = $('category').value;
+  const location = $('location').value.trim();
+  const cardTitle = $('cardTitle').value.trim();
+  const cardDesc = $('cardDesc').value.trim();
+  const targetUrl = $('targetUrl').value.trim();
+  const bid = parseFloat($('bid').value);
+
+  if (!bizName){ toast('Business name required'); return; }
+  if (!wa){ toast('WhatsApp number required'); return; }
+  if (!cardTitle){ toast('Card headline required'); return; }
+  if (!targetUrl){ toast('Link required'); return; }
+  if (!/^https?:\/\//i.test(targetUrl)){ toast('Link must start with https://'); return; }
+  if (isNaN(bid) || bid < 0.01){ toast('Bid must be at least $0.01'); return; }
+
+  $('submitBtn').disabled = true;
+  $('submitBtn').textContent = 'Submitting…';
+
+  // Upload logo if any
+  let imageUrl = null;
+  if (pendingFile){
+    const ext = (pendingFile.name.split('.').pop() || 'jpg').toLowerCase();
+    const path = 'sponsor-' + Date.now() + '.' + ext;
+    const up = await db.storage.from('user-media').upload(path, pendingFile, { cacheControl: '3600' });
+    if (up.error){
+      toast('Logo upload failed — try again or skip');
+      $('submitBtn').disabled = false;
+      $('submitBtn').textContent = 'Submit & choose deposit';
+      return;
+    }
+    const pub = db.storage.from('user-media').getPublicUrl(path);
+    imageUrl = pub.data.publicUrl;
+  }
+
+  // Create reference code
+  const ref = 'KUMG-' + Date.now().toString(36).toUpperCase().slice(-6) + '-' +
+              Math.floor(Math.random() * 90 + 10);
+
+  const payload = {
+    business_name: bizName,
+    contact_whatsapp: wa,
+    contact_email: email || null,
+    card_title: cardTitle,
+    card_description: cardDesc,
+    card_image_url: imageUrl,
+    target_url: targetUrl,
+    category: category || null,
+    location: location || null,
+    bid_per_tap: bid,
+    balance: 0,
+    is_active: false,   // activates after payment
+    created_by: null
+  };
+
+  const ins = await db.from('sponsors').insert(payload).select().single();
+  if (ins.error){
+    console.error(ins.error);
+    toast(ins.error.message || 'Submit failed');
+    $('submitBtn').disabled = false;
+    $('submitBtn').textContent = 'Submit & choose deposit';
+    return;
+  }
+
+  // Save reference on the row (add a note in card_description? we don't have a column)
+  // We'll just use the reference for the WhatsApp message — you (admin) match by business name + WhatsApp.
+
+  // Switch to success view
+  $('formView').style.display = 'none';
+  $('successView').classList.add('show');
+  $('refBox').textContent = ref;
+
+  const msg = encodeURIComponent(
+    'Hi KUMG, I just signed up as a sponsor.\n\n' +
+    'Business: ' + bizName + '\n' +
+    'Ref: ' + ref + '\n' +
+    'WhatsApp: ' + wa + '\n' +
+    'Bid: $' + bid.toFixed(2) + ' per tap\n\n' +
+    'I want to deposit $5 to activate my card.'
+  );
+  $('waLink').href = 'https://wa.me/' + KUMG_WHATSAPP + '?text=' + msg;
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+</script>
+</body>
+</html>

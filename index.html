@@ -104,7 +104,6 @@
   footer.legal a{color:var(--muted)}
   footer.legal a:hover{color:var(--green)}
 
-  /* Pro pill — small, non-intrusive, only shows for pro users */
   .pro-pill{
     font-size:10px;font-weight:800;letter-spacing:.5px;
     text-transform:uppercase;
@@ -161,8 +160,8 @@
   <div id="list"></div>
 
   <div style="display:flex;gap:10px;margin-top:20px">
-    <button class="btn" id="newBtn" style="flex:1">+ Blank</button>
-    <button class="btn-ghost" id="tplBtn" style="flex:1">Templates</button>
+    <button class="btn" id="newBtn" style="flex:1">+ New project</button>
+    <button class="btn-ghost" id="aiNewBtn" style="flex:1">Ask AI</button>
   </div>
 
   <footer class="legal">
@@ -279,6 +278,10 @@ document.getElementById('storeCard').addEventListener('click', () => {
 
 document.getElementById('settingsBtn').addEventListener('click', () => {
   location.href = 'settings.html';
+});
+
+document.getElementById('aiNewBtn').addEventListener('click', () => {
+  location.href = 'ai.html';
 });
 
 document.getElementById('newBtn').addEventListener('click', () => {

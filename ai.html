@@ -1,0 +1,909 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="theme-color" content="#0A0A0A">
+<title>KUMG AI — KUMG Forge</title>
+<script>
+(function(){
+  var t = localStorage.getItem('kumg_theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme','light');
+  var l = localStorage.getItem('kumg_lang') || 'en';
+  document.documentElement.setAttribute('lang', l);
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="KUMG">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  /* ===== VISUAL VIEWPORT LOCK =====
+     - --vvh : visible viewport height (shrinks when keyboard opens)
+     - --vvt : top offset (0 unless page is scrolled)
+     Keeps the composer glued to the keyboard on Android. */
+  html, body { height: 100%; margin: 0; }
+  body.ai-page{
+    position: fixed;
+    top: var(--vvt, 0);
+    left: 0; right: 0;
+    height: var(--vvh, 100dvh);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--black);
+  }
+  [data-theme="light"] body.ai-page{ background: var(--black); }
+
+  .ai-top{
+    display:flex;align-items:center;gap:8px;
+    padding:10px 12px;
+    background:#0A0A0A;
+    border-bottom:1px solid var(--line);
+    flex-shrink: 0;
+  }
+  [data-theme="light"] .ai-top{background:#FFFFFF}
+  .ai-top .home-btn{
+    width:38px;height:38px;border-radius:10px;flex-shrink:0;
+    background:var(--card);border:1px solid var(--line);
+    display:grid;place-items:center;color:var(--mint);text-decoration:none;
+  }
+  [data-theme="light"] .ai-top .home-btn{color:#0A1F17}
+  .ai-top .home-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .ai-top .title{font-weight:800;font-size:15px;flex:1}
+  .ai-top .title span{color:var(--green)}
+  .ai-top .usage{
+    font-size:11px;color:var(--muted);
+    background:var(--card);border:1px solid var(--line);
+    padding:4px 10px;border-radius:999px;font-weight:700;
+    display:flex;gap:8px;align-items:center;
+  }
+  .ai-top .usage .sep{opacity:.4}
+
+  .chat{
+    flex:1;overflow-y:auto;padding:14px 12px 20px;
+    display:flex;flex-direction:column;gap:12px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .msg{
+    max-width:92%;border-radius:16px;padding:12px 14px;
+    font-size:14.5px;line-height:1.55;
+    word-wrap:break-word;white-space:pre-wrap;
+  }
+  .msg.user{
+    align-self:flex-end;background:var(--green);color:#04140C;
+    border-bottom-right-radius:4px;font-weight:600;
+  }
+  .msg.assistant{
+    align-self:flex-start;background:var(--card);color:var(--mint);
+    border:1px solid var(--line);border-bottom-left-radius:4px;
+  }
+  .msg.assistant code{
+    font-family:var(--mono);font-size:12.5px;
+    background:rgba(31,157,98,.12);padding:1px 5px;border-radius:4px;
+  }
+  .msg.assistant .code-block{
+    margin:10px 0;background:#0A0A0A;
+    border:1px solid var(--line);border-radius:10px;overflow:hidden;
+  }
+  [data-theme="light"] .msg.assistant .code-block{background:#F3F7F4}
+  .msg.assistant .code-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:6px 10px;background:rgba(31,157,98,.15);
+    font-size:10.5px;font-family:var(--mono);
+    text-transform:uppercase;letter-spacing:1px;
+    color:var(--green);font-weight:800;
+  }
+  .msg.assistant .code-head button{
+    background:var(--green);color:#04140C;border:0;
+    padding:4px 10px;border-radius:6px;
+    font-size:10px;font-weight:800;letter-spacing:.5px;
+    cursor:pointer;font-family:var(--font);
+  }
+  .msg.assistant pre{
+    margin:0;padding:10px 12px;
+    font-family:var(--mono);font-size:12.5px;line-height:1.5;
+    overflow-x:auto;white-space:pre;color:var(--mint);
+  }
+  [data-theme="light"] .msg.assistant pre{color:#0A1F17}
+  .msg.assistant .ai-img{
+    display:block;width:100%;max-width:100%;
+    border-radius:10px;margin:10px 0;
+    border:1px solid var(--line);background:var(--deep);
+    min-height:180px;
+  }
+  .msg.assistant .img-wrap{position:relative}
+  .msg.assistant .img-cap{
+    font-size:11px;color:var(--muted);margin:-4px 0 8px;font-style:italic;
+  }
+  .msg.assistant a{color:var(--green);text-decoration:underline}
+  .msg.assistant .calc-block{
+    margin:10px 0;background:rgba(31,157,98,.08);
+    border-left:3px solid var(--green);
+    border-radius:0 10px 10px 0;padding:10px 14px;
+    font-family:var(--mono);font-size:13.5px;
+    line-height:1.7;white-space:pre-wrap;color:var(--mint);
+  }
+  [data-theme="light"] .msg.assistant .calc-block{color:#0A1F17}
+  .msg.assistant p{margin:0 0 8px}
+  .msg.assistant p:last-child{margin:0}
+
+  .msg.user .msg-img{
+    display:block;max-width:220px;width:100%;
+    border-radius:10px;margin-bottom:8px;
+    border:1px solid rgba(0,0,0,.15);
+  }
+
+  .msg.typing{
+    display:inline-block;width:6px;height:14px;background:var(--green);
+    animation:blink 1s infinite;vertical-align:middle;margin-left:2px;
+  }
+  @keyframes blink{50%{opacity:0}}
+
+  .suggestions{
+    display:flex;gap:8px;padding:0 12px 10px;overflow-x:auto;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;flex-shrink:0;
+  }
+  .suggestions::-webkit-scrollbar{display:none}
+  .suggestions button{
+    flex-shrink:0;background:var(--card);color:var(--mint);
+    border:1px solid var(--line);border-radius:999px;
+    padding:8px 14px;font-size:12.5px;font-weight:600;white-space:nowrap;
+  }
+  [data-theme="light"] .suggestions button{color:#0A1F17}
+  .suggestions button:active{background:var(--deep);border-color:var(--green);color:var(--mint)}
+
+  /* ============================================
+     COMPOSER — glued to bottom / keyboard
+     ============================================ */
+  .composer-wrap{
+    padding: 8px 12px calc(10px + env(safe-area-inset-bottom));
+    background: #0A0A0A;
+    flex-shrink: 0;
+    transition: padding-bottom .12s ease-out;
+  }
+  [data-theme="light"] .composer-wrap{ background: #FFFFFF; }
+
+  .composer-box{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 12px 12px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color .15s ease;
+  }
+  [data-theme="light"] .composer-box{
+    background: #F7F9F7;
+    border-color: #DDE6E0;
+  }
+  .composer-box:focus-within{
+    border-color: rgba(31,157,98,.55);
+  }
+
+  .composer-box textarea{
+    width: 100%;
+    background: transparent;
+    border: 0;
+    resize: none;
+    min-height: 46px;   /* ~2 lines when keyboard is closed */
+    max-height: 160px;
+    padding: 4px 4px 0;
+    font-size: 15px;
+    line-height: 1.4;
+    font-family: var(--font);
+    color: var(--mint);
+    outline: none;
+  }
+  [data-theme="light"] .composer-box textarea{ color: #0A1F17; }
+  .composer-box textarea::placeholder{
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .composer-actions{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .composer-left{
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex: 1;
+    min-width: 0;
+    padding: 2px 0;
+  }
+  .composer-left::-webkit-scrollbar{ display: none; }
+
+  .mode-pill{
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(31,157,98,.10);
+    color: var(--green);
+    border: 1px solid rgba(31,157,98,.22);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: all .15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mode-pill svg{
+    width: 15px;height: 15px;
+    stroke: currentColor;fill: none;stroke-width: 2;
+    stroke-linecap: round;stroke-linejoin: round;
+  }
+  .mode-pill:active{ transform: scale(.97); }
+  .mode-pill.active{
+    background: var(--green);
+    border-color: var(--green);
+    color: #04140C;
+  }
+  .mode-pill.active svg{ stroke: #04140C; }
+
+  [data-theme="light"] .mode-pill{
+    background: rgba(20,138,86,.08);
+    border-color: rgba(20,138,86,.22);
+  }
+  [data-theme="light"] .mode-pill.active{
+    background: var(--green);
+    color: #FFFFFF;
+    border-color: var(--green);
+  }
+  [data-theme="light"] .mode-pill.active svg{ stroke: #FFFFFF; }
+
+  .composer-right{
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .circle-btn{
+    width: 36px;height: 36px;border-radius: 50%;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--mint);
+    display: grid;place-items: center;
+    cursor: pointer;padding: 0;
+    transition: all .15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .circle-btn svg{
+    width: 18px;height: 18px;
+    stroke: currentColor;fill: none;stroke-width: 2;
+    stroke-linecap: round;stroke-linejoin: round;
+  }
+  .circle-btn:active{ transform: scale(.94); }
+  .circle-btn:disabled{ opacity: .35; }
+  [data-theme="light"] .circle-btn{
+    color: #0A1F17;
+    border-color: #DDE6E0;
+  }
+
+  .circle-btn.send{
+    background: var(--green);
+    border-color: var(--green);
+    color: #04140C;
+  }
+  .circle-btn.send svg{ stroke: #04140C; stroke-width: 2.4; }
+  .circle-btn.send:disabled{
+    background: var(--card);
+    border-color: var(--line);
+    color: var(--muted);
+  }
+  .circle-btn.send:disabled svg{ stroke: var(--muted); }
+
+  .composer-attachment{
+    display: flex;align-items: center;gap: 10px;
+    background: rgba(31,157,98,.08);
+    border: 1px solid rgba(31,157,98,.22);
+    border-radius: 12px;
+    padding: 8px 10px;
+  }
+  .composer-attachment img{
+    width: 40px;height: 40px;border-radius: 8px;
+    object-fit: cover;border: 1px solid var(--line);
+  }
+  .composer-attachment .info{
+    flex: 1;min-width: 0;font-size: 12.5px;
+  }
+  .composer-attachment .info .nm{
+    font-weight: 700;
+    white-space: nowrap;overflow: hidden;text-overflow: ellipsis;
+  }
+  .composer-attachment .info .sz{
+    color: var(--muted);font-size: 11px;margin-top: 2px;
+  }
+  .composer-attachment .rm{
+    background: transparent;border: 0;
+    color: var(--muted);padding: 6px;
+    font-size: 18px;line-height: 1;cursor: pointer;
+  }
+
+  .empty-chat{
+    flex:1;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    padding:40px 24px;text-align:center;color:var(--muted);
+  }
+  .empty-chat .badge{
+    width:64px;height:64px;border-radius:18px;
+    background:linear-gradient(135deg,var(--deep),var(--green));
+    display:grid;place-items:center;color:#04140C;
+    font-size:28px;font-weight:900;margin-bottom:16px;
+  }
+  .empty-chat .badge svg{ width: 32px; height: 32px; stroke:#04140C; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .empty-chat h3{color:var(--mint);margin:0 0 8px;font-size:18px}
+  .empty-chat p{margin:0;font-size:13.5px;max-width:280px;line-height:1.6}
+
+  /* Attachment sheet */
+  .sheet-bg{
+    position: fixed; inset: 0; background: rgba(0,0,0,.6);
+    z-index: 90; display: none;
+    align-items: flex-end; justify-content: center;
+  }
+  .sheet-bg.show{ display: flex; }
+  .sheet{
+    background: var(--card);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-top: 1px solid var(--line);
+    width: 100%; max-width: 560px;
+    padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+    animation: sheetUp .22s ease-out;
+  }
+  @keyframes sheetUp{
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+  .sheet-grip{
+    width: 40px; height: 4px; border-radius: 999px;
+    background: var(--line); margin: 0 auto 10px;
+  }
+  .sheet h3{
+    font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--muted); margin: 8px 8px 6px; font-weight: 800;
+  }
+  .sheet-item{
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; background: transparent; color: var(--mint);
+    border: 0; border-radius: 12px; padding: 14px 12px;
+    font-size: 15px; font-weight: 700; text-align: left;
+    font-family: var(--font);
+  }
+  [data-theme="light"] .sheet-item{ color:#0A1F17; }
+  .sheet-item:active{ background: var(--deep); color: var(--mint); }
+  .sheet-item .sub{
+    display: block; font-size: 11px; font-weight: 500;
+    color: var(--muted); margin-top: 2px;
+  }
+  .sheet-icon{
+    width: 32px; height: 32px; border-radius: 9px;
+    background: var(--deep);
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+  .sheet-icon svg{
+    width: 17px; height: 17px;
+    stroke: #E8F5EE; fill: none; stroke-width: 2;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+</style>
+</head>
+<body class="ai-page">
+
+<header class="ai-top">
+  <a href="index.html" class="home-btn" title="Home">
+    <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg>
+  </a>
+  <div class="title">KUMG <span>AI</span></div>
+  <div class="usage" id="usage">—</div>
+</header>
+
+<div class="chat" id="chat">
+  <div class="empty-chat" id="emptyChat">
+    <div class="badge">
+      <svg viewBox="0 0 24 24"><path d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7z"/><path d="M19 15.5l.5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5z"/></svg>
+    </div>
+    <h3>Ask me anything</h3>
+    <p>I can write HTML, CSS, and JavaScript. I can also generate images, find videos, and do math.</p>
+  </div>
+</div>
+
+<div class="suggestions" id="suggestions">
+  <button data-prompt="Make me a hero section with a headline, subtext, and a green button.">Hero section</button>
+  <button data-prompt="Create a link-in-bio page with 5 buttons.">Link in bio</button>
+  <button data-prompt="Generate a picture of a green hexagon on a black background." data-image="1">Image example</button>
+  <button data-prompt="What is 15% of 240?">Calculate 15% of 240</button>
+  <button data-prompt="Show me a video about CSS animations.">Find a video</button>
+</div>
+
+<div class="composer-wrap" id="composerWrap">
+  <div class="composer-box">
+    <div id="attachmentPreview"></div>
+    <textarea id="input" rows="1" placeholder="Type a message"></textarea>
+    <div class="composer-actions">
+      <div class="composer-left">
+        <button class="mode-pill" data-mode="think" type="button">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></svg>
+          Think
+        </button>
+        <button class="mode-pill" data-mode="search" type="button">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18z"/></svg>
+          Search
+        </button>
+      </div>
+      <div class="composer-right">
+        <button class="circle-btn" id="attachBtn" type="button" title="Attach">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        </button>
+        <button class="circle-btn send" id="sendBtn" type="button" disabled title="Send">
+          <svg viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Attachment sheet -->
+<div class="sheet-bg" id="attachSheet">
+  <div class="sheet">
+    <div class="sheet-grip"></div>
+    <h3>Attach</h3>
+    <button class="sheet-item" id="attachImage">
+      <span class="sheet-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></span>
+      <div>Photo<span class="sub">Attach an image to your message</span></div>
+    </button>
+    <button class="sheet-item" id="attachAvatar">
+      <span class="sheet-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg></span>
+      <div>Set as my avatar<span class="sub">Saved forever until you change it</span></div>
+    </button>
+  </div>
+</div>
+
+<input id="fileInput" type="file" accept="image/*" style="display:none">
+<input id="avatarInput" type="file" accept="image/*" style="display:none">
+
+<div id="toast"></div>
+
+<script>
+// ============================================================
+// VISUAL VIEWPORT — glue layout to keyboard
+// ============================================================
+(function(){
+  if (!window.visualViewport) return;
+  const vv = window.visualViewport;
+  const root = document.documentElement;
+
+  function update(){
+    root.style.setProperty('--vvh', vv.height + 'px');
+    root.style.setProperty('--vvt', vv.offsetTop + 'px');
+  }
+  vv.addEventListener('resize', update);
+  vv.addEventListener('scroll', update);
+  window.addEventListener('orientationchange', () => setTimeout(update, 150));
+  update();
+
+  // Settle loop for keyboard animation
+  let n = 0;
+  const settle = setInterval(() => {
+    update();
+    if (++n > 15) clearInterval(settle);
+  }, 40);
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/settings.js"></script>
+<script>
+// ================== CONFIG ==================
+const AI_API = 'https://kumg-forge.onrender.com';
+
+// ================== STATE ==================
+let userId = null;
+let projectContext = null;
+let messages = [];
+let sending = false;
+let mode = { think: false, search: false };
+let pendingAttachment = null;
+
+const returnId = new URLSearchParams(location.search).get('return');
+
+const chatEl = document.getElementById('chat');
+const emptyEl = document.getElementById('emptyChat');
+const inputEl = document.getElementById('input');
+const sendBtn = document.getElementById('sendBtn');
+const usageEl = document.getElementById('usage');
+const suggestionsEl = document.getElementById('suggestions');
+const attachSheet = document.getElementById('attachSheet');
+const attachmentPreview = document.getElementById('attachmentPreview');
+const composerWrap = document.getElementById('composerWrap');
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+function scrollToBottom(){
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+function updateSendState(){
+  const has = inputEl.value.trim().length > 0 || !!pendingAttachment;
+  sendBtn.disabled = !has || sending;
+}
+
+// ===== MODE PILLS =====
+document.querySelectorAll('.mode-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const m = btn.dataset.mode;
+    mode[m] = !mode[m];
+    btn.classList.toggle('active', mode[m]);
+  });
+});
+
+// ===== ATTACH =====
+document.getElementById('attachBtn').addEventListener('click', () => {
+  attachSheet.classList.add('show');
+});
+attachSheet.addEventListener('click', (e) => {
+  if (e.target === attachSheet) attachSheet.classList.remove('show');
+});
+
+document.getElementById('attachImage').addEventListener('click', () => {
+  attachSheet.classList.remove('show');
+  document.getElementById('fileInput').click();
+});
+
+document.getElementById('attachAvatar').addEventListener('click', () => {
+  attachSheet.classList.remove('show');
+  document.getElementById('avatarInput').click();
+});
+
+document.getElementById('fileInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024){ toast('Max 5MB'); return; }
+  if (!file.type.startsWith('image/')){ toast('Must be an image'); return; }
+
+  toast('Uploading…');
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const path = userId + '/chat-' + Date.now() + '.' + ext;
+
+  const { error } = await db.storage
+    .from('user-media')
+    .upload(path, file, { cacheControl: '3600' });
+  if (error){ toast(error.message || 'Upload failed'); return; }
+
+  const { data: urlData } = db.storage.from('user-media').getPublicUrl(path);
+  pendingAttachment = {
+    url: urlData.publicUrl,
+    name: file.name.slice(0, 40),
+    size: Math.round(file.size / 1024) + ' KB'
+  };
+
+  attachmentPreview.innerHTML = `
+    <div class="composer-attachment">
+      <img src="${pendingAttachment.url}" alt="">
+      <div class="info">
+        <div class="nm">${escapeHtml(pendingAttachment.name)}</div>
+        <div class="sz">${pendingAttachment.size} · will be attached</div>
+      </div>
+      <button class="rm" id="rmAttach" type="button">✕</button>
+    </div>
+  `;
+  document.getElementById('rmAttach').addEventListener('click', () => {
+    pendingAttachment = null;
+    attachmentPreview.innerHTML = '';
+    updateSendState();
+  });
+
+  updateSendState();
+  toast('Attached');
+});
+
+document.getElementById('avatarInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024){ toast('Max 5MB'); return; }
+  if (!file.type.startsWith('image/')){ toast('Must be an image'); return; }
+
+  toast('Saving your avatar…');
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const path = userId + '/avatar.' + ext;
+
+  const { error } = await db.storage
+    .from('user-media')
+    .upload(path, file, { upsert: true, cacheControl: '3600' });
+  if (error){ toast(error.message || 'Upload failed'); return; }
+
+  const { data: urlData } = db.storage.from('user-media').getPublicUrl(path);
+  const publicUrl = urlData.publicUrl + '?t=' + Date.now();
+
+  const { error: upErr } = await db
+    .from('profiles')
+    .update({ avatar_url: publicUrl })
+    .eq('id', userId);
+  if (upErr){ toast(upErr.message || 'Save failed'); return; }
+
+  toast('Avatar saved ✅');
+});
+
+// ===== RENDER MESSAGE =====
+function renderMessage(m){
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + m.role;
+
+  if (m.role === 'user'){
+    if (m.imageUrl){
+      const img = document.createElement('img');
+      img.className = 'msg-img';
+      img.src = m.imageUrl;
+      img.alt = '';
+      wrap.appendChild(img);
+    }
+    if (m.content){
+      const txt = document.createElement('div');
+      txt.textContent = m.content;
+      wrap.appendChild(txt);
+    }
+    return wrap;
+  }
+
+  const raw = m.content;
+  const parts = [];
+  const re = /```(\w*)\n?([\s\S]*?)```|!\[([^\]]*)\]\((https?:\/\/[^)]+)\)/g;
+  let last = 0, match;
+
+  while ((match = re.exec(raw)) !== null){
+    if (match.index > last){
+      parts.push({ type: 'text', content: raw.slice(last, match.index) });
+    }
+    if (match[1] !== undefined){
+      parts.push({ type: 'code', lang: match[1] || 'code', content: match[2] });
+    } else {
+      parts.push({ type: 'image', alt: match[3], url: match[4] });
+    }
+    last = match.index + match[0].length;
+  }
+  if (last < raw.length) parts.push({ type: 'text', content: raw.slice(last) });
+
+  parts.forEach(p => {
+    if (p.type === 'text'){
+      const safe = escapeHtml(p.content).replace(/\n/g, '<br>');
+      const div = document.createElement('div');
+      div.innerHTML = safe;
+      wrap.appendChild(div);
+    } else if (p.type === 'code'){
+      const box = document.createElement('div');
+      box.className = 'code-block';
+      box.innerHTML = `
+        <div class="code-head">
+          <span>${escapeHtml(p.lang)}</span>
+          <button type="button">Insert</button>
+        </div>
+        <pre>${escapeHtml(p.content.replace(/^\n+|\n+$/g,''))}</pre>
+      `;
+      box.querySelector('button').addEventListener('click', () => insertCode(p.content, p.lang));
+      wrap.appendChild(box);
+    } else if (p.type === 'image'){
+      const wrapImg = document.createElement('div');
+      wrapImg.className = 'img-wrap';
+      wrapImg.innerHTML = `
+        <img class="ai-img" src="${escapeHtml(p.url)}" alt="${escapeHtml(p.alt)}"
+             loading="lazy"
+             onerror="this.parentNode.innerHTML='<div style=&quot;padding:14px;color:var(--muted);font-size:12px&quot;>⚠️ Image failed to load. Try again in a moment.</div>'">
+        ${p.alt ? `<div class="img-cap">${escapeHtml(p.alt)}</div>` : ''}
+      `;
+      wrap.appendChild(wrapImg);
+    }
+  });
+
+  return wrap;
+}
+
+function insertCode(code, lang){
+  if (!returnId){
+    navigator.clipboard.writeText(code).then(
+      () => toast('Copied — paste in the editor'),
+      () => toast('Copy failed')
+    );
+    return;
+  }
+  const b64 = btoa(unescape(encodeURIComponent(JSON.stringify({ code, lang }))));
+  location.href = 'editor.html?id=' + encodeURIComponent(returnId) + '&aiInsert=' + b64;
+}
+
+function addMessage(m){
+  emptyEl.style.display = 'none';
+  messages.push(m);
+  const el = renderMessage(m);
+  chatEl.appendChild(el);
+  scrollToBottom();
+}
+
+function addTyping(){
+  const t = document.createElement('div');
+  t.className = 'msg assistant';
+  t.id = 'typingIndicator';
+  t.innerHTML = '<span class="typing"></span>';
+  chatEl.appendChild(t);
+  scrollToBottom();
+}
+
+function removeTyping(){
+  document.getElementById('typingIndicator')?.remove();
+}
+
+async function refreshUsage(){
+  try {
+    const res = await fetch(AI_API + '/api/ai/usage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId })
+    });
+    const json = await res.json();
+    if (!json.ok) return;
+    if (json.limit === null){
+      usageEl.innerHTML = '<span>Pro · ∞</span>';
+      usageEl.style.color = 'var(--green)';
+    } else {
+      usageEl.innerHTML =
+        `<span>💬 ${json.used}/${json.limit}</span>` +
+        `<span class="sep">·</span>` +
+        `<span>🖼 ${json.images}/${json.imageLimit}</span>`;
+      usageEl.style.color = '';
+    }
+  } catch {}
+}
+
+async function send(text){
+  if (sending) return;
+  if (!text.trim() && !pendingAttachment) return;
+
+  sending = true;
+  updateSendState();
+
+  const imageUrl = pendingAttachment?.url || null;
+  const userMsg = { role: 'user', content: text || 'Sent a photo', imageUrl };
+
+  let payloadText = text || 'I sent a photo.';
+  const flags = [];
+  if (mode.think) flags.push('[Think step by step and show your reasoning briefly.]');
+  if (mode.search) flags.push('[Provide factual, search-like results with sources where relevant.]');
+  if (imageUrl) flags.push(`[The user attached this image: ${imageUrl}]`);
+  if (flags.length) payloadText = flags.join(' ') + '\n\n' + payloadText;
+
+  addMessage(userMsg);
+  inputEl.value = '';
+  inputEl.style.height = 'auto';
+  pendingAttachment = null;
+  attachmentPreview.innerHTML = '';
+  addTyping();
+
+  mode = { think: false, search: false };
+  document.querySelectorAll('.mode-pill').forEach(b => b.classList.remove('active'));
+
+  try {
+    const apiMessages = messages.slice(-10).map(m => ({
+      role: m.role,
+      content: m.content + (m.imageUrl ? `\n[Image attached: ${m.imageUrl}]` : '')
+    }));
+
+    const res = await fetch(AI_API + '/api/ai/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        messages: apiMessages,
+        projectContext,
+        wantsImage: /generate|image|picture|photo|draw/i.test(text || '')
+      })
+    });
+
+    const json = await res.json();
+    removeTyping();
+
+    if (!res.ok){
+      if (json.upgrade){
+        addMessage({
+          role: 'assistant',
+          content: json.reason === 'images'
+            ? 'You have reached the 50 AI images/day limit on the Free plan. Upgrade to Pro for unlimited images.'
+            : 'You have reached the 250 AI messages/day limit on the Free plan. Upgrade to Pro for unlimited messages.'
+        });
+      } else {
+        addMessage({ role: 'assistant', content: '⚠️ ' + (json.error || 'Something went wrong.') });
+      }
+      return;
+    }
+
+    addMessage({ role: 'assistant', content: json.reply });
+    refreshUsage();
+  } catch(err){
+    removeTyping();
+    addMessage({ role: 'assistant', content: '⚠️ Network error. Check your internet and try again.' });
+  } finally {
+    sending = false;
+    updateSendState();
+    refreshUsage();
+  }
+}
+
+sendBtn.addEventListener('click', () => send(inputEl.value));
+
+inputEl.addEventListener('input', () => {
+  inputEl.style.height = 'auto';
+  inputEl.style.height = Math.min(inputEl.scrollHeight, 160) + 'px';
+  updateSendState();
+});
+
+inputEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    send(inputEl.value);
+  }
+});
+
+suggestionsEl.addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-prompt]');
+  if (btn) send(btn.dataset.prompt);
+});
+
+// On focus, scroll chat to bottom shortly after
+inputEl.addEventListener('focus', () => {
+  setTimeout(() => scrollToBottom(), 350);
+});
+
+(async () => {
+  const { data } = await db.auth.getSession();
+  if (!data.session){ location.href = 'auth.html'; return; }
+  userId = data.session.user.id;
+
+  if (returnId){
+    const { data: proj } = await db
+      .from('projects')
+      .select('name, html, css, js')
+      .eq('id', returnId)
+      .maybeSingle();
+    if (proj){
+      projectContext = proj;
+      emptyEl.innerHTML = `
+        <div class="badge">
+          <svg viewBox="0 0 24 24"><path d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7z"/><path d="M19 15.5l.5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5z"/></svg>
+        </div>
+        <h3>Working on "${escapeHtml(proj.name)}"</h3>
+        <p>Ask me to add, fix, or explain code. Generated code has an <strong>Insert</strong> button.</p>
+      `;
+    }
+  }
+
+  refreshUsage();
+  updateSendState();
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>

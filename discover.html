@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0A">
+<title>Discover Shops — KUMG</title>
+<script>
+(function(){
+  var t = localStorage.getItem('kumg_theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme','light');
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  body.discover{ min-height: 100vh; }
+
+  .discover-hero{
+    background: linear-gradient(135deg, var(--deep), var(--green));
+    padding: 26px 20px 30px;
+    color: #E8F5EE;
+    border-radius: 0 0 24px 24px;
+  }
+  .discover-hero .brand{
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 800; font-size: 15px;
+    margin-bottom: 16px;
+  }
+  .discover-hero .brand .logo{
+    width: 30px; height: 30px; border-radius: 9px;
+    background: rgba(255,255,255,.15);
+    display: grid; place-items: center;
+    color: #04140C; font-weight: 900; font-size: 14px;
+  }
+  .discover-hero h1{
+    margin: 0 0 6px; font-size: 26px; font-weight: 800;
+    letter-spacing: -0.5px; line-height: 1.15;
+  }
+  .discover-hero p{
+    margin: 0 0 18px; font-size: 14px; opacity: .9; line-height: 1.5;
+  }
+
+  .search-wrap{
+    position: relative;
+    background: rgba(0,0,0,.25);
+    border-radius: 999px;
+    padding: 4px 4px 4px 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .search-wrap svg{
+    width: 18px; height: 18px; flex-shrink: 0;
+    stroke: rgba(255,255,255,.75); fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .search-wrap input{
+    flex: 1; min-width: 0;
+    background: transparent; border: 0;
+    color: #fff; font-size: 14.5px;
+    padding: 10px 0;
+    font-family: var(--font);
+  }
+  .search-wrap input::placeholder{ color: rgba(255,255,255,.6); }
+  .search-wrap input:focus{ outline: none; }
+
+  .cat-row{
+    display: flex; gap: 8px; padding: 14px 12px 4px;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .cat-row::-webkit-scrollbar{ display: none; }
+  .cat-chip{
+    flex-shrink: 0;
+    background: var(--card);
+    border: 1px solid var(--line);
+    color: var(--mint);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 12.5px; font-weight: 700;
+    font-family: var(--font);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  [data-theme="light"] .cat-chip{ color: #0A1F17; }
+  .cat-chip.active{
+    background: var(--green); border-color: var(--green); color: #04140C;
+  }
+
+  .shops-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 12px 16px 80px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  @media(min-width:640px){ .shops-grid{ grid-template-columns: 1fr 1fr 1fr; } }
+
+  .shop-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    transition: transform .05s ease;
+  }
+  .shop-card:active{ transform: scale(.98); }
+  .shop-card:hover{ border-color: var(--green); }
+
+  .shop-card .banner{
+    width: 100%; aspect-ratio: 16/9;
+    background: linear-gradient(135deg, var(--deep), var(--green));
+    display: grid; place-items: center;
+    color: #fff; font-weight: 900; font-size: 32px;
+    overflow: hidden; position: relative;
+  }
+  .shop-card .banner img{
+    width: 100%; height: 100%; object-fit: cover;
+    position: absolute; inset: 0;
+  }
+
+  .shop-card .body{
+    padding: 10px 12px 12px;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .shop-card .nm{
+    font-weight: 800; font-size: 14px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .shop-card .tag{
+    font-size: 11.5px; color: var(--muted);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    min-height: 16px;
+  }
+  .shop-card .meta{
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 6px;
+  }
+  .shop-card .pill{
+    font-size: 9.5px; font-weight: 800; letter-spacing: .5px;
+    text-transform: uppercase;
+    background: var(--deep); color: var(--mint);
+    padding: 2px 7px; border-radius: 999px;
+  }
+
+  .empty-discover{
+    text-align: center; padding: 60px 24px; color: var(--muted);
+  }
+  .empty-discover h3{ color: var(--mint); margin: 0 0 8px; font-size: 18px; }
+  .empty-discover p{ margin: 0 0 20px; font-size: 13.5px; line-height: 1.5; }
+
+  .cta-banner{
+    margin: 24px 16px 90px;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--deep), var(--green));
+    border-radius: 16px;
+    color: #E8F5EE;
+    text-align: center;
+  }
+  .cta-banner h3{ margin: 0 0 6px; font-size: 16px; font-weight: 800; color: #E8F5EE; }
+  .cta-banner p{ margin: 0 0 14px; font-size: 13px; opacity: .9; line-height: 1.5; }
+  .cta-banner a{
+    display: inline-block;
+    background: #fff; color: #04140C;
+    padding: 10px 18px; border-radius: 12px;
+    font-weight: 800; font-size: 13.5px;
+    text-decoration: none;
+  }
+</style>
+</head>
+<body class="discover">
+
+<div class="discover-hero">
+  <div class="brand">
+    <div class="logo">K</div>
+    <div>Discover</div>
+  </div>
+  <h1>Shop from real people<br>across Zimbabwe</h1>
+  <p>Every shop is run by a KUMG user. Order directly on WhatsApp.</p>
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input id="search" type="text" placeholder="Search shops…" autocapitalize="off" autocorrect="off">
+  </div>
+</div>
+
+<div class="cat-row" id="catRow"></div>
+
+<div id="content">
+  <div class="empty-discover">
+    <p style="color:var(--muted)">Loading shops…</p>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script>
+const STORE_API_BASE = 'https://kumg-forge.onrender.com/store/';
+
+let allShops = [];
+let categoryFilter = 'all';
+
+const contentEl = document.getElementById('content');
+const searchEl = document.getElementById('search');
+const catRow = document.getElementById('catRow');
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
+
+async function load(){
+  // RLS allows anyone to read published shops
+  const { data, error } = await db
+    .from('shops')
+    .select('id, name, tagline, slug, logo_url, theme, created_at')
+    .eq('is_published', true)
+    .order('created_at', { ascending: false })
+    .limit(200);
+
+  if (error){
+    console.error(error);
+    contentEl.innerHTML = '<div class="empty-discover"><h3>Could not load shops</h3><p>Try again in a moment.</p></div>';
+    return;
+  }
+
+  allShops = data || [];
+  renderCategories();
+  render();
+}
+
+function renderCategories(){
+  // Extract simple categories from shop taglines/keywords later; for now: single "All"
+  catRow.innerHTML = '<button class="cat-chip active" data-cat="all">All shops</button>';
+}
+
+function render(){
+  const q = searchEl.value.trim().toLowerCase();
+
+  const filtered = allShops.filter(function(s){
+    if (categoryFilter !== 'all'){
+      // future filter
+    }
+    if (!q) return true;
+    return (s.name || '').toLowerCase().includes(q) ||
+           (s.tagline || '').toLowerCase().includes(q);
+  });
+
+  if (!filtered.length){
+    contentEl.innerHTML = `
+      <div class="empty-discover">
+        <h3>${q ? 'No shops match "' + esc(q) + '"' : 'No shops yet'}</h3>
+        <p>${q ? 'Try a different search.' : 'Be the first to open a shop on KUMG.'}</p>
+        <a href="store.html" style="display:inline-block;background:var(--green);color:#04140C;padding:12px 20px;border-radius:12px;font-weight:800;text-decoration:none;font-size:14px">Open your own shop</a>
+      </div>`;
+    return;
+  }
+
+  contentEl.innerHTML = `
+    <div class="shops-grid">
+      ${filtered.map(function(s){
+        const initial = (s.name || '?')[0].toUpperCase();
+        const img = s.logo_url
+          ? '<img src="' + esc(s.logo_url) + '" alt="" loading="lazy">'
+          : '';
+        return `
+          <a class="shop-card" href="${STORE_API_BASE}${encodeURIComponent(s.slug)}" target="_blank" rel="noopener">
+            <div class="banner">${initial}${img}</div>
+            <div class="body">
+              <div class="nm">${esc(s.name)}</div>
+              <div class="tag">${esc(s.tagline || 'Shop now on WhatsApp')}</div>
+              <div class="meta">
+                <span class="pill">Shop</span>
+              </div>
+            </div>
+          </a>
+        `;
+      }).join('')}
+    </div>
+    <div class="cta-banner">
+      <h3>Have something to sell?</h3>
+      <p>Open your shop in 5 minutes. Take orders on WhatsApp. Free to start.</p>
+      <a href="store.html">Create your shop</a>
+    </div>
+  `;
+}
+
+searchEl.addEventListener('input', render);
+
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B3D2E"/>
+      <stop offset="1" stop-color="#1F9D62"/>
+    </linearGradient>
+    <linearGradient id="spark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#25B874"/>
+      <stop offset="1" stop-color="#1F9D62"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Black rounded square background -->
+  <rect width="512" height="512" rx="112" fill="#0A0A0A"/>
+
+  <!-- Phone body -->
+  <rect x="146" y="76" width="220" height="360" rx="36" fill="url(#g)"/>
+
+  <!-- Screen -->
+  <rect x="170" y="120" width="172" height="272" rx="18" fill="#0A0A0A"/>
+
+  <!-- Code brackets -->
+  <path d="M 218 220 L 192 256 L 218 292"
+        stroke="#1F9D62" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M 294 220 L 320 256 L 294 292"
+        stroke="#1F9D62" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Forward slash -->
+  <line x1="240" y1="204" x2="272" y2="308"
+        stroke="#25B874" stroke-width="18" stroke-linecap="round"/>
+
+  <!-- Home bar -->
+  <rect x="220" y="404" width="72" height="8" rx="4" fill="#0A0A0A" opacity="0.5"/>
+
+  <!-- AI spark badge (top-right) -->
+  <circle cx="380" cy="120" r="34" fill="url(#spark)"/>
+  <path d="M 380 100 L 386 114 L 400 120 L 386 126 L 380 140 L 374 126 L 360 120 L 374 114 Z" fill="#0A0A0A"/>
+</svg>

@@ -1,13 +1,16 @@
 -- ============================================================
--- KUMG Forge + TouRryl Store + KUMG Tap — FULL SETUP (v12)
+-- KUMG Forge + TouRryl Store + KUMG Tap — FULL SETUP (v13)
 -- Includes: profiles, projects, payments, manual_payments,
---           AI messages/images, shops, products, orders,
---           sponsors, wallets, taps, RLS, storage, backfill
+--           redemptions, AI messages/images, shops, products,
+--           orders, sponsors, wallets, taps, RLS, storage,
+--           backfill, redeem_pro function
 -- Safe to run multiple times
 -- ============================================================
 
 -- === CLEAN RESET ===
 drop trigger if exists on_auth_user_created on auth.users;
+drop trigger if exists on_profile_create_wallet on public.profiles;
+drop trigger if exists chat_message_added on chat_messages;
 
 drop function if exists public.handle_new_user() cascade;
 drop function if exists public.handle_new_wallet() cascade;
@@ -19,10 +22,16 @@ drop function if exists public.ai_messages_today(uuid) cascade;
 drop function if exists public.ai_images_today(uuid) cascade;
 drop function if exists public.taps_today(uuid) cascade;
 drop function if exists public.record_tap(uuid, uuid) cascade;
+drop function if exists public.redeem_pro(uuid) cascade;
+drop function if exists public.update_chat_on_message() cascade;
+drop function if exists public.unread_count(uuid) cascade;
 
+drop table if exists chat_messages cascade;
+drop table if exists chats cascade;
 drop table if exists taps cascade;
 drop table if exists wallets cascade;
 drop table if exists sponsors cascade;
+drop table if exists redemptions cascade;
 drop table if exists manual_payments cascade;
 drop table if exists affiliate_clicks cascade;
 drop table if exists shop_orders cascade;
@@ -95,7 +104,7 @@ create index payments_reference_idx on payments(reference);
 
 
 -- ============================================================
--- 4. MANUAL ECOCASH PAYMENTS (temporary bridge)
+-- 4. MANUAL ECOCASH PAYMENTS
 -- ============================================================
 create table manual_payments (
   id uuid primary key default gen_random_uuid(),
@@ -118,7 +127,29 @@ create index manual_payments_user_idx
 
 
 -- ============================================================
--- 5. AI MESSAGES
+-- 5. REDEMPTIONS
+-- ============================================================
+create table redemptions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references profiles(id) on delete cascade,
+  kind text not null check (kind in ('pro','cash')),
+  amount_cents int not null,
+  ecocash_to text,
+  status text default 'pending' check (status in ('pending','approved','rejected')),
+  submitted_at timestamptz default now(),
+  reviewed_at timestamptz,
+  reviewed_by uuid references profiles(id),
+  note text
+);
+
+create index redemptions_status_idx
+  on redemptions(status, submitted_at desc);
+create index redemptions_user_idx
+  on redemptions(user_id);
+
+
+-- ============================================================
+-- 6. AI MESSAGES
 -- ============================================================
 create table ai_messages (
   id uuid primary key default gen_random_uuid(),
@@ -132,7 +163,7 @@ create index ai_messages_user_date_idx on ai_messages(user_id, created_at desc);
 
 
 -- ============================================================
--- 6. AI IMAGES
+-- 7. AI IMAGES
 -- ============================================================
 create table ai_images (
   id uuid primary key default gen_random_uuid(),
@@ -145,7 +176,7 @@ create index ai_images_user_date_idx on ai_images(user_id, created_at desc);
 
 
 -- ============================================================
--- 7. TOURRYL STORE — SHOPS
+-- 8. TOURRYL STORE — SHOPS
 -- ============================================================
 create table shops (
   id uuid primary key default gen_random_uuid(),
@@ -171,7 +202,7 @@ create index shops_slug_idx on shops(slug);
 
 
 -- ============================================================
--- 8. TOURRYL STORE — PRODUCTS
+-- 9. TOURRYL STORE — PRODUCTS
 -- ============================================================
 create table shop_products (
   id uuid primary key default gen_random_uuid(),
@@ -190,7 +221,7 @@ create index shop_products_shop_idx on shop_products(shop_id, sort_order);
 
 
 -- ============================================================
--- 9. TOURRYL STORE — ORDERS
+-- 10. TOURRYL STORE — ORDERS
 -- ============================================================
 create table shop_orders (
   id uuid primary key default gen_random_uuid(),
@@ -207,7 +238,7 @@ create index shop_orders_shop_idx on shop_orders(shop_id, created_at desc);
 
 
 -- ============================================================
--- 10. KUMG TAP — SPONSORS
+-- 11. KUMG TAP — SPONSORS
 -- ============================================================
 create table sponsors (
   id uuid primary key default gen_random_uuid(),
@@ -229,7 +260,7 @@ create table sponsors (
 
 
 -- ============================================================
--- 11. KUMG TAP — WALLETS
+-- 12. KUMG TAP — WALLETS
 -- ============================================================
 create table wallets (
   user_id uuid primary key references profiles(id) on delete cascade,
@@ -240,7 +271,7 @@ create table wallets (
 
 
 -- ============================================================
--- 12. KUMG TAP — TAPS
+-- 13. KUMG TAP — TAPS
 -- ============================================================
 create table taps (
   id uuid primary key default gen_random_uuid(),
@@ -255,7 +286,36 @@ create index taps_sponsor_idx on taps(sponsor_id);
 
 
 -- ============================================================
--- 13. HELPER FUNCTIONS
+-- 14. CHATS (shop-focused)
+-- ============================================================
+create table chats (
+  id uuid primary key default gen_random_uuid(),
+  participant_a uuid references profiles(id) on delete cascade not null,
+  participant_b uuid references profiles(id) on delete cascade not null,
+  shop_id uuid references shops(id) on delete set null,
+  last_message_at timestamptz default now(),
+  last_message_preview text,
+  created_at timestamptz default now(),
+  unique(participant_a, participant_b, shop_id)
+);
+
+create index chats_a_idx on chats(participant_a, last_message_at desc);
+create index chats_b_idx on chats(participant_b, last_message_at desc);
+
+create table chat_messages (
+  id uuid primary key default gen_random_uuid(),
+  chat_id uuid references chats(id) on delete cascade not null,
+  sender_id uuid references profiles(id) on delete cascade not null,
+  content text not null,
+  read_at timestamptz,
+  created_at timestamptz default now()
+);
+
+create index chat_messages_chat_idx on chat_messages(chat_id, created_at);
+
+
+-- ============================================================
+-- 15. HELPER FUNCTIONS
 -- ============================================================
 create or replace function public.is_admin()
 returns boolean language sql stable security definer set search_path = public
@@ -291,9 +351,20 @@ as $$
   where user_id = uid and created_at >= current_date;
 $$;
 
+create or replace function public.unread_count(uid uuid)
+returns int language sql stable security definer set search_path = public
+as $$
+  select count(*)::int
+  from chat_messages m
+  join chats c on c.id = m.chat_id
+  where (c.participant_a = uid or c.participant_b = uid)
+    and m.sender_id <> uid
+    and m.read_at is null;
+$$;
+
 
 -- ============================================================
--- 14. AUTO-CREATE PROFILE ON SIGNUP
+-- 16. AUTO-CREATE PROFILE ON SIGNUP
 -- ============================================================
 create function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public
@@ -316,7 +387,7 @@ for each row execute procedure public.handle_new_user();
 
 
 -- ============================================================
--- 15. AUTO-CREATE WALLET ON PROFILE CREATE
+-- 17. AUTO-CREATE WALLET ON PROFILE CREATE
 -- ============================================================
 create function public.handle_new_wallet()
 returns trigger language plpgsql security definer set search_path = public
@@ -335,7 +406,7 @@ for each row execute procedure public.handle_new_wallet();
 
 
 -- ============================================================
--- 16. AUTO-UPDATE updated_at
+-- 18. AUTO-UPDATE updated_at
 -- ============================================================
 create function public.touch_updated_at()
 returns trigger language plpgsql
@@ -360,7 +431,7 @@ for each row execute procedure public.touch_updated_at();
 
 
 -- ============================================================
--- 17. AGE VERIFICATION (13+)
+-- 19. AGE VERIFICATION (13+)
 -- ============================================================
 create function public.check_dob()
 returns trigger language plpgsql
@@ -390,16 +461,13 @@ for each row execute procedure public.check_dob();
 
 
 -- ============================================================
--- 18. RECORD TAP — pays user + debits sponsor
+-- 20. RECORD TAP
 -- ============================================================
 create or replace function public.record_tap(
   p_user_id uuid,
   p_sponsor_id uuid
 )
-returns jsonb
-language plpgsql
-security definer
-set search_path = public
+returns jsonb language plpgsql security definer set search_path = public
 as $$
 declare
   v_bid numeric;
@@ -411,18 +479,15 @@ declare
 begin
   select count(*) into v_daily_taps
   from taps where user_id = p_user_id and created_at >= current_date;
-
   if v_daily_taps >= 50 then
     return jsonb_build_object('ok', false, 'reason', 'daily_limit');
   end if;
 
   select bid_per_tap, balance into v_bid, v_balance
   from sponsors where id = p_sponsor_id and is_active = true;
-
   if v_bid is null then
     return jsonb_build_object('ok', false, 'reason', 'sponsor_missing');
   end if;
-
   if v_balance < v_bid then
     return jsonb_build_object('ok', false, 'reason', 'sponsor_broke');
   end if;
@@ -432,7 +497,6 @@ begin
   v_owner_share := v_cents - v_user_share;
 
   update sponsors set balance = balance - v_bid where id = p_sponsor_id;
-
   insert into taps (user_id, sponsor_id, amount_cents)
   values (p_user_id, p_sponsor_id, v_user_share);
 
@@ -443,22 +507,80 @@ begin
         lifetime_cents = wallets.lifetime_cents + v_user_share,
         updated_at = now();
 
-  return jsonb_build_object(
-    'ok', true,
-    'user_share_cents', v_user_share,
-    'owner_share_cents', v_owner_share
-  );
+  return jsonb_build_object('ok', true, 'user_share_cents', v_user_share, 'owner_share_cents', v_owner_share);
 end;
 $$;
 
 
 -- ============================================================
--- 19. ROW LEVEL SECURITY
+-- 21. REDEEM PRO (spend wallet balance to become Pro)
+-- ============================================================
+create or replace function public.redeem_pro(p_user_id uuid)
+returns jsonb language plpgsql security definer set search_path = public
+as $$
+declare
+  v_balance int;
+  v_plan text;
+  v_cost int := 500;
+begin
+  select w.balance_cents, p.plan into v_balance, v_plan
+  from wallets w
+  join profiles p on p.id = w.user_id
+  where w.user_id = p_user_id;
+
+  if v_balance is null then
+    return jsonb_build_object('ok', false, 'reason', 'no_wallet');
+  end if;
+  if v_plan = 'pro' then
+    return jsonb_build_object('ok', false, 'reason', 'already_pro');
+  end if;
+  if v_balance < v_cost then
+    return jsonb_build_object('ok', false, 'reason', 'insufficient', 'balance', v_balance, 'needed', v_cost);
+  end if;
+
+  update wallets
+  set balance_cents = balance_cents - v_cost,
+      updated_at = now()
+  where user_id = p_user_id;
+
+  update profiles set plan = 'pro' where id = p_user_id;
+
+  insert into redemptions (user_id, kind, amount_cents, status, reviewed_at)
+  values (p_user_id, 'pro', v_cost, 'approved', now());
+
+  return jsonb_build_object('ok', true, 'cost', v_cost);
+end;
+$$;
+
+
+-- ============================================================
+-- 22. CHAT — auto-update preview on new message
+-- ============================================================
+create or replace function public.update_chat_on_message()
+returns trigger language plpgsql security definer set search_path = public
+as $$
+begin
+  update chats
+  set last_message_at = new.created_at,
+      last_message_preview = substr(new.content, 1, 80)
+  where id = new.chat_id;
+  return new;
+end;
+$$;
+
+create trigger chat_message_added
+after insert on chat_messages
+for each row execute procedure public.update_chat_on_message();
+
+
+-- ============================================================
+-- 23. ROW LEVEL SECURITY
 -- ============================================================
 alter table profiles         enable row level security;
 alter table projects         enable row level security;
 alter table payments         enable row level security;
 alter table manual_payments  enable row level security;
+alter table redemptions      enable row level security;
 alter table ai_messages      enable row level security;
 alter table ai_images        enable row level security;
 alter table shops            enable row level security;
@@ -467,6 +589,8 @@ alter table shop_orders      enable row level security;
 alter table sponsors         enable row level security;
 alter table wallets          enable row level security;
 alter table taps             enable row level security;
+alter table chats            enable row level security;
+alter table chat_messages    enable row level security;
 
 -- PROFILES
 drop policy if exists "own profile read" on profiles;
@@ -492,16 +616,15 @@ create policy "admin read all projects" on projects
 create policy "public can read published projects" on projects
   for select using (is_published = true);
 
--- PAYMENTS (Paynow)
+-- PAYMENTS
 drop policy if exists "own payments" on payments;
 drop policy if exists "admin read all payments" on payments;
-
 create policy "own payments" on payments
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "admin read all payments" on payments
   for select using (public.is_admin());
 
--- MANUAL PAYMENTS (EcoCash)
+-- MANUAL PAYMENTS
 drop policy if exists "own manual payments insert" on manual_payments;
 drop policy if exists "own manual payments read" on manual_payments;
 drop policy if exists "admin read all manual payments" on manual_payments;
@@ -516,10 +639,24 @@ create policy "admin read all manual payments" on manual_payments
 create policy "admin update manual payments" on manual_payments
   for update using (public.is_admin()) with check (public.is_admin());
 
+-- REDEMPTIONS
+drop policy if exists "own redemptions insert" on redemptions;
+drop policy if exists "own redemptions read" on redemptions;
+drop policy if exists "admin read all redemptions" on redemptions;
+drop policy if exists "admin update redemptions" on redemptions;
+
+create policy "own redemptions insert" on redemptions
+  for insert with check (auth.uid() = user_id);
+create policy "own redemptions read" on redemptions
+  for select using (auth.uid() = user_id);
+create policy "admin read all redemptions" on redemptions
+  for select using (public.is_admin());
+create policy "admin update redemptions" on redemptions
+  for update using (public.is_admin()) with check (public.is_admin());
+
 -- AI MESSAGES
 drop policy if exists "own ai messages" on ai_messages;
 drop policy if exists "admin read all ai messages" on ai_messages;
-
 create policy "own ai messages" on ai_messages
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "admin read all ai messages" on ai_messages
@@ -528,7 +665,6 @@ create policy "admin read all ai messages" on ai_messages
 -- AI IMAGES
 drop policy if exists "own ai images" on ai_images;
 drop policy if exists "admin read all ai images" on ai_images;
-
 create policy "own ai images" on ai_images
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "admin read all ai images" on ai_images
@@ -538,7 +674,6 @@ create policy "admin read all ai images" on ai_images
 drop policy if exists "own shops" on shops;
 drop policy if exists "public read published shops" on shops;
 drop policy if exists "admin read all shops" on shops;
-
 create policy "own shops" on shops
   for all using (auth.uid() = owner) with check (auth.uid() = owner);
 create policy "public read published shops" on shops
@@ -550,7 +685,6 @@ create policy "admin read all shops" on shops
 drop policy if exists "own shop products" on shop_products;
 drop policy if exists "public read shop products" on shop_products;
 drop policy if exists "admin read all shop products" on shop_products;
-
 create policy "own shop products" on shop_products
   for all using (
     exists (select 1 from shops s where s.id = shop_products.shop_id and s.owner = auth.uid())
@@ -568,7 +702,6 @@ create policy "admin read all shop products" on shop_products
 drop policy if exists "own shop orders read" on shop_orders;
 drop policy if exists "public create shop orders" on shop_orders;
 drop policy if exists "admin read all shop orders" on shop_orders;
-
 create policy "own shop orders read" on shop_orders
   for select using (
     exists (select 1 from shops s where s.id = shop_orders.shop_id and s.owner = auth.uid())
@@ -581,7 +714,6 @@ create policy "admin read all shop orders" on shop_orders
 -- SPONSORS
 drop policy if exists "sponsors public read" on sponsors;
 drop policy if exists "sponsors admin all" on sponsors;
-
 create policy "sponsors public read" on sponsors
   for select using (is_active = true);
 create policy "sponsors admin all" on sponsors
@@ -590,7 +722,6 @@ create policy "sponsors admin all" on sponsors
 -- WALLETS
 drop policy if exists "own wallet" on wallets;
 drop policy if exists "admin read all wallets" on wallets;
-
 create policy "own wallet" on wallets
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "admin read all wallets" on wallets
@@ -599,15 +730,56 @@ create policy "admin read all wallets" on wallets
 -- TAPS
 drop policy if exists "own taps" on taps;
 drop policy if exists "admin read all taps" on taps;
-
 create policy "own taps" on taps
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "admin read all taps" on taps
   for select using (public.is_admin());
 
+-- CHATS
+drop policy if exists "chat participant read" on chats;
+drop policy if exists "chat participant insert" on chats;
+drop policy if exists "chat participant update" on chats;
+create policy "chat participant read" on chats
+  for select using (auth.uid() = participant_a or auth.uid() = participant_b);
+create policy "chat participant insert" on chats
+  for insert with check (auth.uid() = participant_a or auth.uid() = participant_b);
+create policy "chat participant update" on chats
+  for update using (auth.uid() = participant_a or auth.uid() = participant_b);
+
+-- CHAT MESSAGES
+drop policy if exists "message participant read" on chat_messages;
+drop policy if exists "message participant insert" on chat_messages;
+drop policy if exists "message participant update" on chat_messages;
+
+create policy "message participant read" on chat_messages
+  for select using (
+    exists (
+      select 1 from chats c
+      where c.id = chat_messages.chat_id
+        and (c.participant_a = auth.uid() or c.participant_b = auth.uid())
+    )
+  );
+create policy "message participant insert" on chat_messages
+  for insert with check (
+    sender_id = auth.uid() and
+    exists (
+      select 1 from chats c
+      where c.id = chat_messages.chat_id
+        and (c.participant_a = auth.uid() or c.participant_b = auth.uid())
+    )
+  );
+create policy "message participant update" on chat_messages
+  for update using (
+    exists (
+      select 1 from chats c
+      where c.id = chat_messages.chat_id
+        and (c.participant_a = auth.uid() or c.participant_b = auth.uid())
+    )
+  );
+
 
 -- ============================================================
--- 20. STORAGE BUCKETS
+-- 24. STORAGE BUCKETS
 -- ============================================================
 insert into storage.buckets (id, name, public)
 values ('avatars', 'avatars', true)
@@ -662,7 +834,7 @@ create policy "user-media user delete" on storage.objects
 
 
 -- ============================================================
--- 21. AUTO-BACKFILL existing auth users + wallets
+-- 25. AUTO-BACKFILL auth users + wallets
 -- ============================================================
 insert into public.profiles (id, username, email)
 select
@@ -683,7 +855,7 @@ on conflict (user_id) do nothing;
 
 
 -- ============================================================
--- 22. MAKE kumgtourryl@gmail.com THE ADMIN
+-- 26. MAKE kumgtourryl@gmail.com ADMIN
 -- ============================================================
 update public.profiles
 set is_admin = true
@@ -692,4 +864,4 @@ where email = 'kumgtourryl@gmail.com';
 
 -- ============================================================
 -- DONE. You should see "Success. No rows returned"
--- ============================================================ 
+-- ============================================================

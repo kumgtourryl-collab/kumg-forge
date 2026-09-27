@@ -1,5 +1,5 @@
 // KUMG Forge — Service Worker
-const CACHE = 'kumg-v12';
+const CACHE = 'kumg-v13';
 
 const ASSETS = [
   './',

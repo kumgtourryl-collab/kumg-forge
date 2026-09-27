@@ -76,17 +76,20 @@
   }
 
   .pay-actions{ display: flex; gap: 6px; flex-wrap: wrap; }
-  .pay-actions button{
+  .pay-actions button,
+  .pay-actions a{
     flex: 1; min-width: 100px;
     font-size: 13px; font-weight: 700;
     padding: 11px 12px; border-radius: 10px;
     border: 0; cursor: pointer;
     font-family: var(--font);
+    text-decoration: none; text-align: center;
+    display: inline-flex; align-items: center; justify-content: center;
   }
   .pay-actions .approve{ background: var(--green); color: #04140C; }
   .pay-actions .reject{ background: transparent; color: var(--danger); border: 1px solid var(--danger); }
   .pay-actions .ghost{ background: transparent; color: var(--muted); border: 1px solid var(--line); }
-  .pay-actions .wa{ background: #25D366; color: #04140C; text-decoration: none; text-align: center; display: block; }
+  .pay-actions .wa{ background: #25D366; color: #04140C; }
 
   .summary-row{
     display: grid; grid-template-columns: 1fr 1fr 1fr;
@@ -122,7 +125,7 @@
 </header>
 
 <main class="container" style="max-width:640px">
-  <h1 class="page-title">Manual payments</h1>
+  <h1 class="page-title">Payments</h1>
   <p class="page-sub" id="summary">Loading…</p>
 
   <div class="summary-row">
@@ -180,82 +183,118 @@ async function load(){
     return;
   }
 
-  var result = await db
+  var paymentsRes = await db
     .from('manual_payments')
     .select('*')
     .order('status', { ascending: true })
     .order('submitted_at', { ascending: false })
     .limit(100);
 
-  if (result.error){
-    document.getElementById('list').innerHTML =
-      '<div class="empty"><h3>Could not load</h3><p>' + esc(result.error.message) + '</p></div>';
+  var redemptionsRes = await db
+    .from('redemptions')
+    .select('*')
+    .eq('kind', 'cash')
+    .order('status', { ascending: true })
+    .order('submitted_at', { ascending: false })
+    .limit(100);
+
+  if (paymentsRes.error && redemptionsRes.error){
+    document.getElementById('list').innerHTML = '<div class="empty"><h3>Could not load</h3></div>';
     return;
   }
 
-  var payments = result.data || [];
-  var pending = payments.filter(function(p){ return p.status === 'pending'; }).length;
-  var approved = payments.filter(function(p){ return p.status === 'approved'; }).length;
+  var payments = paymentsRes.data || [];
+  var redemptions = redemptionsRes.data || [];
+
+  var all = [];
+  payments.forEach(function(p){ all.push({ type: 'in', row: p }); });
+  redemptions.forEach(function(r){ all.push({ type: 'out', row: r }); });
+  all.sort(function(a, b){
+    var sa = a.row.status === 'pending' ? 0 : 1;
+    var sb = b.row.status === 'pending' ? 0 : 1;
+    if (sa !== sb) return sa - sb;
+    return new Date(b.row.submitted_at) - new Date(a.row.submitted_at);
+  });
+
+  var pendIn = payments.filter(function(p){ return p.status === 'pending'; }).length;
+  var pendOut = redemptions.filter(function(r){ return r.status === 'pending'; }).length;
   var revenue = payments
     .filter(function(p){ return p.status === 'approved'; })
     .reduce(function(a, p){ return a + Number(p.amount || 0); }, 0);
 
-  document.getElementById('sPending').textContent = pending;
-  document.getElementById('sApproved').textContent = approved;
+  document.getElementById('sPending').textContent = pendIn + pendOut;
+  document.getElementById('sApproved').textContent = payments.filter(function(p){ return p.status === 'approved'; }).length;
   document.getElementById('sRevenue').textContent = '$' + revenue.toFixed(2);
 
   document.getElementById('summary').textContent =
-    pending + ' pending approval · ' + payments.length + ' total submissions';
+    pendIn + ' upgrades pending · ' + pendOut + ' cash-outs pending · ' + all.length + ' total';
 
-  render(payments);
+  render(all);
 }
 
 function render(list){
   var el = document.getElementById('list');
   if (!list.length){
-    el.innerHTML = '<div class="empty"><h3>No payments yet</h3><p>Share the upgrade page with users.</p></div>';
+    el.innerHTML = '<div class="empty"><h3>Nothing to review</h3></div>';
     return;
   }
 
-  el.innerHTML = list.map(function(p){
-    var initial = (p.email || '?')[0].toUpperCase();
-    var waLink = p.ecocash_from
-      ? 'https://wa.me/263' + String(p.ecocash_from).replace(/[^\d]/g, '').replace(/^0/, '')
-      : null;
+  el.innerHTML = list.map(function(item){
+    var row = item.row;
+    var isOut = item.type === 'out';
+
+    var headLine = isOut
+      ? 'Cash out · ' + esc(row.ecocash_to || '—')
+      : esc(row.email || 'unknown');
+
+    var subtitle = isOut
+      ? 'Requested ' + timeAgo(row.submitted_at)
+      : 'Sent from ' + esc(row.ecocash_from || '—') + ' · ' + timeAgo(row.submitted_at);
+
+    var detailA = isOut
+      ? { l: 'Send to', v: esc(row.ecocash_to || '—') }
+      : { l: 'Sent from', v: esc(row.ecocash_from || '—') };
+
+    var amount = isOut ? row.amount_cents / 100 : Number(row.amount || 0);
+    var detailB = { l: 'Amount', v: '$' + amount.toFixed(2) };
+
+    var refLine = isOut
+      ? { l: 'User ID', v: esc((row.user_id || '').slice(0, 8)) }
+      : { l: 'Reference', v: esc(row.reference || '—') };
+
+    var waLink = null;
+    var phone = isOut ? row.ecocash_to : row.ecocash_from;
+    if (phone){
+      var digits = String(phone).replace(/[^\d]/g, '').replace(/^0/, '');
+      if (digits.length >= 9) waLink = 'https://wa.me/263' + digits;
+    }
 
     return `
-      <div class="pay-card ${esc(p.status)}" data-id="${p.id}">
+      <div class="pay-card ${esc(row.status)}" data-id="${row.id}" data-type="${item.type}">
         <div class="pay-head">
-          <div class="pay-icon">${esc(initial)}</div>
+          <div class="pay-icon">${isOut ? '↑' : '↓'}</div>
           <div class="pay-info">
-            <div class="email">${esc(p.email || 'unknown')}</div>
-            <div class="meta">submitted ${timeAgo(p.submitted_at)}</div>
+            <div class="email">${headLine}</div>
+            <div class="meta">${subtitle}</div>
           </div>
-          <span class="pay-status ${esc(p.status)}">${esc(p.status)}</span>
+          <span class="pay-status ${esc(row.status)}">${esc(row.status)}</span>
         </div>
 
         <div class="pay-details">
-          <div class="pay-detail">
-            <div class="l">Sent from</div>
-            <div class="v">${esc(p.ecocash_from || '—')}</div>
-          </div>
-          <div class="pay-detail">
-            <div class="l">Amount</div>
-            <div class="v">$${Number(p.amount || 0).toFixed(2)}</div>
-          </div>
-          <div class="pay-detail" style="grid-column: 1 / -1">
-            <div class="l">Reference</div>
-            <div class="v">${esc(p.reference || '—')}</div>
-          </div>
+          <div class="pay-detail"><div class="l">${detailA.l}</div><div class="v">${detailA.v}</div></div>
+          <div class="pay-detail"><div class="l">${detailB.l}</div><div class="v">${detailB.v}</div></div>
+          <div class="pay-detail" style="grid-column:1/-1"><div class="l">${refLine.l}</div><div class="v">${refLine.v}</div></div>
         </div>
 
-        ${p.note ? '<div class="pay-note">"' + esc(p.note) + '"</div>' : ''}
+        ${row.note ? '<div class="pay-note">"' + esc(row.note) + '"</div>' : ''}
 
         <div class="pay-actions">
-          ${p.status === 'pending' ? `
-            <button class="approve" data-action="approve">Approve &amp; upgrade</button>
+          ${row.status === 'pending' ? `
+            <button class="${isOut ? 'approve' : 'approve'}" data-action="${isOut ? 'markpaid' : 'approve'}">
+              ${isOut ? 'Mark as paid' : 'Approve &amp; upgrade'}
+            </button>
             <button class="reject" data-action="reject">Reject</button>
-            ${waLink ? '<a class="wa" href="' + waLink + '" target="_blank" rel="noopener" style="flex:1;min-width:100px;padding:11px 12px;border-radius:10px;font-size:13px;font-weight:700;font-family:var(--font)">WhatsApp user</a>' : ''}
+            ${waLink ? '<a class="wa" href="' + waLink + '" target="_blank" rel="noopener">WhatsApp</a>' : ''}
           ` : `
             <button class="ghost" data-action="reset">Reset to pending</button>
           `}
@@ -268,12 +307,12 @@ function render(list){
     btn.addEventListener('click', async function(){
       var card = btn.closest('.pay-card');
       var id = card.dataset.id;
+      var type = card.dataset.type;
       var action = btn.dataset.action;
 
       if (action === 'approve'){
         if (!confirm('Approve this payment and upgrade the user to Pro?')) return;
-        btn.disabled = true;
-        btn.textContent = 'Approving…';
+        btn.disabled = true; btn.textContent = 'Approving…';
 
         var payment = await db.from('manual_payments').select('user_id').eq('id', id).single();
         if (payment.error || !payment.data){
@@ -282,42 +321,76 @@ function render(list){
           return;
         }
 
-        var upd1 = await db.from('profiles').update({ plan: 'pro' }).eq('id', payment.data.user_id);
-        if (upd1.error){ toast(upd1.error.message); btn.disabled = false; btn.textContent = 'Approve & upgrade'; return; }
-
-        var upd2 = await db.from('manual_payments').update({
+        await db.from('profiles').update({ plan: 'pro' }).eq('id', payment.data.user_id);
+        await db.from('manual_payments').update({
           status: 'approved',
           reviewed_at: new Date().toISOString(),
           reviewed_by: adminId
         }).eq('id', id);
-        if (upd2.error){ toast(upd2.error.message); btn.disabled = false; btn.textContent = 'Approve & upgrade'; return; }
 
-        toast('Approved. User is now Pro.');
+        toast('User upgraded to Pro');
+        load();
+        return;
+      }
+
+      if (action === 'markpaid'){
+        if (!confirm('Mark this cash-out as paid? The user has been sent the money.')) return;
+        await db.from('redemptions').update({
+          status: 'approved',
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: adminId
+        }).eq('id', id);
+        toast('Marked as paid');
         load();
         return;
       }
 
       if (action === 'reject'){
-        if (!confirm('Reject this payment?')) return;
-        var upd = await db.from('manual_payments').update({
-          status: 'rejected',
-          reviewed_at: new Date().toISOString(),
-          reviewed_by: adminId
-        }).eq('id', id);
-        if (upd.error){ toast(upd.error.message); return; }
+        if (!confirm('Reject this? Balance will be refunded (for cash outs).')) return;
+
+        if (type === 'out'){
+          var red = await db.from('redemptions').select('user_id, amount_cents').eq('id', id).single();
+          if (red.data){
+            var w = await db.from('wallets').select('balance_cents').eq('user_id', red.data.user_id).single();
+            if (w.data){
+              await db.from('wallets').update({
+                balance_cents: (w.data.balance_cents || 0) + Number(red.data.amount_cents || 0),
+                updated_at: new Date().toISOString()
+              }).eq('user_id', red.data.user_id);
+            }
+          }
+          await db.from('redemptions').update({
+            status: 'rejected',
+            reviewed_at: new Date().toISOString(),
+            reviewed_by: adminId
+          }).eq('id', id);
+        } else {
+          await db.from('manual_payments').update({
+            status: 'rejected',
+            reviewed_at: new Date().toISOString(),
+            reviewed_by: adminId
+          }).eq('id', id);
+        }
         toast('Rejected');
         load();
         return;
       }
 
       if (action === 'reset'){
-        if (!confirm('Reset this to pending? This will not downgrade the user.')) return;
-        var upd = await db.from('manual_payments').update({
-          status: 'pending',
-          reviewed_at: null,
-          reviewed_by: null
-        }).eq('id', id);
-        if (upd.error){ toast(upd.error.message); return; }
+        if (!confirm('Reset this to pending?')) return;
+        if (type === 'out'){
+          await db.from('redemptions').update({
+            status: 'pending',
+            reviewed_at: null,
+            reviewed_by: null
+          }).eq('id', id);
+        } else {
+          await db.from('manual_payments').update({
+            status: 'pending',
+            reviewed_at: null,
+            reviewed_by: null
+          }).eq('id', id);
+        }
         toast('Reset to pending');
         load();
       }
@@ -326,6 +399,11 @@ function render(list){
 }
 
 load();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
 </script>
 </body>
 </html>

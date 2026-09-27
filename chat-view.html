@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="theme-color" content="#0A0A0A">
+<title>Chat — KUMG</title>
+<script>
+(function(){
+  var t = localStorage.getItem('kumg_theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme','light');
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  html, body{ margin: 0; padding: 0; height: 100%; overflow: hidden; overscroll-behavior: none; }
+
+  #app{
+    display: flex; flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--black);
+  }
+
+  .chat-top{
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    background: #0A0A0A;
+    border-bottom: 1px solid var(--line);
+    flex-shrink: 0;
+  }
+  [data-theme="light"] .chat-top{ background: #FFFFFF; }
+  .chat-top .back-btn{
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--card); border: 1px solid var(--line);
+    display: grid; place-items: center;
+    color: var(--mint); text-decoration: none; flex-shrink: 0;
+  }
+  [data-theme="light"] .chat-top .back-btn{ color: #0A1F17; }
+  .chat-top .back-btn svg{ width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .chat-top .avatar{
+    width: 38px; height: 38px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--deep), var(--green));
+    display: grid; place-items: center;
+    color: #04140C; font-weight: 900; font-size: 16px;
+    overflow: hidden; flex-shrink: 0;
+  }
+  .chat-top .avatar img{ width: 100%; height: 100%; object-fit: cover; }
+
+  .chat-top .who{
+    flex: 1; min-width: 0;
+  }
+  .chat-top .who .nm{
+    font-weight: 800; font-size: 15px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .chat-top .who .shop{
+    font-size: 11.5px; color: var(--green); font-weight: 700;
+  }
+
+  .messages{
+    flex: 1 1 0; min-height: 0;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    padding: 14px 12px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+
+  .msg{
+    max-width: 82%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 14.5px;
+    line-height: 1.45;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    position: relative;
+  }
+  .msg.me{
+    align-self: flex-end;
+    background: var(--green); color: #04140C;
+    border-bottom-right-radius: 4px;
+  }
+  .msg.them{
+    align-self: flex-start;
+    background: var(--card);
+    border: 1px solid var(--line);
+    color: var(--mint);
+    border-bottom-left-radius: 4px;
+  }
+  [data-theme="light"] .msg.them{ color: #0A1F17; }
+  .msg .t{
+    font-size: 10px; opacity: .7; margin-top: 4px; display: block;
+  }
+
+  .composer-wrap{
+    flex-shrink: 0;
+    padding: 8px 12px calc(10px + env(safe-area-inset-bottom));
+    background: #0A0A0A;
+    border-top: 1px solid var(--line);
+  }
+  [data-theme="light"] .composer-wrap{ background: #FFFFFF; }
+
+  .composer-box{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 6px 6px 6px 14px;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .composer-box:focus-within{ border-color: rgba(31,157,98,.55); }
+  .composer-box textarea{
+    flex: 1; min-height: 40px; max-height: 120px;
+    background: transparent; border: 0; outline: none;
+    resize: none;
+    font-family: var(--font); font-size: 15px; line-height: 1.4;
+    color: var(--mint);
+    padding: 10px 4px;
+  }
+  [data-theme="light"] .composer-box textarea{ color: #0A1F17; }
+  .composer-box textarea::placeholder{ color: var(--muted); }
+  .composer-box button{
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--green); color: #04140C; border: 0;
+    display: grid; place-items: center; cursor: pointer;
+    padding: 0; flex-shrink: 0;
+  }
+  .composer-box button svg{ width: 18px; height: 18px; stroke: #04140C; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .composer-box button:disabled{ opacity: .4; }
+
+  .empty-chat{
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 40px 24px; color: var(--muted);
+  }
+  .empty-chat h3{ color: var(--mint); margin: 0 0 8px; font-size: 16px; }
+  .empty-chat p{ margin: 0; font-size: 13.5px; line-height: 1.5; max-width: 260px; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header class="chat-top">
+    <a href="chat.html" class="back-btn" aria-label="Back">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </a>
+    <div class="avatar" id="otherAvatar">?</div>
+    <div class="who">
+      <div class="nm" id="otherName">Loading…</div>
+      <div class="shop" id="shopName"></div>
+    </div>
+  </header>
+
+  <div class="messages" id="messages"></div>
+
+  <div class="composer-wrap">
+    <div class="composer-box">
+      <textarea id="input" rows="1" placeholder="Type a message…" maxlength="2000"></textarea>
+      <button id="sendBtn" disabled aria-label="Send">
+        <svg viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script>
+let userId = null;
+let chatId = null;
+let otherId = null;
+let sending = false;
+let lastMessageId = null;
+
+const messagesEl = document.getElementById('messages');
+const inputEl = document.getElementById('input');
+const sendBtn = document.getElementById('sendBtn');
+const otherNameEl = document.getElementById('otherName');
+const otherAvatarEl = document.getElementById('otherAvatar');
+const shopNameEl = document.getElementById('shopName');
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function fmtTime(iso){
+  const d = new Date(iso);
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+function scrollBottom(){
+  requestAnimationFrame(function(){ messagesEl.scrollTop = messagesEl.scrollHeight; });
+}
+function updateSend(){
+  sendBtn.disabled = !inputEl.value.trim() || sending;
+}
+
+// === INIT ===
+async function init(){
+  const sess = await db.auth.getSession();
+  if (!sess.data.session){ location.href = 'auth.html'; return; }
+  userId = sess.data.session.user.id;
+
+  chatId = new URLSearchParams(location.search).get('id');
+  if (!chatId){ location.href = 'chat.html'; return; }
+
+  const c = await db.from('chats').select('*').eq('id', chatId).single();
+  if (c.error || !c.data){ location.href = 'chat.html'; return; }
+
+  const chat = c.data;
+  otherId = chat.participant_a === userId ? chat.participant_b : chat.participant_a;
+
+  // Load other user
+  const p = await db.from('profiles').select('username, email, avatar_url').eq('id', otherId).maybeSingle();
+  if (p.data){
+    otherNameEl.textContent = p.data.username || p.data.email || 'Unknown';
+    if (p.data.avatar_url){
+      otherAvatarEl.innerHTML = '<img src="' + esc(p.data.avatar_url) + '" alt="">';
+    } else {
+      otherAvatarEl.textContent = (p.data.username || p.data.email || '?')[0].toUpperCase();
+    }
+  }
+
+  // Load shop if this chat is shop-related
+  if (chat.shop_id){
+    const s = await db.from('shops').select('name').eq('id', chat.shop_id).maybeSingle();
+    if (s.data) shopNameEl.textContent = 'About ' + s.data.name;
+  }
+
+  await loadMessages();
+  await markRead();
+  scrollBottom();
+
+  // Poll for new messages every 5 seconds
+  setInterval(refresh, 5000);
+}
+
+// === LOAD MESSAGES ===
+async function loadMessages(){
+  const res = await db
+    .from('chat_messages')
+    .select('*')
+    .eq('chat_id', chatId)
+    .order('created_at', { ascending: true })
+    .limit(200);
+
+  if (res.error) return;
+
+  const msgs = res.data || [];
+  if (!msgs.length){
+    messagesEl.innerHTML =
+      '<div class="empty-chat">' +
+      '<h3>Start the conversation</h3>' +
+      '<p>Send a message to get started.</p>' +
+      '</div>';
+    return;
+  }
+
+  messagesEl.innerHTML = msgs.map(m => {
+    const mine = m.sender_id === userId;
+    return '<div class="msg ' + (mine ? 'me' : 'them') + '">' +
+      esc(m.content) +
+      '<span class="t">' + fmtTime(m.created_at) + '</span>' +
+      '</div>';
+  }).join('');
+
+  if (msgs.length){
+    lastMessageId = msgs[msgs.length - 1].id;
+  }
+  scrollBottom();
+}
+
+// === REFRESH (polling) ===
+async function refresh(){
+  const res = await db
+    .from('chat_messages')
+    .select('*')
+    .eq('chat_id', chatId)
+    .order('created_at', { ascending: true })
+    .limit(200);
+
+  if (res.error || !res.data) return;
+
+  const msgs = res.data;
+  const newest = msgs[msgs.length - 1];
+  if (!newest) return;
+
+  if (newest.id !== lastMessageId){
+    messagesEl.innerHTML = msgs.map(m => {
+      const mine = m.sender_id === userId;
+      return '<div class="msg ' + (mine ? 'me' : 'them') + '">' +
+        esc(m.content) +
+        '<span class="t">' + fmtTime(m.created_at) + '</span>' +
+        '</div>';
+    }).join('');
+    lastMessageId = newest.id;
+    scrollBottom();
+    markRead();
+  }
+}
+
+// === MARK READ ===
+async function markRead(){
+  try {
+    await db
+      .from('chat_messages')
+      .update({ read_at: new Date().toISOString() })
+      .eq('chat_id', chatId)
+      .neq('sender_id', userId)
+      .is('read_at', null);
+  } catch (e){}
+}
+
+// === SEND ===
+async function send(){
+  const text = inputEl.value.trim();
+  if (!text || sending) return;
+
+  sending = true;
+  updateSend();
+
+  // Optimistic UI
+  const tempId = 'temp-' + Date.now();
+  const el = document.createElement('div');
+  el.className = 'msg me';
+  el.innerHTML = esc(text) + '<span class="t">sending…</span>';
+  el.id = tempId;
+  if (messagesEl.querySelector('.empty-chat')) messagesEl.innerHTML = '';
+  messagesEl.appendChild(el);
+  scrollBottom();
+
+  inputEl.value = '';
+  inputEl.style.height = 'auto';
+
+  const res = await db.from('chat_messages').insert({
+    chat_id: chatId,
+    sender_id: userId,
+    content: text
+  }).select().single();
+
+  sending = false;
+  updateSend();
+
+  if (res.error){
+    el.querySelector('.t').textContent = 'failed';
+    return;
+  }
+
+  // Update last_message_id so polling doesn't re-render this message
+  lastMessageId = res.data.id;
+  el.id = '';
+  el.querySelector('.t').textContent = fmtTime(res.data.created_at);
+}
+
+sendBtn.addEventListener('click', send);
+
+inputEl.addEventListener('input', function(){
+  inputEl.style.height = 'auto';
+  inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+  updateSend();
+});
+
+inputEl.addEventListener('keydown', function(e){
+  if (e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    send();
+  }
+});
+
+inputEl.addEventListener('focus', function(){ setTimeout(scrollBottom, 300); });
+
+init();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
+</script>
+</body>
+</html>

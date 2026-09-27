@@ -1,16 +1,14 @@
 -- ============================================================
--- KUMG Forge + TouRryl Store + KUMG Tap — FULL SETUP (v13)
+-- KUMG Forge + TouRryl Store + KUMG Tap — FULL SETUP (v13-fixed)
 -- Includes: profiles, projects, payments, manual_payments,
 --           redemptions, AI messages/images, shops, products,
---           orders, sponsors, wallets, taps, RLS, storage,
---           backfill, redeem_pro function
+--           orders, sponsors, wallets, taps, chats, chat_messages,
+--           RLS, storage, backfill, redeem_pro, unread_count
 -- Safe to run multiple times
 -- ============================================================
 
 -- === CLEAN RESET ===
 drop trigger if exists on_auth_user_created on auth.users;
-drop trigger if exists on_profile_create_wallet on public.profiles;
-drop trigger if exists chat_message_added on chat_messages;
 
 drop function if exists public.handle_new_user() cascade;
 drop function if exists public.handle_new_wallet() cascade;
@@ -513,7 +511,7 @@ $$;
 
 
 -- ============================================================
--- 21. REDEEM PRO (spend wallet balance to become Pro)
+-- 21. REDEEM PRO
 -- ============================================================
 create or replace function public.redeem_pro(p_user_id uuid)
 returns jsonb language plpgsql security definer set search_path = public
@@ -596,7 +594,6 @@ alter table chat_messages    enable row level security;
 drop policy if exists "own profile read" on profiles;
 drop policy if exists "own profile update" on profiles;
 drop policy if exists "admin read all profiles" on profiles;
-
 create policy "own profile read" on profiles
   for select using (auth.uid() = id);
 create policy "own profile update" on profiles
@@ -608,7 +605,6 @@ create policy "admin read all profiles" on profiles
 drop policy if exists "own projects" on projects;
 drop policy if exists "admin read all projects" on projects;
 drop policy if exists "public can read published projects" on projects;
-
 create policy "own projects" on projects
   for all using (auth.uid() = owner) with check (auth.uid() = owner);
 create policy "admin read all projects" on projects
@@ -629,7 +625,6 @@ drop policy if exists "own manual payments insert" on manual_payments;
 drop policy if exists "own manual payments read" on manual_payments;
 drop policy if exists "admin read all manual payments" on manual_payments;
 drop policy if exists "admin update manual payments" on manual_payments;
-
 create policy "own manual payments insert" on manual_payments
   for insert with check (auth.uid() = user_id);
 create policy "own manual payments read" on manual_payments
@@ -644,7 +639,6 @@ drop policy if exists "own redemptions insert" on redemptions;
 drop policy if exists "own redemptions read" on redemptions;
 drop policy if exists "admin read all redemptions" on redemptions;
 drop policy if exists "admin update redemptions" on redemptions;
-
 create policy "own redemptions insert" on redemptions
   for insert with check (auth.uid() = user_id);
 create policy "own redemptions read" on redemptions

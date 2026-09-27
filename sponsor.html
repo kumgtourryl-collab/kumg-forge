@@ -18,7 +18,7 @@
     background: var(--card); border: 1px solid var(--line);
     border-radius: 14px; padding: 14px; margin-bottom: 10px;
   }
-  .sp-card.inactive{ opacity: .65; }
+  .sp-card.inactive{ opacity: .7; }
   .sp-head{
     display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px;
   }
@@ -52,8 +52,8 @@
     border-radius: 10px; padding: 8px;
     text-align: center;
   }
-  .sp-stat .v{ font-weight: 800; font-size: 15px; color: var(--green); }
-  .sp-stat .l{ font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+  .sp-stat .v{ font-weight: 800; font-size: 14px; color: var(--green); }
+  .sp-stat .l{ font-size: 9.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
 
   .sp-actions{ display: flex; gap: 6px; flex-wrap: wrap; }
   .sp-actions button, .sp-actions a{
@@ -129,7 +129,6 @@ function toast(msg){
 }
 
 async function load(){
-  // Admin guard
   const sess = await db.auth.getSession();
   if (!sess.data.session){ location.href = 'auth.html'; return; }
 

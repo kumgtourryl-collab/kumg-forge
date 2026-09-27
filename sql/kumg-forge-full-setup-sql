@@ -1,7 +1,8 @@
 -- ============================================================
--- KUMG Forge + TouRryl Store + KUMG Tap — FULL SETUP (v11)
--- Includes: profiles, projects, payments, AI, shops, sponsors,
---           wallets, taps, RLS, 3 storage buckets, backfill
+-- KUMG Forge + TouRryl Store + KUMG Tap — FULL SETUP (v12)
+-- Includes: profiles, projects, payments, manual_payments,
+--           AI messages/images, shops, products, orders,
+--           sponsors, wallets, taps, RLS, storage, backfill
 -- Safe to run multiple times
 -- ============================================================
 
@@ -22,6 +23,7 @@ drop function if exists public.record_tap(uuid, uuid) cascade;
 drop table if exists taps cascade;
 drop table if exists wallets cascade;
 drop table if exists sponsors cascade;
+drop table if exists manual_payments cascade;
 drop table if exists affiliate_clicks cascade;
 drop table if exists shop_orders cascade;
 drop table if exists shop_products cascade;
@@ -73,7 +75,7 @@ create index projects_subdomain_idx on projects(subdomain) where is_published = 
 
 
 -- ============================================================
--- 3. PAYMENTS
+-- 3. PAYNOW PAYMENTS
 -- ============================================================
 create table payments (
   id uuid primary key default gen_random_uuid(),
@@ -93,7 +95,30 @@ create index payments_reference_idx on payments(reference);
 
 
 -- ============================================================
--- 4. AI MESSAGES
+-- 4. MANUAL ECOCASH PAYMENTS (temporary bridge)
+-- ============================================================
+create table manual_payments (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references profiles(id) on delete cascade,
+  email text,
+  ecocash_from text,
+  amount numeric(10,2) default 5.00,
+  reference text,
+  note text,
+  status text default 'pending' check (status in ('pending','approved','rejected')),
+  submitted_at timestamptz default now(),
+  reviewed_at timestamptz,
+  reviewed_by uuid references profiles(id)
+);
+
+create index manual_payments_status_idx
+  on manual_payments(status, submitted_at desc);
+create index manual_payments_user_idx
+  on manual_payments(user_id);
+
+
+-- ============================================================
+-- 5. AI MESSAGES
 -- ============================================================
 create table ai_messages (
   id uuid primary key default gen_random_uuid(),
@@ -107,7 +132,7 @@ create index ai_messages_user_date_idx on ai_messages(user_id, created_at desc);
 
 
 -- ============================================================
--- 5. AI IMAGES
+-- 6. AI IMAGES
 -- ============================================================
 create table ai_images (
   id uuid primary key default gen_random_uuid(),
@@ -120,7 +145,7 @@ create index ai_images_user_date_idx on ai_images(user_id, created_at desc);
 
 
 -- ============================================================
--- 6. TOURRYL STORE — SHOPS
+-- 7. TOURRYL STORE — SHOPS
 -- ============================================================
 create table shops (
   id uuid primary key default gen_random_uuid(),
@@ -146,7 +171,7 @@ create index shops_slug_idx on shops(slug);
 
 
 -- ============================================================
--- 7. TOURRYL STORE — PRODUCTS
+-- 8. TOURRYL STORE — PRODUCTS
 -- ============================================================
 create table shop_products (
   id uuid primary key default gen_random_uuid(),
@@ -165,7 +190,7 @@ create index shop_products_shop_idx on shop_products(shop_id, sort_order);
 
 
 -- ============================================================
--- 8. TOURRYL STORE — ORDERS
+-- 9. TOURRYL STORE — ORDERS
 -- ============================================================
 create table shop_orders (
   id uuid primary key default gen_random_uuid(),
@@ -182,7 +207,7 @@ create index shop_orders_shop_idx on shop_orders(shop_id, created_at desc);
 
 
 -- ============================================================
--- 9. KUMG TAP — SPONSORS
+-- 10. KUMG TAP — SPONSORS
 -- ============================================================
 create table sponsors (
   id uuid primary key default gen_random_uuid(),
@@ -204,7 +229,7 @@ create table sponsors (
 
 
 -- ============================================================
--- 10. KUMG TAP — WALLETS
+-- 11. KUMG TAP — WALLETS
 -- ============================================================
 create table wallets (
   user_id uuid primary key references profiles(id) on delete cascade,
@@ -215,7 +240,7 @@ create table wallets (
 
 
 -- ============================================================
--- 11. KUMG TAP — TAPS
+-- 12. KUMG TAP — TAPS
 -- ============================================================
 create table taps (
   id uuid primary key default gen_random_uuid(),
@@ -230,7 +255,7 @@ create index taps_sponsor_idx on taps(sponsor_id);
 
 
 -- ============================================================
--- 12. HELPER FUNCTIONS
+-- 13. HELPER FUNCTIONS
 -- ============================================================
 create or replace function public.is_admin()
 returns boolean language sql stable security definer set search_path = public
@@ -268,7 +293,7 @@ $$;
 
 
 -- ============================================================
--- 13. AUTO-CREATE PROFILE ON SIGNUP
+-- 14. AUTO-CREATE PROFILE ON SIGNUP
 -- ============================================================
 create function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public
@@ -291,7 +316,7 @@ for each row execute procedure public.handle_new_user();
 
 
 -- ============================================================
--- 14. AUTO-CREATE WALLET ON PROFILE CREATE
+-- 15. AUTO-CREATE WALLET ON PROFILE CREATE
 -- ============================================================
 create function public.handle_new_wallet()
 returns trigger language plpgsql security definer set search_path = public
@@ -310,7 +335,7 @@ for each row execute procedure public.handle_new_wallet();
 
 
 -- ============================================================
--- 15. AUTO-UPDATE updated_at
+-- 16. AUTO-UPDATE updated_at
 -- ============================================================
 create function public.touch_updated_at()
 returns trigger language plpgsql
@@ -335,7 +360,7 @@ for each row execute procedure public.touch_updated_at();
 
 
 -- ============================================================
--- 16. AGE VERIFICATION (13+)
+-- 17. AGE VERIFICATION (13+)
 -- ============================================================
 create function public.check_dob()
 returns trigger language plpgsql
@@ -365,7 +390,7 @@ for each row execute procedure public.check_dob();
 
 
 -- ============================================================
--- 17. RECORD TAP — pays user + debits sponsor
+-- 18. RECORD TAP — pays user + debits sponsor
 -- ============================================================
 create or replace function public.record_tap(
   p_user_id uuid,
@@ -406,9 +431,7 @@ begin
   v_user_share := floor(v_cents / 2);
   v_owner_share := v_cents - v_user_share;
 
-  update sponsors
-  set balance = balance - v_bid
-  where id = p_sponsor_id;
+  update sponsors set balance = balance - v_bid where id = p_sponsor_id;
 
   insert into taps (user_id, sponsor_id, amount_cents)
   values (p_user_id, p_sponsor_id, v_user_share);
@@ -430,19 +453,20 @@ $$;
 
 
 -- ============================================================
--- 18. ROW LEVEL SECURITY
+-- 19. ROW LEVEL SECURITY
 -- ============================================================
-alter table profiles      enable row level security;
-alter table projects      enable row level security;
-alter table payments      enable row level security;
-alter table ai_messages   enable row level security;
-alter table ai_images     enable row level security;
-alter table shops         enable row level security;
-alter table shop_products enable row level security;
-alter table shop_orders   enable row level security;
-alter table sponsors      enable row level security;
-alter table wallets       enable row level security;
-alter table taps          enable row level security;
+alter table profiles         enable row level security;
+alter table projects         enable row level security;
+alter table payments         enable row level security;
+alter table manual_payments  enable row level security;
+alter table ai_messages      enable row level security;
+alter table ai_images        enable row level security;
+alter table shops            enable row level security;
+alter table shop_products    enable row level security;
+alter table shop_orders      enable row level security;
+alter table sponsors         enable row level security;
+alter table wallets          enable row level security;
+alter table taps             enable row level security;
 
 -- PROFILES
 drop policy if exists "own profile read" on profiles;
@@ -468,7 +492,7 @@ create policy "admin read all projects" on projects
 create policy "public can read published projects" on projects
   for select using (is_published = true);
 
--- PAYMENTS
+-- PAYMENTS (Paynow)
 drop policy if exists "own payments" on payments;
 drop policy if exists "admin read all payments" on payments;
 
@@ -476,6 +500,21 @@ create policy "own payments" on payments
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "admin read all payments" on payments
   for select using (public.is_admin());
+
+-- MANUAL PAYMENTS (EcoCash)
+drop policy if exists "own manual payments insert" on manual_payments;
+drop policy if exists "own manual payments read" on manual_payments;
+drop policy if exists "admin read all manual payments" on manual_payments;
+drop policy if exists "admin update manual payments" on manual_payments;
+
+create policy "own manual payments insert" on manual_payments
+  for insert with check (auth.uid() = user_id);
+create policy "own manual payments read" on manual_payments
+  for select using (auth.uid() = user_id);
+create policy "admin read all manual payments" on manual_payments
+  for select using (public.is_admin());
+create policy "admin update manual payments" on manual_payments
+  for update using (public.is_admin()) with check (public.is_admin());
 
 -- AI MESSAGES
 drop policy if exists "own ai messages" on ai_messages;
@@ -568,7 +607,7 @@ create policy "admin read all taps" on taps
 
 
 -- ============================================================
--- 19. STORAGE BUCKETS — avatars, shop-images, user-media
+-- 20. STORAGE BUCKETS
 -- ============================================================
 insert into storage.buckets (id, name, public)
 values ('avatars', 'avatars', true)
@@ -623,7 +662,7 @@ create policy "user-media user delete" on storage.objects
 
 
 -- ============================================================
--- 20. AUTO-BACKFILL existing auth users + wallets
+-- 21. AUTO-BACKFILL existing auth users + wallets
 -- ============================================================
 insert into public.profiles (id, username, email)
 select
@@ -644,7 +683,7 @@ on conflict (user_id) do nothing;
 
 
 -- ============================================================
--- 21. MAKE kumgtourryl@gmail.com THE ADMIN
+-- 22. MAKE kumgtourryl@gmail.com THE ADMIN
 -- ============================================================
 update public.profiles
 set is_admin = true
@@ -653,4 +692,4 @@ where email = 'kumgtourryl@gmail.com';
 
 -- ============================================================
 -- DONE. You should see "Success. No rows returned"
--- ============================================================
+-- ============================================================ 

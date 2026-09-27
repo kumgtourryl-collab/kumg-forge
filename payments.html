@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0A">
+<title>Payments — KUMG Admin</title>
+<script>
+(function(){
+  var t = localStorage.getItem('kumg_theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme','light');
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .pay-card{
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 14px; padding: 14px; margin-bottom: 10px;
+  }
+  .pay-card.approved{ opacity: .55; }
+  .pay-card.rejected{ opacity: .4; }
+
+  .pay-head{
+    display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px;
+  }
+  .pay-icon{
+    width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--deep), var(--green));
+    display: grid; place-items: center;
+    color: #04140C; font-weight: 900; font-size: 18px;
+  }
+  .pay-info{ flex: 1; min-width: 0; }
+  .pay-info .email{
+    font-weight: 800; font-size: 14px;
+    word-break: break-all; margin-bottom: 2px;
+  }
+  .pay-info .meta{ font-size: 11.5px; color: var(--muted); }
+  .pay-status{
+    font-size: 9.5px; font-weight: 800; letter-spacing: .5px;
+    text-transform: uppercase;
+    padding: 3px 8px; border-radius: 999px;
+    flex-shrink: 0;
+  }
+  .pay-status.pending{ background: #7A6520; color: #F5DEA0; }
+  .pay-status.approved{ background: var(--green); color: #04140C; }
+  .pay-status.rejected{ background: var(--danger); color: #fff; }
+
+  .pay-details{
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; margin-bottom: 12px;
+  }
+  .pay-detail{
+    background: rgba(31,157,98,.08);
+    border-radius: 10px; padding: 8px 10px;
+  }
+  .pay-detail .l{
+    font-size: 10px; text-transform: uppercase;
+    letter-spacing: .5px; color: var(--muted); font-weight: 700;
+  }
+  .pay-detail .v{
+    font-size: 13px; font-weight: 700; margin-top: 2px;
+    word-break: break-all;
+  }
+
+  .pay-note{
+    background: rgba(31,157,98,.05);
+    border-left: 3px solid var(--green);
+    border-radius: 0 8px 8px 0;
+    padding: 8px 12px;
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+
+  .pay-actions{ display: flex; gap: 6px; flex-wrap: wrap; }
+  .pay-actions button{
+    flex: 1; min-width: 100px;
+    font-size: 13px; font-weight: 700;
+    padding: 11px 12px; border-radius: 10px;
+    border: 0; cursor: pointer;
+    font-family: var(--font);
+  }
+  .pay-actions .approve{ background: var(--green); color: #04140C; }
+  .pay-actions .reject{ background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+  .pay-actions .ghost{ background: transparent; color: var(--muted); border: 1px solid var(--line); }
+  .pay-actions .wa{ background: #25D366; color: #04140C; text-decoration: none; text-align: center; display: block; }
+
+  .summary-row{
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px; margin-bottom: 20px;
+  }
+  .summary-box{
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 12px;
+    text-align: center;
+  }
+  .summary-box .num{
+    font-size: 20px; font-weight: 800; color: var(--green);
+  }
+  .summary-box .lbl{
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .5px;
+    margin-top: 2px; font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <a href="admin.html" style="display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none">
+      <div class="logo">K</div>
+      <div>KUMG <span class="accent">Payments</span></div>
+    </a>
+  </div>
+  <div class="actions">
+    <button class="btn-ghost" onclick="location.href='admin.html'" style="font-size:13px;padding:8px 12px">Back</button>
+  </div>
+</header>
+
+<main class="container" style="max-width:640px">
+  <h1 class="page-title">Manual payments</h1>
+  <p class="page-sub" id="summary">Loading…</p>
+
+  <div class="summary-row">
+    <div class="summary-box">
+      <div class="num" id="sPending">—</div>
+      <div class="lbl">Pending</div>
+    </div>
+    <div class="summary-box">
+      <div class="num" id="sApproved">—</div>
+      <div class="lbl">Approved</div>
+    </div>
+    <div class="summary-box">
+      <div class="num" id="sRevenue">—</div>
+      <div class="lbl">Revenue</div>
+    </div>
+  </div>
+
+  <div id="list"></div>
+</main>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script>
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2400);
+}
+function timeAgo(iso){
+  const s = Math.floor((Date.now() - new Date(iso).getTime())/1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  return Math.floor(s/86400) + 'd ago';
+}
+
+let adminId = null;
+
+async function load(){
+  var sess = await db.auth.getSession();
+  if (!sess.data.session){ location.href = 'auth.html'; return; }
+  adminId = sess.data.session.user.id;
+
+  var me = await db.from('profiles').select('is_admin').eq('id', adminId).maybeSingle();
+  if (!me.data || !me.data.is_admin){
+    document.querySelector('main').innerHTML =
+      '<div class="empty"><h3>Not allowed</h3><p>Admin only.</p></div>';
+    return;
+  }
+
+  var result = await db
+    .from('manual_payments')
+    .select('*')
+    .order('status', { ascending: true })
+    .order('submitted_at', { ascending: false })
+    .limit(100);
+
+  if (result.error){
+    document.getElementById('list').innerHTML =
+      '<div class="empty"><h3>Could not load</h3><p>' + esc(result.error.message) + '</p></div>';
+    return;
+  }
+
+  var payments = result.data || [];
+  var pending = payments.filter(function(p){ return p.status === 'pending'; }).length;
+  var approved = payments.filter(function(p){ return p.status === 'approved'; }).length;
+  var revenue = payments
+    .filter(function(p){ return p.status === 'approved'; })
+    .reduce(function(a, p){ return a + Number(p.amount || 0); }, 0);
+
+  document.getElementById('sPending').textContent = pending;
+  document.getElementById('sApproved').textContent = approved;
+  document.getElementById('sRevenue').textContent = '$' + revenue.toFixed(2);
+
+  document.getElementById('summary').textContent =
+    pending + ' pending approval · ' + payments.length + ' total submissions';
+
+  render(payments);
+}
+
+function render(list){
+  var el = document.getElementById('list');
+  if (!list.length){
+    el.innerHTML = '<div class="empty"><h3>No payments yet</h3><p>Share the upgrade page with users.</p></div>';
+    return;
+  }
+
+  el.innerHTML = list.map(function(p){
+    var initial = (p.email || '?')[0].toUpperCase();
+    var waLink = p.ecocash_from
+      ? 'https://wa.me/263' + String(p.ecocash_from).replace(/[^\d]/g, '').replace(/^0/, '')
+      : null;
+
+    return `
+      <div class="pay-card ${esc(p.status)}" data-id="${p.id}">
+        <div class="pay-head">
+          <div class="pay-icon">${esc(initial)}</div>
+          <div class="pay-info">
+            <div class="email">${esc(p.email || 'unknown')}</div>
+            <div class="meta">submitted ${timeAgo(p.submitted_at)}</div>
+          </div>
+          <span class="pay-status ${esc(p.status)}">${esc(p.status)}</span>
+        </div>
+
+        <div class="pay-details">
+          <div class="pay-detail">
+            <div class="l">Sent from</div>
+            <div class="v">${esc(p.ecocash_from || '—')}</div>
+          </div>
+          <div class="pay-detail">
+            <div class="l">Amount</div>
+            <div class="v">$${Number(p.amount || 0).toFixed(2)}</div>
+          </div>
+          <div class="pay-detail" style="grid-column: 1 / -1">
+            <div class="l">Reference</div>
+            <div class="v">${esc(p.reference || '—')}</div>
+          </div>
+        </div>
+
+        ${p.note ? '<div class="pay-note">"' + esc(p.note) + '"</div>' : ''}
+
+        <div class="pay-actions">
+          ${p.status === 'pending' ? `
+            <button class="approve" data-action="approve">Approve &amp; upgrade</button>
+            <button class="reject" data-action="reject">Reject</button>
+            ${waLink ? '<a class="wa" href="' + waLink + '" target="_blank" rel="noopener" style="flex:1;min-width:100px;padding:11px 12px;border-radius:10px;font-size:13px;font-weight:700;font-family:var(--font)">WhatsApp user</a>' : ''}
+          ` : `
+            <button class="ghost" data-action="reset">Reset to pending</button>
+          `}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  el.querySelectorAll('[data-action]').forEach(function(btn){
+    btn.addEventListener('click', async function(){
+      var card = btn.closest('.pay-card');
+      var id = card.dataset.id;
+      var action = btn.dataset.action;
+
+      if (action === 'approve'){
+        if (!confirm('Approve this payment and upgrade the user to Pro?')) return;
+        btn.disabled = true;
+        btn.textContent = 'Approving…';
+
+        var payment = await db.from('manual_payments').select('user_id').eq('id', id).single();
+        if (payment.error || !payment.data){
+          toast('Could not load payment');
+          btn.disabled = false; btn.textContent = 'Approve & upgrade';
+          return;
+        }
+
+        var upd1 = await db.from('profiles').update({ plan: 'pro' }).eq('id', payment.data.user_id);
+        if (upd1.error){ toast(upd1.error.message); btn.disabled = false; btn.textContent = 'Approve & upgrade'; return; }
+
+        var upd2 = await db.from('manual_payments').update({
+          status: 'approved',
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: adminId
+        }).eq('id', id);
+        if (upd2.error){ toast(upd2.error.message); btn.disabled = false; btn.textContent = 'Approve & upgrade'; return; }
+
+        toast('Approved. User is now Pro.');
+        load();
+        return;
+      }
+
+      if (action === 'reject'){
+        if (!confirm('Reject this payment?')) return;
+        var upd = await db.from('manual_payments').update({
+          status: 'rejected',
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: adminId
+        }).eq('id', id);
+        if (upd.error){ toast(upd.error.message); return; }
+        toast('Rejected');
+        load();
+        return;
+      }
+
+      if (action === 'reset'){
+        if (!confirm('Reset this to pending? This will not downgrade the user.')) return;
+        var upd = await db.from('manual_payments').update({
+          status: 'pending',
+          reviewed_at: null,
+          reviewed_by: null
+        }).eq('id', id);
+        if (upd.error){ toast(upd.error.message); return; }
+        toast('Reset to pending');
+        load();
+      }
+    });
+  });
+}
+
+load();
+</script>
+</body>
+</html>

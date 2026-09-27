@@ -79,7 +79,6 @@
   }
   .preset.active{ background: var(--green); color: #04140C; border-color: var(--green); }
 
-  /* Success state */
   .success{
     display: none;
     max-width: 520px; margin: 0 auto; padding: 30px 20px 40px;
@@ -117,10 +116,6 @@
     text-decoration: none; margin-bottom: 10px;
   }
   .wa-cta:active{ opacity: .9; }
-
-  .price-row{
-    display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;
-  }
 </style>
 </head>
 <body>
@@ -182,7 +177,7 @@
       <p style="margin:0 0 12px;color:var(--muted);font-size:13px">This is what users see on their dashboard.</p>
 
       <div class="img-pick">
-        <div class="box" id="imgPreview"><span>📷</span></div>
+        <div class="box" id="imgPreview"><span>+</span></div>
         <div style="flex:1;min-width:0">
           <button class="btn-ghost" id="imgBtn" style="font-size:13px;padding:8px 12px;width:100%">Upload logo (optional)</button>
           <input id="imgInput" type="file" accept="image/*" style="display:none">
@@ -229,17 +224,17 @@
   <div class="check">
     <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
   </div>
-  <h2>Almost there!</h2>
+  <h2>Almost there</h2>
   <p>Save this reference code. Now deposit at least $5 via EcoCash and send us a WhatsApp with the code.</p>
 
   <div class="ref-box" id="refBox">KUMG-XXXX-XX</div>
 
   <a class="wa-cta" id="waLink" href="#" target="_blank" rel="noopener">
-    💬 Send payment on WhatsApp
+    Send payment on WhatsApp
   </a>
 
   <p style="font-size:12px;color:var(--muted);line-height:1.55">
-    We'll activate your card within a few minutes of receiving payment.<br>
+    We activate your card within a few minutes of receiving payment.<br>
     Your balance is topped up and every tap starts spending it.
   </p>
 
@@ -252,9 +247,9 @@
 <script src="js/supabase.js"></script>
 <script>
 // ============================================================
-// CONFIG
+// CONFIG — KUMG contact
 // ============================================================
-const KUMG_WHATSAPP = '263773599014'; // your number — change later
+const KUMG_WHATSAPP = '263790272300';   // from 0790272300
 
 let logoUrl = null;
 let pendingFile = null;
@@ -267,7 +262,6 @@ function toast(msg){
   setTimeout(function(){ t.classList.remove('show'); }, 2200);
 }
 
-// Logo upload
 $('imgBtn').addEventListener('click', () => $('imgInput').click());
 
 $('imgInput').addEventListener('change', async (e) => {
@@ -281,7 +275,6 @@ $('imgInput').addEventListener('change', async (e) => {
   $('imgPreview').innerHTML = '<img src="' + url + '" alt="">';
 });
 
-// Bid presets
 document.querySelectorAll('.preset').forEach(function(b){
   b.addEventListener('click', function(){
     document.querySelectorAll('.preset').forEach(function(x){ x.classList.remove('active'); });
@@ -290,7 +283,6 @@ document.querySelectorAll('.preset').forEach(function(b){
   });
 });
 
-// Submit
 $('submitBtn').addEventListener('click', async () => {
   const bizName = $('bizName').value.trim();
   const wa = $('wa').value.trim();
@@ -312,7 +304,6 @@ $('submitBtn').addEventListener('click', async () => {
   $('submitBtn').disabled = true;
   $('submitBtn').textContent = 'Submitting…';
 
-  // Upload logo if any
   let imageUrl = null;
   if (pendingFile){
     const ext = (pendingFile.name.split('.').pop() || 'jpg').toLowerCase();
@@ -328,7 +319,6 @@ $('submitBtn').addEventListener('click', async () => {
     imageUrl = pub.data.publicUrl;
   }
 
-  // Create reference code
   const ref = 'KUMG-' + Date.now().toString(36).toUpperCase().slice(-6) + '-' +
               Math.floor(Math.random() * 90 + 10);
 
@@ -344,7 +334,7 @@ $('submitBtn').addEventListener('click', async () => {
     location: location || null,
     bid_per_tap: bid,
     balance: 0,
-    is_active: false,   // activates after payment
+    is_active: false,
     created_by: null
   };
 
@@ -357,10 +347,6 @@ $('submitBtn').addEventListener('click', async () => {
     return;
   }
 
-  // Save reference on the row (add a note in card_description? we don't have a column)
-  // We'll just use the reference for the WhatsApp message — you (admin) match by business name + WhatsApp.
-
-  // Switch to success view
   $('formView').style.display = 'none';
   $('successView').classList.add('show');
   $('refBox').textContent = ref;

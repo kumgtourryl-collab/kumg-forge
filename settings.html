@@ -259,41 +259,8 @@ langSelect.addEventListener('change', function(){
   }
 })();
 
-document.getElementById('upgradeBtn')?.addEventListener('click', async function(){
-  const msgEl = document.getElementById('paynowMsg');
-  if (msgEl){ msgEl.textContent = 'Opening Paynow…'; msgEl.style.color = ''; }
-
-  const { data } = await db.auth.getSession();
-  if (!data.session) return;
-
-  try {
-    const res = await fetch('https://kumg-forge.onrender.com/api/paynow/initiate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: data.session.user.id, plan: 'pro' })
-    });
-    const json = await res.json();
-
-    if (!res.ok){
-      if (/not configured/i.test(json.error || '')){
-        if (msgEl){
-          msgEl.innerHTML = 'Upgrade coming very soon.<br>' +
-            '<a href="mailto:kumgtourryl@gmail.com?subject=KUMG%20Pro%20waitlist" ' +
-            'style="color:#B5F5D5;text-decoration:underline">Join the Pro waitlist</a>';
-          msgEl.style.color = '';
-        }
-        return;
-      }
-      throw new Error(json.error || 'Failed');
-    }
-
-    location.href = json.redirectUrl;
-  } catch (err){
-    if (msgEl){
-      msgEl.textContent = err.message;
-      msgEl.style.color = '#FFB4B4';
-    }
-  }
+document.getElementById('upgradeBtn')?.addEventListener('click', function(){
+  location.href = 'upgrade.html';
 });
 
 document.getElementById('logoutBtn').addEventListener('click', async function(){
@@ -307,4 +274,4 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 </body>
-  </html> 
+</html>

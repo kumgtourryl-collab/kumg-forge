@@ -148,7 +148,7 @@ app.post('/api/unpublish', async (req, res) => {
 });
 
 // ============================================================
-// AI CHAT
+// AI CHAT — with shop context
 // ============================================================
 app.post('/api/ai/chat', async (req, res) => {
   try {
@@ -199,14 +199,15 @@ app.post('/api/ai/chat', async (req, res) => {
     }
 
     const systemPrompt = [
-      'You are KUMG AI, a friendly coding assistant inside the KUMG Forge mobile app.',
-      'Users are building websites on their phones. Help with HTML, CSS, JavaScript.',
-      'Assume beginner level unless clearly advanced. Never invent KUMG features.',
+      'You are KUMG AI, a friendly coding and business assistant inside the KUMG Forge mobile app.',
+      'Users build websites and run online shops from their phones.',
+      'Help with HTML, CSS, JavaScript — and help shop owners improve their listings, write product descriptions, and set prices.',
+      'Assume beginner level unless clearly advanced. Never invent KUMG features that do not exist.',
       '',
-      'STYLE: Keep answers short — 2-3 short paragraphs, then code.',
+      'STYLE: Keep answers short — 2-3 short paragraphs, then code if needed.',
       'Wrap code in triple-backtick fences with a language tag: ```html, ```css, ```js.',
       '',
-      'MATH: Show calculations like Google — clean steps, no $ signs.',
+      'MATH: Show calculations like Google — clean steps, no $ signs unless money was asked.',
       'Example: "15% of 200" →',
       '  15% of 200',
       '  = 15 ÷ 100 × 200',
@@ -217,15 +218,40 @@ app.post('/api/ai/chat', async (req, res) => {
       '  ![short description](https://image.pollinations.ai/prompt/WORDS+JOINED+BY+PLUS?width=1024&height=768&nologo=true)',
       '',
       'VIDEO: When asked for a video, respond with:',
-      '  🎥 [Watch videos about TOPIC](https://www.pexels.com/search/videos/TOPIC%20ENCODED/)'
+      '  [Watch videos about TOPIC](https://www.pexels.com/search/videos/TOPIC%20ENCODED/)',
+      '',
+      'SHOPS: If the user has shops (listed below), you know their names, taglines, and publish status.',
+      'Help them write better product names, taglines, delivery info, and WhatsApp replies.',
+      'If a shop is still a draft, encourage them to publish it.'
     ].join('\n');
 
-    const contextNote = projectContext
-      ? '\n\nProject context (do not repeat back):\n' +
-        'HTML: ' + (projectContext.html || '').slice(0, 800) + '\n' +
-        'CSS: '  + (projectContext.css  || '').slice(0, 800) + '\n' +
-        'JS: '   + (projectContext.js   || '').slice(0, 800)
-      : '';
+    // Build context — HTML/CSS/JS + user's shops
+    let contextNote = '';
+    if (projectContext){
+      const parts = [];
+
+      if (projectContext.html) parts.push('Current HTML: ' + String(projectContext.html).slice(0, 700));
+      if (projectContext.css)  parts.push('Current CSS: '  + String(projectContext.css).slice(0, 700));
+      if (projectContext.js)   parts.push('Current JS: '   + String(projectContext.js).slice(0, 700));
+
+      if (Array.isArray(projectContext.shops) && projectContext.shops.length){
+        const shopLines = projectContext.shops.map(s => {
+          let line = '- "' + (s.name || 'untitled') + '"';
+          line += ' (URL: /store/' + (s.slug || 'unknown') + ')';
+          line += ', status: ' + (s.is_published ? 'published' : 'draft');
+          if (s.tagline) line += ', tagline: "' + String(s.tagline).slice(0, 80) + '"';
+          if (s.whatsapp) line += ', WhatsApp: ' + String(s.whatsapp).slice(0, 30);
+          if (s.ecocash) line += ', EcoCash: ' + String(s.ecocash).slice(0, 30);
+          if (s.delivery_info) line += ', delivery: ' + String(s.delivery_info).slice(0, 80);
+          return line;
+        });
+        parts.push('User\'s shops (context only — do not repeat back):\n' + shopLines.join('\n'));
+      }
+
+      if (parts.length){
+        contextNote = '\n\n=== USER CONTEXT ===\n' + parts.join('\n');
+      }
+    }
 
     const groqMessages = [
       { role: 'system', content: systemPrompt + contextNote },
@@ -415,7 +441,7 @@ function render404(sub){
 <style>body{font-family:system-ui;background:#0A0A0A;color:#E8F5EE;display:grid;place-items:center;min-height:100vh;margin:0;padding:24px;text-align:center}
 h1{font-size:56px;margin:0;color:#1F9D62}p{color:#A8BAB1}a{color:#1F9D62}</style></head>
 <body><div><h1>404</h1><p>No site at <strong>${escapeHtml(sub)}.kumg.app</strong> yet.</p>
-<p><a href="https://kumg.app">Build yours free →</a></p></div></body></html>`;
+<p><a href="https://kumg.app">Build yours free</a></p></div></body></html>`;
 }
 
 // ============================================================
@@ -442,7 +468,6 @@ async function servePublicShop(req, res){
     .eq('shop_id', shop.id)
     .order('sort_order', { ascending: true });
 
-  // Fire-and-forget view count
   db.from('shops').update({ views: (shop.views || 0) + 1 }).eq('id', shop.id).then(()=>{}).catch(()=>{});
 
   res.set('Content-Type', 'text/html; charset=utf-8');
@@ -555,8 +580,8 @@ body{margin:0;background:${t.bg};color:${t.text};font-family:system-ui,-apple-sy
   <div class="shop-logo">${logo}</div>
   <h1>${escapeHtml(shop.name)}</h1>
   ${shop.tagline ? `<p class="tagline">${escapeHtml(shop.tagline)}</p>` : ''}
-  <a class="wa-btn" href="${waLink}" target="_blank" rel="noopener">💬 Chat on WhatsApp</a>
-  ${shop.delivery_info ? `<div class="delivery-info">🚚 ${escapeHtml(shop.delivery_info)}</div>` : ''}
+  <a class="wa-btn" href="${waLink}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+  ${shop.delivery_info ? `<div class="delivery-info">${escapeHtml(shop.delivery_info)}</div>` : ''}
 </div>
 
 <div class="shop-body">
@@ -568,7 +593,7 @@ body{margin:0;background:${t.bg};color:${t.text};font-family:system-ui,-apple-sy
     <div class="count" id="cartCount">0 items</div>
     <div class="total" id="cartTotal">$0.00</div>
   </div>
-  <button id="viewCartBtn">View cart →</button>
+  <button id="viewCartBtn">View cart</button>
 </div>
 
 <div class="cart-bg" id="cartBg">
@@ -715,7 +740,7 @@ function renderShop404(slug){
 <style>body{font-family:system-ui;background:#0A0A0A;color:#E8F5EE;display:grid;place-items:center;min-height:100vh;margin:0;padding:24px;text-align:center}
 h1{font-size:56px;margin:0;color:#1F9D62}p{color:#A8BAB1}a{color:#1F9D62}</style></head>
 <body><div><h1>404</h1><p>No shop at <strong>/store/${escapeHtml(slug)}</strong>.</p>
-<p><a href="https://kumg.app">Create your own free shop →</a></p></div></body></html>`;
+<p><a href="https://kumg.app">Create your own free shop</a></p></div></body></html>`;
 }
 
 // ===== START =====
@@ -723,4 +748,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log('KUMG Forge + TouRryl Store running on port ' + PORT);
   console.log('AI model: ' + GROQ_MODEL);
+  console.log('AI limits — messages: ' + AI_FREE_LIMIT + ', images: ' + AI_IMAGE_LIMIT);
 });

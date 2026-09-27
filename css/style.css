@@ -42,6 +42,7 @@ a:hover{text-decoration:underline}
   width:28px;height:28px;border-radius:8px;
   background:linear-gradient(135deg,var(--deep),var(--green));
   display:grid;place-items:center;color:#04140C;font-weight:900;font-size:14px;
+  overflow:hidden;
 }
 .brand span.accent{color:var(--green)}
 .topbar .actions{display:flex;gap:8px;align-items:center}
@@ -58,6 +59,23 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .btn-ghost{background:transparent;color:var(--mint);border:1px solid var(--line)}
 .btn-danger{background:var(--danger);color:#fff}
 .btn-block{width:100%;display:block;text-align:center}
+
+/* Icon button */
+.icon-btn{
+  width:38px;height:38px;border-radius:10px;
+  background:transparent;border:1px solid var(--line);
+  display:grid;place-items:center;color:var(--mint);
+  flex-shrink:0;padding:0;cursor:pointer;
+  transition:all .15s ease;
+}
+[data-theme="light"] .icon-btn{ color:#0A1F17; }
+.icon-btn svg{
+  width:20px;height:20px;stroke:currentColor;fill:none;
+  stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;
+}
+.icon-btn:active{
+  background:var(--deep);border-color:var(--green);color:var(--green);
+}
 
 /* Layout */
 .container{width:100%;max-width:720px;margin:0 auto;padding:var(--pad);flex:1}
@@ -85,34 +103,21 @@ input:focus,textarea:focus,select:focus{
 }
 textarea{font-family:var(--mono);font-size:14px;line-height:1.5;resize:vertical}
 
-/* Editor layout */
-.editor-wrap{display:flex;flex-direction:column;height:100vh}
-.editor-body{display:flex;flex-direction:column;flex:1;min-height:0}
-.pane{flex:1;min-height:0;display:flex;flex-direction:column;border-top:1px solid var(--line)}
-.pane-header{
-  font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);
-  padding:8px 14px;background:#0D1210;border-bottom:1px solid var(--line);
-}
-.pane textarea{
-  flex:1;border:0;border-radius:0;background:#0A0A0A;
-  padding:12px 14px;font-size:14px;
-}
-.pane iframe{flex:1;border:0;background:#fff;width:100%}
-
-/* Tabs */
-.tabs{display:flex;gap:4px;background:#0D1210;padding:6px;border-bottom:1px solid var(--line)}
-.tabs button{
-  flex:1;background:transparent;color:var(--muted);
-  border-radius:10px;padding:8px 10px;font-size:13px;
-}
-.tabs button.active{background:var(--deep);color:var(--mint)}
-
 /* Badge */
 .badge{
   display:inline-block;font-size:11px;font-weight:700;
   padding:3px 8px;border-radius:999px;background:var(--deep);color:var(--mint);
 }
 .badge.pro{background:var(--green);color:#04140C}
+
+/* Pro pill */
+.pro-pill{
+  font-size:10px;font-weight:800;letter-spacing:.5px;
+  text-transform:uppercase;
+  background:var(--green);color:#04140C;
+  padding:3px 8px;border-radius:999px;
+  margin-right:4px;
+}
 
 /* Toast */
 #toast{
@@ -135,7 +140,9 @@ textarea{font-family:var(--mono);font-size:14px;line-height:1.5;resize:vertical}
   .pane:first-child{border-left:0}
 }
 
-/* ===== Light theme override ===== */
+/* ============================================================
+   Light theme override
+   ============================================================ */
 [data-theme="light"]{
   --black:#F5F7F5;
   --deep:#0B3D2E;
@@ -146,42 +153,29 @@ textarea{font-family:var(--mono);font-size:14px;line-height:1.5;resize:vertical}
   --card:#FFFFFF;
   --danger:#C43D3D;
 }
-[data-theme="light"] body{
-  background:#F5F7F5;
-  color:#0A1F17;
-}
+[data-theme="light"] body{ background:#F5F7F5; color:#0A1F17; }
 [data-theme="light"] .topbar{
   background:linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 70%,rgba(255,255,255,.85) 100%);
 }
 [data-theme="light"] input,
 [data-theme="light"] textarea,
 [data-theme="light"] select{
-  background:#FFFFFF;
-  color:#0A1F17;
+  background:#FFFFFF; color:#0A1F17;
 }
 [data-theme="light"] .tabs,
 [data-theme="light"] .pane-header,
 [data-theme="light"] .preview-pane .ph,
-[data-theme="light"] .tab-row{
-  background:#EEF3EF;
-}
+[data-theme="light"] .tab-row{ background:#EEF3EF; }
 [data-theme="light"] .editor-top,
 [data-theme="light"] .code-pane textarea,
-[data-theme="light"] .pane textarea{
-  background:#FFFFFF;
-}
-[data-theme="light"] .badge{
-  background:#DDEBE3;
-  color:#0A1F17;
-}
-[data-theme="light"] .badge.pro{
-  background:#148A56;
-  color:#FFFFFF;
-}
-[data-theme="light"] .empty h3{color:#0A1F17}
-[data-theme="light"] .empty{color:#5F6E66}
+[data-theme="light"] .pane textarea{ background:#FFFFFF; }
+[data-theme="light"] .badge{ background:#DDEBE3; color:#0A1F17; }
+[data-theme="light"] .badge.pro{ background:#148A56; color:#FFFFFF; }
+[data-theme="light"] .empty h3{ color:#0A1F17; }
+[data-theme="light"] .empty{ color:#5F6E66; }
+
 /* ============================================================
-   Bottom navigation bar + icon system
+   Bottom navigation bar
    ============================================================ */
 .bottom-nav{
   position: fixed;
@@ -200,6 +194,7 @@ textarea{font-family:var(--mono);font-size:14px;line-height:1.5;resize:vertical}
 }
 .bottom-nav .nav-item{
   flex: 1;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -240,47 +235,31 @@ textarea{font-family:var(--mono);font-size:14px;line-height:1.5;resize:vertical}
 [data-theme="light"] .bottom-nav .nav-item:active{
   background: rgba(20,138,86,.1);
 }
+.bottom-nav .nav-item .nav-badge{
+  position: absolute;
+  top: 4px;
+  left: calc(50% + 4px);
+  background: var(--green);
+  color: #04140C;
+  font-size: 9px;
+  font-weight: 800;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  padding: 0 4px;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
 
 /* Prevent content hiding behind the fixed bottom nav */
-body.has-bottom-nav{
-  padding-bottom: 0;
-}
 body.has-bottom-nav .container{
   padding-bottom: 100px;
 }
 
-/* Generic icon button (used in editor, modals, sheets) */
-.icon-btn{
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: transparent;
-  border: 1px solid var(--line);
-  display: grid;
-  place-items: center;
-  color: var(--mint);
-  flex-shrink: 0;
-  padding: 0;
-  cursor: pointer;
-  transition: all .15s ease;
-}
-[data-theme="light"] .icon-btn{
-  color: #0A1F17;
-}
-.icon-btn svg{
-  width: 20px;
-  height: 20px;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 1.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.icon-btn:active{
-  background: var(--deep);
-  border-color: var(--green);
-  color: var(--green);
-}
+/* ============================================================
+   Generic icon button (used in editor, modals, sheets)
+   ============================================================ */
 .icon-btn.icon-btn-accent{
   background: var(--green);
   border-color: var(--green);
@@ -293,7 +272,7 @@ body.has-bottom-nav .container{
   background: #25B874;
 }
 
-/* More sheet — icon list */
+/* Sheet icon list */
 .sheet-icon{
   width: 32px;
   height: 32px;

@@ -1,5 +1,5 @@
 // KUMG Forge — Service Worker
-const CACHE = 'kumg-v11';
+const CACHE = 'kumg-v12';
 
 const ASSETS = [
   './',
@@ -25,6 +25,8 @@ const ASSETS = [
   './wallet.html',
   './upgrade.html',
   './payments.html',
+  './chat.html',
+  './chat-view.html',
   './manifest.json',
   './css/style.css',
   './js/supabase.js',

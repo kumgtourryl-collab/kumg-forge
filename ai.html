@@ -2,619 +2,601 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0,
-               maximum-scale=1.0,user-scalable=no">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050806">
+<meta name="description" content="KUMG AI - Your intelligent KUMG assistant">
 <title>KUMG AI</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-:root{
-    --bg:#050706;
-    --panel:#0b110f;
-    --panel2:#0e1714;
-    --border:#1c2b26;
-    --green:#20a96b;
-    --green2:#0c5137;
-    --text:#f2f7f4;
-    --muted:#8b9993;
-    --danger:#ef6464;
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #050806;
+    color: #f1f5f3;
 }
 
-html,body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:var(--bg);
-    color:var(--text);
-    font-family:
-        Inter,
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-}
-
-button,
-textarea,
-input{
-    font:inherit;
-}
-
-button{
-    border:0;
-    cursor:pointer;
-}
-
-.app{
-    width:100%;
-    height:100dvh;
-    display:flex;
-    flex-direction:column;
-    background:var(--bg);
+body {
+    display: flex;
+    flex-direction: column;
 }
 
 /* =========================
-   HEADER
+   TOP BAR
 ========================= */
 
-.header{
-    height:72px;
-    min-height:72px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 18px;
-    border-bottom:1px solid var(--border);
-    background:#070908;
-    z-index:20;
+.topbar {
+    height: 62px;
+    min-height: 62px;
+    background: #07100c;
+    border-bottom: 1px solid #15251e;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    position: relative;
+    z-index: 20;
 }
 
-.brand{
-    display:flex;
-    align-items:center;
-    gap:12px;
+.brand-area {
+    display: flex;
+    align-items: center;
+    gap: 11px;
 }
 
-.logo{
-    width:46px;
-    height:46px;
-    border-radius:14px;
-    background:linear-gradient(145deg,#0c6b48,#20a96b);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#03130d;
-    font-size:22px;
-    font-weight:900;
+.back-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    border: 1px solid #1b3328;
+    background: #0b1712;
+    color: #dce8e2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 20px;
+    cursor: pointer;
 }
 
-.brand-name{
-    font-size:22px;
-    font-weight:850;
+.back-btn:active {
+    transform: scale(.95);
 }
 
-.brand-name span{
-    color:var(--green);
+.brand-logo {
+    width: 35px;
+    height: 35px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, #19b56d, #087a48);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    color: white;
+    box-shadow: 0 0 18px rgba(25,181,109,.18);
 }
 
-.header-right{
-    display:flex;
-    align-items:center;
-    gap:9px;
+.brand-name {
+    font-size: 18px;
+    font-weight: 800;
 }
 
-.usage{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    padding:10px 13px;
-    border:1px solid var(--border);
-    border-radius:20px;
-    color:var(--muted);
-    font-size:13px;
-    white-space:nowrap;
+.brand-sub {
+    color: #7f9189;
+    font-size: 11px;
+    margin-top: 2px;
 }
 
-.header-btn{
-    width:44px;
-    height:44px;
-    border-radius:14px;
-    background:var(--panel);
-    border:1px solid var(--border);
-    color:var(--text);
-    font-size:21px;
+.status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    color: #7f9189;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #777;
+}
+
+.status-dot.online {
+    background: #19c878;
+    box-shadow: 0 0 8px rgba(25,200,120,.7);
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.main {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 20px 15px 155px;
+}
+
+.container {
+    width: 100%;
+    max-width: 850px;
+    margin: auto;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero {
+    padding: 20px 4px 16px;
+}
+
+.hero h1 {
+    font-size: 29px;
+    line-height: 1.15;
+    margin-bottom: 8px;
+}
+
+.hero h1 span {
+    color: #1ec477;
+}
+
+.hero p {
+    color: #81918a;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* =========================
+   USAGE
+========================= */
+
+.usage-card {
+    background: #09130f;
+    border: 1px solid #172920;
+    border-radius: 17px;
+    padding: 14px;
+    margin-bottom: 16px;
+}
+
+.usage-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.usage-title {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.plan {
+    font-size: 11px;
+    color: #1ec477;
+    background: #0d251a;
+    padding: 5px 9px;
+    border-radius: 20px;
+}
+
+.usage-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.usage-box {
+    background: #060d09;
+    border: 1px solid #122019;
+    border-radius: 12px;
+    padding: 11px;
+}
+
+.usage-label {
+    color: #71817a;
+    font-size: 11px;
+    margin-bottom: 5px;
+}
+
+.usage-number {
+    font-size: 17px;
+    font-weight: 800;
 }
 
 /* =========================
    CHAT
 ========================= */
 
-.chat{
-    flex:1;
-    min-height:0;
-    overflow-y:auto;
-    padding:26px 18px 180px;
-    scroll-behavior:smooth;
+.chat {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
-.chat-inner{
-    width:100%;
-    max-width:850px;
-    margin:auto;
+.message {
+    display: flex;
+    width: 100%;
 }
 
-.welcome{
-    min-height:55vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    text-align:center;
-    padding:40px 20px;
+.message.user {
+    justify-content: flex-end;
 }
 
-.ai-icon{
-    width:104px;
-    height:104px;
-    border-radius:30px;
-    background:linear-gradient(145deg,#0c5e3f,#20a96b);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:48px;
-    color:#03140d;
-    margin-bottom:25px;
-    box-shadow:0 15px 50px rgba(20,170,105,.15);
+.bubble {
+    max-width: 88%;
+    padding: 13px 15px;
+    border-radius: 17px;
+    font-size: 14px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
 }
 
-.welcome h1{
-    font-size:30px;
-    margin-bottom:12px;
+.message.assistant .bubble {
+    background: #0a1510;
+    border: 1px solid #172920;
+    border-top-left-radius: 6px;
 }
 
-.welcome p{
-    color:var(--muted);
-    max-width:520px;
-    line-height:1.7;
-    font-size:16px;
+.message.user .bubble {
+    background: #123d29;
+    border: 1px solid #1b6543;
+    border-top-right-radius: 6px;
 }
 
-/* =========================
-   MESSAGE
-========================= */
-
-.message{
-    display:flex;
-    margin:18px 0;
+.message-meta {
+    margin-top: 6px;
+    font-size: 10px;
+    color: #64736d;
 }
 
-.message.user{
-    justify-content:flex-end;
+.ai-avatar {
+    width: 29px;
+    height: 29px;
+    flex: 0 0 29px;
+    border-radius: 9px;
+    margin-right: 9px;
+    background: linear-gradient(135deg, #19b56d, #087a48);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 900;
 }
 
-.message.ai{
-    justify-content:flex-start;
-}
+/* Code */
 
-.bubble{
-    max-width:min(82%,700px);
-    padding:14px 16px;
-    border-radius:20px;
-    line-height:1.65;
-    font-size:15px;
-    white-space:pre-wrap;
-    overflow-wrap:anywhere;
-}
-
-.user .bubble{
-    background:var(--green);
-    color:#03150d;
-    border-bottom-right-radius:6px;
-    font-weight:500;
-}
-
-.ai .bubble{
-    background:var(--panel2);
-    border:1px solid var(--border);
-    color:var(--text);
-    border-bottom-left-radius:6px;
-}
-
-.message-meta{
-    color:#68766f;
-    font-size:11px;
-    margin-top:6px;
+.code-block {
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #020403;
+    border: 1px solid #1a2922;
+    overflow-x: auto;
+    font-family: monospace;
+    font-size: 12px;
+    white-space: pre;
 }
 
 /* =========================
-   QUICK ACTIONS
+   WELCOME
 ========================= */
 
-.quick{
-    position:fixed;
-    left:0;
-    right:0;
-    bottom:116px;
-    display:flex;
-    gap:10px;
-    overflow-x:auto;
-    padding:8px 18px;
-    background:linear-gradient(
-        transparent,
-        rgba(5,7,6,.97) 35%
+.welcome {
+    background: #09130f;
+    border: 1px solid #172920;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.welcome-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    background: #0d291c;
+    border: 1px solid #1a5338;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 14px;
+}
+
+.welcome h2 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.welcome p {
+    color: #81918a;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* =========================
+   QUICK PROMPTS
+========================= */
+
+.quick-title {
+    font-size: 12px;
+    color: #72837b;
+    margin: 18px 0 9px;
+}
+
+.quick {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.quick button {
+    border: 1px solid #193127;
+    background: #09140f;
+    color: #b7c5bf;
+    padding: 9px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.quick button:hover {
+    border-color: #1da866;
+    color: #fff;
+}
+
+.quick button:active {
+    transform: scale(.97);
+}
+
+/* =========================
+   TYPING
+========================= */
+
+.typing {
+    display: none;
+    align-items: center;
+    gap: 9px;
+    color: #74857d;
+    font-size: 12px;
+    padding: 4px 0;
+}
+
+.typing.show {
+    display: flex;
+}
+
+.dots {
+    display: flex;
+    gap: 4px;
+}
+
+.dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #1ec477;
+    animation: blink 1.2s infinite;
+}
+
+.dots span:nth-child(2) {
+    animation-delay: .15s;
+}
+
+.dots span:nth-child(3) {
+    animation-delay: .3s;
+}
+
+@keyframes blink {
+    0%, 70%, 100% {
+        opacity: .25;
+    }
+    35% {
+        opacity: 1;
+    }
+}
+
+/* =========================
+   INPUT AREA
+========================= */
+
+.input-area {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 65px;
+    background: linear-gradient(
+        to top,
+        #050806 75%,
+        rgba(5,8,6,.92),
+        transparent
     );
-    z-index:10;
+    padding: 15px;
+    z-index: 30;
 }
 
-.quick::-webkit-scrollbar{
-    display:none;
+.input-inner {
+    max-width: 850px;
+    margin: auto;
 }
 
-.quick button{
-    flex:0 0 auto;
-    padding:11px 16px;
-    border-radius:22px;
-    background:var(--panel);
-    border:1px solid var(--border);
-    color:#dce8e2;
-    white-space:nowrap;
+.tools {
+    display: flex;
+    gap: 7px;
+    margin-bottom: 8px;
 }
 
-/* =========================
-   COMPOSER
-========================= */
-
-.composer-wrap{
-    position:fixed;
-    left:0;
-    right:0;
-    bottom:0;
-    padding:12px 18px 16px;
-    background:linear-gradient(
-        transparent,
-        #050706 18%
-    );
-    z-index:15;
+.tool-btn {
+    background: #09140f;
+    border: 1px solid #172920;
+    color: #85968e;
+    padding: 7px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    cursor: pointer;
 }
 
-.composer{
-    width:100%;
-    max-width:850px;
-    margin:auto;
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:25px;
-    padding:13px 14px 11px;
-    box-shadow:0 -10px 40px rgba(0,0,0,.25);
+.tool-btn.active {
+    color: #1ec477;
+    border-color: #1c6945;
+    background: #0c2117;
 }
 
-textarea{
-    width:100%;
-    min-height:48px;
-    max-height:150px;
-    resize:none;
-    border:0;
-    outline:0;
-    background:transparent;
-    color:var(--text);
-    padding:5px 8px;
-    font-size:16px;
-    line-height:1.5;
+.input-box {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    background: #09130f;
+    border: 1px solid #1b3027;
+    border-radius: 17px;
+    padding: 8px;
+    box-shadow: 0 10px 35px rgba(0,0,0,.3);
 }
 
-textarea::placeholder{
-    color:#718078;
+textarea {
+    flex: 1;
+    resize: none;
+    min-height: 42px;
+    max-height: 130px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #eef5f1;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.45;
+    padding: 10px 7px;
 }
 
-.composer-bottom{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    margin-top:7px;
+textarea::placeholder {
+    color: #62736b;
 }
 
-.tools{
-    display:flex;
-    gap:8px;
+.send-btn {
+    width: 43px;
+    height: 43px;
+    border: none;
+    border-radius: 13px;
+    background: #19ad68;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
 }
 
-.tool{
-    padding:9px 13px;
-    border-radius:18px;
-    background:#092018;
-    border:1px solid #123d2d;
-    color:var(--green);
-    font-size:13px;
+.send-btn:hover {
+    background: #20c879;
 }
 
-.tool.active{
-    background:var(--green);
-    color:#04140d;
-}
-
-.send{
-    width:44px;
-    height:44px;
-    border-radius:50%;
-    background:var(--green);
-    color:#03130d;
-    font-size:20px;
-    font-weight:900;
-}
-
-.send:disabled{
-    opacity:.35;
+.send-btn:disabled {
+    opacity: .4;
+    cursor: not-allowed;
 }
 
 /* =========================
-   DRAWER
+   BOTTOM NAV
 ========================= */
 
-.overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.65);
-    z-index:50;
-    display:none;
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    background: rgba(5,9,7,.97);
+    border-top: 1px solid #17251f;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    z-index: 50;
+    backdrop-filter: blur(12px);
 }
 
-.overlay.show{
-    display:block;
+.nav-item {
+    text-decoration: none;
+    color: #64756d;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 10px;
 }
 
-.drawer{
-    position:absolute;
-    left:0;
-    top:0;
-    bottom:0;
-    width:min(330px,88vw);
-    background:#080c0a;
-    border-right:1px solid var(--border);
-    padding:20px;
-    overflow-y:auto;
+.nav-icon {
+    font-size: 19px;
 }
 
-.drawer-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:22px;
+.nav-item.active {
+    color: #20c477;
 }
 
-.drawer-title{
-    font-size:20px;
-    font-weight:800;
-}
-
-.close{
-    width:42px;
-    height:42px;
-    border-radius:12px;
-    background:var(--panel);
-    color:white;
-    border:1px solid var(--border);
-}
-
-.new-chat{
-    width:100%;
-    padding:14px;
-    border-radius:15px;
-    background:var(--green);
-    color:#03140d;
-    font-weight:800;
-    margin-bottom:18px;
-}
-
-.history-title{
-    color:#6e7b75;
-    font-size:12px;
-    text-transform:uppercase;
-    letter-spacing:1px;
-    margin-bottom:10px;
-}
-
-.history-item{
-    padding:13px;
-    border:1px solid transparent;
-    border-radius:13px;
-    margin-bottom:6px;
-    color:#cdd8d3;
-    cursor:pointer;
-}
-
-.history-item:hover{
-    background:var(--panel);
-    border-color:var(--border);
-}
-
-.history-item.active{
-    background:#0d2018;
-    border-color:#174936;
+.nav-item:active {
+    transform: scale(.95);
 }
 
 /* =========================
-   AUTH
+   ERROR
 ========================= */
 
-.auth{
-    position:fixed;
-    inset:0;
-    z-index:100;
-    background:#050706;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
+.error {
+    display: none;
+    background: #29100f;
+    border: 1px solid #63302b;
+    color: #e9aaa3;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    line-height: 1.4;
+    margin-bottom: 12px;
 }
 
-.auth.show{
-    display:flex;
-}
-
-.auth-card{
-    width:100%;
-    max-width:420px;
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:25px;
-    padding:28px;
-}
-
-.auth-card h2{
-    font-size:27px;
-    margin-bottom:8px;
-}
-
-.auth-card p{
-    color:var(--muted);
-    line-height:1.5;
-    margin-bottom:22px;
-}
-
-.auth-input{
-    width:100%;
-    padding:15px;
-    margin-bottom:11px;
-    border-radius:13px;
-    border:1px solid var(--border);
-    background:#080d0b;
-    color:white;
-    outline:none;
-}
-
-.auth-input:focus{
-    border-color:var(--green);
-}
-
-.auth-btn{
-    width:100%;
-    padding:15px;
-    border-radius:14px;
-    background:var(--green);
-    color:#03140d;
-    font-weight:800;
-    margin-top:5px;
-}
-
-.auth-switch{
-    background:transparent;
-    color:var(--green);
-    margin-top:15px;
-    width:100%;
-}
-
-.status{
-    margin-top:12px;
-    font-size:13px;
-    color:var(--muted);
-}
-
-/* =========================
-   LOADING
-========================= */
-
-.typing{
-    display:flex;
-    gap:5px;
-    padding:5px;
-}
-
-.dot{
-    width:7px;
-    height:7px;
-    background:var(--green);
-    border-radius:50%;
-    animation:bounce 1s infinite;
-}
-
-.dot:nth-child(2){
-    animation-delay:.15s;
-}
-
-.dot:nth-child(3){
-    animation-delay:.3s;
-}
-
-@keyframes bounce{
-    0%,60%,100%{transform:translateY(0);opacity:.45}
-    30%{transform:translateY(-5px);opacity:1}
+.error.show {
+    display: block;
 }
 
 /* =========================
    MOBILE
 ========================= */
 
-@media(max-width:600px){
+@media (max-width: 500px) {
 
-    .header{
-        height:64px;
-        min-height:64px;
-        padding:0 12px;
+    .topbar {
+        padding: 0 12px;
     }
 
-    .logo{
-        width:40px;
-        height:40px;
+    .brand-name {
+        font-size: 16px;
     }
 
-    .brand-name{
-        font-size:19px;
+    .brand-sub {
+        font-size: 10px;
     }
 
-    .usage{
-        font-size:11px;
-        padding:8px 10px;
+    .status {
+        font-size: 10px;
     }
 
-    .header-btn{
-        width:40px;
-        height:40px;
+    .main {
+        padding-left: 11px;
+        padding-right: 11px;
     }
 
-    .chat{
-        padding:18px 12px 185px;
+    .hero h1 {
+        font-size: 26px;
     }
 
-    .bubble{
-        max-width:88%;
-    }
-
-    .quick{
-        bottom:113px;
-        padding-left:12px;
-        padding-right:12px;
-    }
-
-    .composer-wrap{
-        padding:9px 10px 12px;
-    }
-
-    .composer{
-        border-radius:21px;
-    }
-
-    .tool{
-        font-size:12px;
-        padding:8px 11px;
-    }
-
-    .welcome h1{
-        font-size:27px;
-    }
-
-    .welcome p{
-        font-size:14px;
+    .bubble {
+        max-width: 94%;
     }
 }
 </style>
@@ -622,1247 +604,933 @@ textarea::placeholder{
 
 <body>
 
-<div class="app">
+<!-- =========================
+     TOP BAR
+========================= -->
 
-    <!-- HEADER -->
-    <header class="header">
+<header class="topbar">
 
-        <div class="brand">
-            <button class="header-btn" id="menuBtn">☰</button>
+    <div class="brand-area">
 
-            <div class="logo">✦</div>
+        <!-- LINKS DIRECTLY TO YOUR EXISTING index.html -->
+        <a href="index.html" class="back-btn" aria-label="Back to KUMG">
+            ‹
+        </a>
 
-            <div class="brand-name">
-                KUMG <span>AI</span>
-            </div>
+        <div class="brand-logo">
+            K
         </div>
 
-        <div class="header-right">
+        <div>
+            <div class="brand-name">KUMG AI</div>
+            <div class="brand-sub">Intelligent assistant</div>
+        </div>
 
-            <div class="usage">
-                💬 <span id="messageCount">0</span>/<span id="messageLimit">250</span>
-                ·
-                🖼️ <span id="imageCount">0</span>/50
+    </div>
+
+    <div class="status">
+        <span id="statusDot" class="status-dot"></span>
+        <span id="statusText">Connecting</span>
+    </div>
+
+</header>
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<main class="main" id="main">
+
+<div class="container">
+
+    <section class="hero">
+        <h1>Ask <span>KUMG AI</span></h1>
+        <p>
+            Write, build, calculate, explain and create with your KUMG AI assistant.
+        </p>
+    </section>
+
+
+    <!-- ERROR -->
+
+    <div id="errorBox" class="error"></div>
+
+
+    <!-- USAGE -->
+
+    <section class="usage-card">
+
+        <div class="usage-top">
+            <span class="usage-title">Today's AI usage</span>
+            <span class="plan" id="planText">Free</span>
+        </div>
+
+        <div class="usage-grid">
+
+            <div class="usage-box">
+                <div class="usage-label">Messages</div>
+                <div class="usage-number">
+                    <span id="messagesUsed">0</span>/<span id="messagesLimit">250</span>
+                </div>
+            </div>
+
+            <div class="usage-box">
+                <div class="usage-label">Images</div>
+                <div class="usage-number">
+                    <span id="imagesUsed">0</span>/<span id="imagesLimit">50</span>
+                </div>
             </div>
 
         </div>
 
-    </header>
+    </section>
+
+
+    <!-- WELCOME -->
+
+    <section class="welcome" id="welcome">
+
+        <div class="welcome-icon">
+            ✦
+        </div>
+
+        <h2>How can I help?</h2>
+
+        <p>
+            Ask me a question, give me an idea, ask me to write code,
+            explain something, solve a problem or help build your KUMG project.
+        </p>
+
+    </section>
 
 
     <!-- CHAT -->
-    <main class="chat" id="chat">
 
-        <div class="chat-inner" id="chatInner">
-
-            <section class="welcome" id="welcome">
-
-                <div class="ai-icon">✦</div>
-
-                <h1>Ask me anything</h1>
-
-                <p>
-                    KUMG AI can help you write, code, research,
-                    calculate, plan and create.
-                </p>
-
-            </section>
-
-        </div>
-
-    </main>
+    <section id="chat" class="chat"></section>
 
 
-    <!-- QUICK ACTIONS -->
-    <div class="quick">
+    <!-- TYPING -->
 
-        <button onclick="quickPrompt('Create a professional landing page for my business.')">
-            Hero section
-        </button>
+    <div id="typing" class="typing">
 
-        <button onclick="quickPrompt('Create a short professional link-in-bio page.')">
-            Link in bio
-        </button>
+        <div class="ai-avatar">K</div>
 
-        <button onclick="quickPrompt('Give me an idea for an image I could create for my business.')">
-            Image example
-        </button>
+        <span>KUMG AI is thinking</span>
 
-        <button onclick="quickPrompt('Calculate 250 multiplied by 24 and explain the working.')">
-            Calculate
-        </button>
-
-    </div>
-
-
-    <!-- COMPOSER -->
-    <div class="composer-wrap">
-
-        <div class="composer">
-
-            <textarea
-                id="messageInput"
-                placeholder="Type a message"
-                rows="1"></textarea>
-
-            <div class="composer-bottom">
-
-                <div class="tools">
-
-                    <button
-                        class="tool"
-                        id="thinkBtn"
-                        onclick="toggleThink()">
-                        ✽ Think
-                    </button>
-
-                    <button
-                        class="tool"
-                        id="searchBtn"
-                        onclick="toggleSearch()">
-                        ◉ Search
-                    </button>
-
-                </div>
-
-                <button
-                    class="send"
-                    id="sendBtn"
-                    onclick="sendMessage()">
-                    ↑
-                </button>
-
-            </div>
-
+        <div class="dots">
+            <span></span>
+            <span></span>
+            <span></span>
         </div>
 
     </div>
 
-</div>
 
+    <!-- QUICK PROMPTS -->
 
-<!-- DRAWER -->
-<div class="overlay" id="overlay">
+    <div id="quickSection">
 
-    <aside class="drawer">
+        <div class="quick-title">
+            Try something
+        </div>
 
-        <div class="drawer-top">
+        <div class="quick">
 
-            <div class="drawer-title">
-                KUMG AI
-            </div>
+            <button data-prompt="Create a modern hero section for my website.">
+                Hero section
+            </button>
 
-            <button class="close" onclick="closeDrawer()">
-                ×
+            <button data-prompt="Create a professional link-in-bio page.">
+                Link in bio
+            </button>
+
+            <button data-prompt="Explain this concept in simple terms.">
+                Explain
+            </button>
+
+            <button data-prompt="Help me calculate this: ">
+                Calculate
+            </button>
+
+            <button data-prompt="Help me build a website using HTML, CSS and JavaScript.">
+                Build website
             </button>
 
         </div>
 
-        <button class="new-chat" onclick="newChat()">
-            + New Chat
-        </button>
-
-        <div class="history-title">
-            Recent chats
-        </div>
-
-        <div id="history"></div>
-
-        <button
-            class="auth-switch"
-            style="margin-top:30px"
-            onclick="logout()">
-            Sign out
-        </button>
-
-    </aside>
+    </div>
 
 </div>
 
+</main>
 
-<!-- AUTH -->
-<div class="auth" id="authScreen">
 
-    <div class="auth-card">
+<!-- =========================
+     INPUT
+========================= -->
 
-        <div class="logo" style="margin-bottom:20px;">
-            ✦
-        </div>
+<section class="input-area">
 
-        <h2 id="authTitle">
-            Welcome to KUMG AI
-        </h2>
+<div class="input-inner">
 
-        <p id="authDescription">
-            Sign in to save your conversations and use KUMG AI.
-        </p>
+    <div class="tools">
 
-        <input
-            id="email"
-            class="auth-input"
-            type="email"
-            placeholder="Email">
-
-        <input
-            id="password"
-            class="auth-input"
-            type="password"
-            placeholder="Password">
-
-        <button
-            class="auth-btn"
-            onclick="handleAuth()"
-            id="authButton">
-            Sign in
+        <button class="tool-btn active" id="thinkBtn">
+            🧠 Think
         </button>
 
-        <button
-            class="auth-switch"
-            onclick="toggleAuthMode()"
-            id="authSwitch">
-            Create an account
+        <button class="tool-btn" id="searchBtn">
+            🔎 Search
         </button>
 
-        <div
-            class="status"
-            id="authStatus">
-        </div>
+        <button class="tool-btn" id="newChatBtn">
+            ＋ New chat
+        </button>
+
+    </div>
+
+    <div class="input-box">
+
+        <textarea
+            id="messageInput"
+            placeholder="Ask me anything..."
+            rows="1"
+            maxlength="6000"
+        ></textarea>
+
+        <button
+            id="sendBtn"
+            class="send-btn"
+            aria-label="Send message"
+        >
+            ↑
+        </button>
 
     </div>
 
 </div>
 
+</section>
+
+
+<!-- =========================
+     BOTTOM NAV
+========================= -->
+
+<nav class="bottom-nav">
+
+    <a href="index.html" class="nav-item">
+        <span class="nav-icon">⌂</span>
+        <span>Home</span>
+    </a>
+
+    <a href="discover.html" class="nav-item">
+        <span class="nav-icon">◉</span>
+        <span>Discover</span>
+    </a>
+
+    <a href="store.html" class="nav-item">
+        <span class="nav-icon">▣</span>
+        <span>Store</span>
+    </a>
+
+    <a href="wallet.html" class="nav-item">
+        <span class="nav-icon">◇</span>
+        <span>Wallet</span>
+    </a>
+
+    <a href="ai.html" class="nav-item active">
+        <span class="nav-icon">✦</span>
+        <span>AI</span>
+    </a>
+
+</nav>
+
 
 <script>
-
-/* ============================================================
+/* =========================================================
    KUMG AI CONFIGURATION
-============================================================ */
 
-/*
-IMPORTANT:
-
-Replace these two values with your Supabase project's
-PUBLIC/PUBLISHABLE values.
-
-DO NOT put your Groq API key here.
-*/
-
-const SUPABASE_URL =
-    "https://YOUR_PROJECT_ID.supabase.co";
-
-const SUPABASE_PUBLISHABLE_KEY =
-    "YOUR_SUPABASE_PUBLISHABLE_KEY";
-
-
-/*
-This must point to your Render backend.
-
-Example:
-
-https://kumg-api.onrender.com
-
-The backend endpoint expected by this file is:
-
-POST /api/chat
-*/
-
-const RENDER_API =
-    "https://YOUR-KUMG-BACKEND.onrender.com";
-
-
-/* ============================================================
-   SUPABASE
-============================================================ */
-
-const { createClient } =
-    supabase;
-
-const db =
-    createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY,
-        {
-            auth:{
-                persistSession:true,
-                autoRefreshToken:true,
-                detectSessionInUrl:true
-            }
-        }
-    );
-
-
-/* ============================================================
-   STATE
-============================================================ */
-
-let currentUser = null;
-
-let currentConversation = null;
-
-let messages = [];
-
-let authMode = "login";
-
-let thinking = false;
-
-let searching = false;
-
-let sending = false;
-
-
-/* ============================================================
-   DOM
-============================================================ */
-
-const chat =
-    document.getElementById("chat");
-
-const chatInner =
-    document.getElementById("chatInner");
-
-const welcome =
-    document.getElementById("welcome");
-
-const input =
-    document.getElementById("messageInput");
-
-const sendBtn =
-    document.getElementById("sendBtn");
-
-const overlay =
-    document.getElementById("overlay");
-
-const authScreen =
-    document.getElementById("authScreen");
-
-
-/* ============================================================
-   STARTUP
-============================================================ */
-
-async function init(){
-
-    const {
-        data:{
-            session
-        }
-    } =
-    await db.auth.getSession();
-
-    if(session){
-
-        currentUser =
-            session.user;
-
-        await startApplication();
-
-    }else{
-
-        authScreen.classList.add("show");
-
-    }
-
-    db.auth.onAuthStateChange(
-        async(event,session)=>{
-
-            if(session){
-
-                currentUser =
-                    session.user;
-
-                authScreen.classList.remove("show");
-
-                await startApplication();
-
-            }
-
-        }
-    );
-
-}
-
-
-/* ============================================================
-   APPLICATION START
-============================================================ */
-
-async function startApplication(){
-
-    await loadUsage();
-
-    await loadConversations();
-
-    if(!currentConversation){
-
-        await createConversation();
-
-    }
-
-}
-
-
-/* ============================================================
-   AUTH
-============================================================ */
-
-function toggleAuthMode(){
-
-    if(authMode === "login"){
-
-        authMode = "signup";
-
-        document.getElementById("authTitle")
-            .textContent =
-            "Create your KUMG account";
-
-        document.getElementById("authDescription")
-            .textContent =
-            "Create an account to save your KUMG AI conversations.";
-
-        document.getElementById("authButton")
-            .textContent =
-            "Create account";
-
-        document.getElementById("authSwitch")
-            .textContent =
-            "Already have an account? Sign in";
-
-    }else{
-
-        authMode = "login";
-
-        document.getElementById("authTitle")
-            .textContent =
-            "Welcome to KUMG AI";
-
-        document.getElementById("authDescription")
-            .textContent =
-            "Sign in to save your conversations and use KUMG AI.";
-
-        document.getElementById("authButton")
-            .textContent =
-            "Sign in";
-
-        document.getElementById("authSwitch")
-            .textContent =
-            "Create an account";
-
-    }
-
-}
-
-
-async function handleAuth(){
-
-    const email =
-        document.getElementById("email")
-            .value.trim();
-
-    const password =
-        document.getElementById("password")
-            .value;
-
-    const status =
-        document.getElementById("authStatus");
-
-    if(!email || !password){
-
-        status.textContent =
-            "Enter your email and password.";
-
-        return;
-
-    }
-
-    status.textContent =
-        "Please wait...";
-
-    if(authMode === "login"){
-
-        const {
-            error
-        } =
-        await db.auth.signInWithPassword({
-            email,
-            password
-        });
-
-        if(error){
-
-            status.textContent =
-                error.message;
-
-        }
-
-    }else{
-
-        const {
-            data,
-            error
-        } =
-        await db.auth.signUp({
-            email,
-            password
-        });
-
-        if(error){
-
-            status.textContent =
-                error.message;
-
-        }else{
-
-            status.textContent =
-                data.session
-                ? "Account created."
-                : "Check your email to confirm your account.";
-
-        }
-
-    }
-
-}
-
-
-async function logout(){
-
-    await db.auth.signOut();
-
-    currentUser = null;
-
-    currentConversation = null;
-
-    messages = [];
-
-    authScreen.classList.add("show");
-
-    closeDrawer();
-
-}
-
-
-/* ============================================================
-   CONVERSATIONS
-============================================================ */
-
-async function loadConversations(){
-
-    if(!currentUser)
-        return;
-
-    const {
-        data,
-        error
-    } =
-    await db
-        .from("conversations")
-        .select("*")
-        .eq("user_id",currentUser.id)
-        .order("updated_at",{ascending:false})
-        .limit(30);
-
-    if(error){
-
-        console.error(error);
-
-        return;
-
-    }
-
-    renderHistory(data || []);
-
-    if(data && data.length){
-
-        currentConversation =
-            data[0];
-
-        await loadMessages(
-            currentConversation.id
-        );
-
-    }
-
-}
-
-
-async function createConversation(title="New chat"){
-
-    if(!currentUser)
-        return;
-
-    const {
-        data,
-        error
-    } =
-    await db
-        .from("conversations")
-        .insert({
-            user_id:currentUser.id,
-            title:title
-        })
-        .select()
-        .single();
-
-    if(error){
-
-        console.error(error);
-
-        return;
-
-    }
-
-    currentConversation =
-        data;
-
-    messages = [];
-
-    clearChat();
-
-    await loadConversations();
-
-}
-
-
-async function loadMessages(conversationId){
-
-    const {
-        data,
-        error
-    } =
-    await db
-        .from("messages")
-        .select("*")
-        .eq("conversation_id",conversationId)
-        .order("created_at",{ascending:true});
-
-    if(error){
-
-        console.error(error);
-
-        return;
-
-    }
-
-    messages =
-        (data || []).map(row=>({
-            role:row.role,
-            content:row.content
-        }));
-
-    renderMessages();
-
-}
-
-
-function renderHistory(list){
-
-    const history =
-        document.getElementById("history");
-
-    history.innerHTML = "";
-
-    list.forEach(item=>{
-
-        const el =
-            document.createElement("div");
-
-        el.className =
-            "history-item" +
-            (
-                currentConversation &&
-                item.id === currentConversation.id
-                ? " active"
-                : ""
-            );
-
-        el.textContent =
-            item.title || "New chat";
-
-        el.onclick =
-            async()=>{
-
-                currentConversation =
-                    item;
-
-                await loadMessages(item.id);
-
-                closeDrawer();
-
-            };
-
-        history.appendChild(el);
-
-    });
-
-}
-
-
-/* ============================================================
-   MESSAGES
-============================================================ */
-
-function renderMessages(){
-
-    chatInner.innerHTML = "";
-
-    if(!messages.length){
-
-        chatInner.appendChild(
-            createWelcome()
-        );
-
-        return;
-
-    }
-
-    messages.forEach(message=>{
-
-        appendMessage(
-            message.role,
-            message.content,
-            false
-        );
-
-    });
-
-    scrollBottom();
-
-}
-
-
-function createWelcome(){
-
-    const section =
-        document.createElement("section");
-
-    section.className =
-        "welcome";
-
-    section.innerHTML = `
-        <div class="ai-icon">✦</div>
-        <h1>Ask me anything</h1>
-        <p>
-            KUMG AI can help you write, code,
-            research, calculate, plan and create.
-        </p>
-    `;
-
-    return section;
-
-}
-
-
-function appendMessage(
-    role,
-    content,
-    scroll=true
-){
-
-    const wrapper =
-        document.createElement("div");
-
-    wrapper.className =
-        "message " +
-        (role === "user" ? "user" : "ai");
-
-    const bubble =
-        document.createElement("div");
-
-    bubble.className =
-        "bubble";
-
-    bubble.textContent =
-        content;
-
-    wrapper.appendChild(bubble);
-
-    chatInner.appendChild(wrapper);
-
-    if(scroll)
-        scrollBottom();
-
-}
-
-
-function addTyping(){
-
-    const wrapper =
-        document.createElement("div");
-
-    wrapper.className =
-        "message ai";
-
-    wrapper.id =
-        "typingMessage";
-
-    wrapper.innerHTML = `
-        <div class="bubble">
-            <div class="typing">
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-            </div>
-        </div>
-    `;
-
-    chatInner.appendChild(wrapper);
-
-    scrollBottom();
-
-}
-
-
-function removeTyping(){
-
-    const el =
-        document.getElementById(
-            "typingMessage"
-        );
-
-    if(el)
-        el.remove();
-
-}
-
-
-function scrollBottom(){
-
-    requestAnimationFrame(()=>{
-        chat.scrollTop =
-            chat.scrollHeight;
-    });
-
-}
-
-
-/* ============================================================
-   SEND MESSAGE
-============================================================ */
-
-async function sendMessage(){
-
-    if(sending)
-        return;
-
-    const text =
-        input.value.trim();
-
-    if(!text)
-        return;
-
-    if(!currentUser){
-
-        authScreen.classList.add("show");
-
-        return;
-
-    }
-
-    sending = true;
-
-    sendBtn.disabled = true;
-
-    input.value = "";
-
-    autoResize();
-
-    if(welcome &&
-       welcome.parentNode){
-
-        welcome.remove();
-
-    }
-
-    const userMessage = {
-        role:"user",
-        content:text
-    };
-
-    messages.push(userMessage);
-
-    appendMessage(
-        "user",
-        text
-    );
-
-    await saveMessage(
-        "user",
-        text
-    );
-
-    const title =
-        text.length > 42
-        ? text.substring(0,42) + "..."
-        : text;
-
-    if(messages.length === 1){
-
-        await db
-            .from("conversations")
-            .update({
-                title:title,
-                updated_at:new Date().toISOString()
-            })
-            .eq("id",currentConversation.id);
-
-    }
-
-    addTyping();
-
-    try{
-
-        const sessionResult =
-            await db.auth.getSession();
-
-        const session =
-            sessionResult.data.session;
-
-        if(!session){
-
-            throw new Error(
-                "Your session has expired. Please sign in again."
-            );
-
-        }
-
-        const response =
-            await fetch(
-                RENDER_API + "/api/chat",
-                {
-                    method:"POST",
-
-                    headers:{
-                        "Content-Type":
-                            "application/json",
-
-                        "Authorization":
-                            "Bearer " +
-                            session.access_token
-                    },
-
-                    body:JSON.stringify({
-
-                        conversation_id:
-                            currentConversation.id,
-
-                        messages:messages,
-
-                        think:thinking,
-
-                        search:searching
-
-                    })
-                }
-            );
-
-        const data =
-            await response.json();
-
-        removeTyping();
-
-        if(!response.ok){
-
-            throw new Error(
-                data.error ||
-                "KUMG AI server error."
-            );
-
-        }
-
-        const answer =
-            data.answer ||
-            data.message ||
-            data.content;
-
-        if(!answer){
-
-            throw new Error(
-                "The AI server returned no answer."
-            );
-
-        }
-
-        messages.push({
-            role:"assistant",
-            content:answer
-        });
-
-        appendMessage(
-            "assistant",
-            answer
-        );
-
-        await saveMessage(
-            "assistant",
-            answer
-        );
-
-        await updateUsage();
-
-        await loadConversations();
-
-    }catch(error){
-
-        removeTyping();
-
-        console.error(error);
-
-        const errorText =
-            "KUMG AI couldn't complete that request.\n\n" +
-            error.message;
-
-        appendMessage(
-            "assistant",
-            errorText
-        );
-
-    }finally{
-
-        sending = false;
-
-        sendBtn.disabled = false;
-
-        input.focus();
-
-    }
-
-}
-
-
-/* ============================================================
-   SAVE MESSAGE
-============================================================ */
-
-async function saveMessage(
-    role,
-    content
-){
-
-    if(!currentConversation)
-        return;
-
-    const {
-        error
-    } =
-    await db
-        .from("messages")
-        .insert({
-            conversation_id:
-                currentConversation.id,
-
-            user_id:
-                currentUser.id,
-
-            role:role,
-
-            content:content
-        });
-
-    if(error)
-        console.error(error);
-
-}
-
-
-/* ============================================================
-   USAGE
-============================================================ */
-
-async function loadUsage(){
-
-    if(!currentUser)
-        return;
-
-    const start =
-        new Date();
-
-    start.setHours(
-        0,0,0,0
-    );
-
-    const {
-        count,
-        error
-    } =
-    await db
-        .from("messages")
-        .select("*",{
-            count:"exact",
-            head:true
-        })
-        .eq("user_id",currentUser.id)
-        .eq("role","user")
-        .gte(
-            "created_at",
-            start.toISOString()
-        );
-
-    if(error){
-
-        console.error(error);
-
-        return;
-
-    }
-
-    document.getElementById(
-        "messageCount"
-    ).textContent =
-        count || 0;
-
-}
-
-
-async function updateUsage(){
-
-    await loadUsage();
-
-}
-
-
-/* ============================================================
-   NEW CHAT
-============================================================ */
-
-async function newChat(){
-
-    await createConversation();
-
-    closeDrawer();
-
-}
-
-
-/* ============================================================
-   DRAWER
-============================================================ */
-
-document.getElementById(
-    "menuBtn"
-).onclick = ()=>{
-
-    overlay.classList.add("show");
+   IMPORTANT:
+   - Supabase publishable key goes here.
+   - NEVER put GROQ_API_KEY here.
+   - Groq stays on your Render backend.
+========================================================= */
+
+const KUMG_CONFIG = {
+
+    /*
+     * Replace these two values with the SAME Supabase
+     * project already used by your existing KUMG system.
+     */
+    SUPABASE_URL:
+        "https://YOUR-PROJECT.supabase.co",
+
+    SUPABASE_PUBLISHABLE_KEY:
+        "YOUR_SUPABASE_PUBLISHABLE_KEY",
+
+    /*
+     * Your Render backend.
+     *
+     * Example:
+     * https://kumg-api.onrender.com
+     */
+    API_URL:
+        "https://YOUR-KUMG-API.onrender.com"
 
 };
 
 
-function closeDrawer(){
+/* =========================================================
+   SUPABASE
+========================================================= */
 
-    overlay.classList.remove(
-        "show"
-    );
+const { createClient } = window.supabase;
 
-}
-
-
-overlay.addEventListener(
-    "click",
-    event=>{
-
-        if(event.target === overlay)
-            closeDrawer();
-
-    }
+const sb = createClient(
+    KUMG_CONFIG.SUPABASE_URL,
+    KUMG_CONFIG.SUPABASE_PUBLISHABLE_KEY
 );
 
 
-/* ============================================================
-   THINK / SEARCH
-============================================================ */
+/* =========================================================
+   STATE
+========================================================= */
 
-function toggleThink(){
+let session = null;
 
-    thinking =
-        !thinking;
+let conversation = [];
 
-    document
-        .getElementById("thinkBtn")
-        .classList.toggle(
-            "active",
-            thinking
-        );
+let thinking = false;
+
+let thinkMode = true;
+
+let searchMode = false;
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const chat = document.getElementById("chat");
+
+const input = document.getElementById("messageInput");
+
+const sendBtn = document.getElementById("sendBtn");
+
+const typing = document.getElementById("typing");
+
+const welcome = document.getElementById("welcome");
+
+const quickSection = document.getElementById("quickSection");
+
+const errorBox = document.getElementById("errorBox");
+
+const statusDot = document.getElementById("statusDot");
+
+const statusText = document.getElementById("statusText");
+
+const thinkBtn = document.getElementById("thinkBtn");
+
+const searchBtn = document.getElementById("searchBtn");
+
+const newChatBtn = document.getElementById("newChatBtn");
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+function setStatus(online, text) {
+
+    statusDot.classList.toggle("online", online);
+
+    statusText.textContent = text;
 
 }
 
 
-function toggleSearch(){
+/* =========================================================
+   ERROR
+========================================================= */
 
-    searching =
-        !searching;
+function showError(message) {
 
-    document
-        .getElementById("searchBtn")
-        .classList.toggle(
-            "active",
-            searching
-        );
+    errorBox.textContent = message;
+
+    errorBox.classList.add("show");
+
+}
+
+function hideError() {
+
+    errorBox.classList.remove("show");
 
 }
 
 
-/* ============================================================
-   QUICK PROMPTS
-============================================================ */
+/* =========================================================
+   INITIALISE
+========================================================= */
 
-function quickPrompt(text){
+async function initialise() {
 
-    input.value =
-        text;
+    try {
 
-    autoResize();
+        setStatus(false, "Connecting");
+
+        const result = await sb.auth.getSession();
+
+        session = result.data.session;
+
+        /*
+         * IMPORTANT:
+         *
+         * We DO NOT create registration here.
+         *
+         * Your existing KUMG authentication system
+         * is responsible for signing users in.
+         */
+
+        if (!session) {
+
+            setStatus(false, "Not signed in");
+
+            showError(
+                "Your KUMG session could not be found. Please sign in through the existing KUMG login page, then open AI again."
+            );
+
+            disableAI();
+
+            return;
+        }
+
+        setStatus(true, "Online");
+
+        enableAI();
+
+        await loadUsage();
+
+    } catch (error) {
+
+        console.error(error);
+
+        setStatus(false, "Offline");
+
+        showError(
+            "KUMG AI could not connect. Check your connection and try again."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   ENABLE / DISABLE
+========================================================= */
+
+function disableAI() {
+
+    input.disabled = true;
+
+    sendBtn.disabled = true;
+
+}
+
+function enableAI() {
+
+    input.disabled = false;
+
+    sendBtn.disabled = false;
+
+}
+
+
+/* =========================================================
+   LOAD USAGE
+========================================================= */
+
+async function loadUsage() {
+
+    if (!session) return;
+
+    try {
+
+        const response = await fetch(
+            `${KUMG_CONFIG.API_URL}/api/ai/usage`,
+            {
+                method: "GET",
+
+                headers: {
+                    "Authorization":
+                        `Bearer ${session.access_token}`
+                }
+            }
+        );
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+
+        updateUsage(data.usage);
+
+        if (data.plan) {
+            document.getElementById("planText").textContent =
+                data.plan;
+        }
+
+    } catch (error) {
+
+        /*
+         * Usage failure should NOT prevent the AI
+         * interface from opening.
+         */
+
+        console.warn("Usage request failed:", error);
+
+    }
+
+}
+
+
+/* =========================================================
+   UPDATE USAGE
+========================================================= */
+
+function updateUsage(usage) {
+
+    if (!usage) return;
+
+    if (usage.messagesUsed !== undefined) {
+
+        document.getElementById("messagesUsed")
+            .textContent = usage.messagesUsed;
+
+    }
+
+    if (usage.messagesLimit !== undefined) {
+
+        document.getElementById("messagesLimit")
+            .textContent = usage.messagesLimit;
+
+    }
+
+    if (usage.imagesUsed !== undefined) {
+
+        document.getElementById("imagesUsed")
+            .textContent = usage.imagesUsed;
+
+    }
+
+    if (usage.imagesLimit !== undefined) {
+
+        document.getElementById("imagesLimit")
+            .textContent = usage.imagesLimit;
+
+    }
+
+}
+
+
+/* =========================================================
+   ADD MESSAGE
+========================================================= */
+
+function addMessage(role, text) {
+
+    welcome.style.display = "none";
+
+    quickSection.style.display = "none";
+
+    const wrapper = document.createElement("div");
+
+    wrapper.className =
+        `message ${role}`;
+
+    const bubble = document.createElement("div");
+
+    bubble.className = "bubble";
+
+    /*
+     * textContent is intentional.
+     *
+     * AI output is NOT inserted as raw HTML.
+     * This prevents AI responses from injecting
+     * arbitrary HTML/JavaScript into the page.
+     */
+
+    bubble.textContent = text;
+
+    if (role === "assistant") {
+
+        const avatar = document.createElement("div");
+
+        avatar.className = "ai-avatar";
+
+        avatar.textContent = "K";
+
+        wrapper.appendChild(avatar);
+
+    }
+
+    wrapper.appendChild(bubble);
+
+    chat.appendChild(wrapper);
+
+    scrollToBottom();
+
+    return bubble;
+
+}
+
+
+/* =========================================================
+   COPY MESSAGE
+========================================================= */
+
+function addCopyButton(bubble, text) {
+
+    const button = document.createElement("button");
+
+    button.textContent = "Copy";
+
+    button.style.marginTop = "9px";
+
+    button.style.padding = "6px 9px";
+
+    button.style.borderRadius = "8px";
+
+    button.style.border = "1px solid #1b3328";
+
+    button.style.background = "#07100c";
+
+    button.style.color = "#8da098";
+
+    button.style.fontSize = "10px";
+
+    button.style.cursor = "pointer";
+
+    button.onclick = async () => {
+
+        try {
+
+            await navigator.clipboard.writeText(text);
+
+            button.textContent = "Copied";
+
+            setTimeout(() => {
+                button.textContent = "Copy";
+            }, 1500);
+
+        } catch {
+
+            button.textContent = "Copy failed";
+
+        }
+
+    };
+
+    bubble.appendChild(document.createElement("br"));
+
+    bubble.appendChild(button);
+
+}
+
+
+/* =========================================================
+   SEND MESSAGE
+========================================================= */
+
+async function sendMessage() {
+
+    const text = input.value.trim();
+
+    if (!text || thinking) return;
+
+    hideError();
+
+    if (!session) {
+
+        showError(
+            "Please sign in through your existing KUMG account."
+        );
+
+        return;
+
+    }
+
+    thinking = true;
+
+    sendBtn.disabled = true;
+
+    input.disabled = true;
+
+    addMessage("user", text);
+
+    conversation.push({
+        role: "user",
+        content: text
+    });
+
+    input.value = "";
+
+    resizeInput();
+
+    typing.classList.add("show");
+
+    scrollToBottom();
+
+
+    try {
+
+        const response = await fetch(
+            `${KUMG_CONFIG.API_URL}/api/chat`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+
+                    "Authorization":
+                        `Bearer ${session.access_token}`
+                },
+
+                body: JSON.stringify({
+
+                    messages:
+                        conversation.slice(-20),
+
+                    think:
+                        thinkMode,
+
+                    search:
+                        searchMode
+
+                })
+            }
+        );
+
+
+        let data = {};
+
+        try {
+            data = await response.json();
+        } catch {
+            data = {};
+        }
+
+
+        if (response.status === 401) {
+
+            throw new Error(
+                "Your KUMG session has expired. Please sign in again through KUMG."
+            );
+
+        }
+
+
+        if (response.status === 429) {
+
+            throw new Error(
+                data.message ||
+                "Your daily AI message limit has been reached."
+            );
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "KUMG AI could not process your request."
+            );
+
+        }
+
+
+        const answer =
+            data.message ||
+            data.content ||
+            data.answer;
+
+
+        if (!answer) {
+
+            throw new Error(
+                "The AI server returned an empty response."
+            );
+
+        }
+
+
+        const bubble =
+            addMessage("assistant", answer);
+
+        addCopyButton(bubble, answer);
+
+
+        conversation.push({
+
+            role: "assistant",
+
+            content: answer
+
+        });
+
+
+        if (data.usage) {
+
+            updateUsage(data.usage);
+
+        }
+
+
+        setStatus(true, "Online");
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        setStatus(false, "Error");
+
+        showError(error.message);
+
+
+    } finally {
+
+        typing.classList.remove("show");
+
+        thinking = false;
+
+        sendBtn.disabled = false;
+
+        input.disabled = false;
+
+        input.focus();
+
+        scrollToBottom();
+
+    }
+
+}
+
+
+/* =========================================================
+   NEW CHAT
+========================================================= */
+
+function newChat() {
+
+    conversation = [];
+
+    chat.innerHTML = "";
+
+    welcome.style.display = "block";
+
+    quickSection.style.display = "block";
+
+    hideError();
+
+    input.value = "";
+
+    resizeInput();
 
     input.focus();
 
+    scrollToBottom();
+
 }
 
 
-/* ============================================================
-   CLEAR CHAT
-============================================================ */
+/* =========================================================
+   QUICK PROMPTS
+========================================================= */
 
-function clearChat(){
+document.querySelectorAll(".quick button")
+.forEach(button => {
 
-    chatInner.innerHTML = "";
+    button.addEventListener("click", () => {
 
-    chatInner.appendChild(
-        createWelcome()
+        input.value =
+            button.dataset.prompt || "";
+
+        resizeInput();
+
+        input.focus();
+
+    });
+
+});
+
+
+/* =========================================================
+   THINK BUTTON
+========================================================= */
+
+thinkBtn.addEventListener("click", () => {
+
+    thinkMode = !thinkMode;
+
+    thinkBtn.classList.toggle(
+        "active",
+        thinkMode
     );
 
-}
+});
 
 
-/* ============================================================
-   TEXTAREA
-============================================================ */
+/* =========================================================
+   SEARCH BUTTON
+========================================================= */
 
-input.addEventListener(
-    "input",
-    autoResize
+searchBtn.addEventListener("click", () => {
+
+    searchMode = !searchMode;
+
+    searchBtn.classList.toggle(
+        "active",
+        searchMode
+    );
+
+});
+
+
+/* =========================================================
+   NEW CHAT BUTTON
+========================================================= */
+
+newChatBtn.addEventListener(
+    "click",
+    newChat
 );
 
-function autoResize(){
 
-    input.style.height =
-        "auto";
+/* =========================================================
+   SEND BUTTON
+========================================================= */
 
-    input.style.height =
-        Math.min(
-            input.scrollHeight,
-            150
-        ) + "px";
+sendBtn.addEventListener(
+    "click",
+    sendMessage
+);
 
-}
 
+/* =========================================================
+   KEYBOARD
+========================================================= */
 
 input.addEventListener(
     "keydown",
-    event=>{
+    event => {
 
-        if(
+        if (
             event.key === "Enter" &&
             !event.shiftKey
-        ){
+        ) {
 
             event.preventDefault();
 
@@ -1874,11 +1542,79 @@ input.addEventListener(
 );
 
 
-/* ============================================================
-   START
-============================================================ */
+/* =========================================================
+   AUTO RESIZE
+========================================================= */
 
-init();
+function resizeInput() {
+
+    input.style.height = "auto";
+
+    input.style.height =
+        Math.min(input.scrollHeight, 130)
+        + "px";
+
+}
+
+input.addEventListener(
+    "input",
+    resizeInput
+);
+
+
+/* =========================================================
+   SCROLL
+========================================================= */
+
+function scrollToBottom() {
+
+    requestAnimationFrame(() => {
+
+        const main =
+            document.getElementById("main");
+
+        main.scrollTop =
+            main.scrollHeight;
+
+    });
+
+}
+
+
+/* =========================================================
+   EXISTING SUPABASE SESSION CHANGES
+========================================================= */
+
+sb.auth.onAuthStateChange(
+    (_event, newSession) => {
+
+        session = newSession;
+
+        if (session) {
+
+            setStatus(true, "Online");
+
+            enableAI();
+
+            loadUsage();
+
+        } else {
+
+            setStatus(false, "Not signed in");
+
+            disableAI();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+initialise();
 
 </script>
 

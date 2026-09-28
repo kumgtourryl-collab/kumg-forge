@@ -1,5 +1,5 @@
 // KUMG Forge + TouRryl Store — Backend server
-// Publish + AI (Groq) + Paynow + Public shops
+// Publish + AI (Groq) + Paynow + Public shops + Share badge
 
 const express = require('express');
 const cors = require('cors');
@@ -17,44 +17,112 @@ const BASE_DOMAIN = process.env.BASE_DOMAIN || 'kumg.app';
 const PUBLIC_URL = process.env.PUBLIC_URL || 'https://kumg-forge.onrender.com';
 const APP_URL = process.env.APP_URL || 'https://kumgtourryl-collab.github.io/kumg-forge';
 
-// AI (Groq)
 const GROQ_KEY = process.env.GROQ_API_KEY;
 const GROQ_MODEL = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
 const AI_FREE_LIMIT = 250;
 const AI_IMAGE_LIMIT = 50;
 
-// Paynow
 let Paynow = null;
-try {
-  Paynow = require('paynow').Paynow;
-} catch(e) {
-  console.warn('Paynow SDK not installed — /api/paynow endpoints disabled.');
+try { Paynow = require('paynow').Paynow; } catch(e){
+  console.warn('Paynow SDK not installed.');
 }
 const PAYNOW_ID  = process.env.PAYNOW_INTEGRATION_ID;
 const PAYNOW_KEY = process.env.PAYNOW_INTEGRATION_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY){
-  console.error('⚠️  Missing SUPABASE_URL or SUPABASE_SERVICE_KEY');
+  console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_KEY');
 }
 
 const db = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-// ===== Helpers =====
 function escapeHtml(s){
   return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   }[c]));
 }
 
-// ===== Health =====
+// ============================================================
+// KUMG BADGE + WHATSAPP SHARE (injected into published sites)
+// ============================================================
+function kumgBadge(){
+  return `
+<style data-kumg-badge>
+  .kumg-share-fab{
+    position: fixed;
+    bottom: 20px;
+    right: 16px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #25D366;
+    color: #04140C;
+    border: 0;
+    border-radius: 999px;
+    padding: 12px 18px;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0,0,0,.35);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .kumg-share-fab:active{ transform: scale(.97); }
+  .kumg-share-fab svg{ width: 18px; height: 18px; fill: #04140C; }
+  .kumg-made-footer{
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    background: rgba(10,10,10,.92);
+    color: #E8F5EE;
+    text-align: center;
+    padding: 9px 12px calc(9px + env(safe-area-inset-bottom));
+    font-size: 11.5px;
+    z-index: 9998;
+    font-family: system-ui, -apple-system, sans-serif;
+    letter-spacing: .2px;
+    backdrop-filter: blur(8px);
+  }
+  .kumg-made-footer a{ color: #4FE39B; font-weight: 800; text-decoration: none; }
+  @media(min-width:640px){
+    .kumg-made-footer{ display: none; }
+    .kumg-share-fab{ bottom: 20px; }
+  }
+  @media(max-width:639px){
+    .kumg-share-fab{ bottom: 52px; }
+  }
+</style>
+
+<button class="kumg-share-fab" onclick="kumgShare()" aria-label="Share on WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  Share
+</button>
+
+<div class="kumg-made-footer">
+  Built with <a href="${APP_URL}" target="_blank" rel="noopener">KUMG</a> — create your own free
+</div>
+
+<script data-kumg-badge>
+function kumgShare(){
+  try {
+    var url = window.location.href;
+    var title = document.title || 'this site';
+    var msg = 'Check out ' + title + ' — ' + url;
+    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+  } catch(e){}
+}
+<\/script>
+`;
+}
+
+// ============================================================
+// HEALTH
+// ============================================================
 app.get('/', (req, res) => {
   res.json({
     ok: true,
     service: 'KUMG Forge backend',
     ai: GROQ_KEY ? 'groq' : 'not configured',
     aiModel: GROQ_MODEL,
-    aiMessageLimit: AI_FREE_LIMIT,
-    aiImageLimit: AI_IMAGE_LIMIT,
     paynow: (PAYNOW_ID && PAYNOW_KEY) ? 'configured' : 'not configured'
   });
 });
@@ -66,7 +134,7 @@ app.post('/api/publish', async (req, res) => {
   try {
     const { projectId, subdomain, userId } = req.body || {};
     if (!projectId || !subdomain || !userId){
-      return res.status(400).json({ error: 'Missing projectId, subdomain, or userId' });
+      return res.status(400).json({ error: 'Missing fields' });
     }
 
     const reserved = ['www','api','app','admin','mail','blog','docs','help','support','status','store'];
@@ -78,15 +146,14 @@ app.post('/api/publish', async (req, res) => {
       return res.status(400).json({ error: 'That subdomain is reserved.' });
     }
 
-    const { data: project, error: pErr } = await db
-      .from('projects').select('id, owner, name')
-      .eq('id', projectId).single();
-    if (pErr || !project) return res.status(404).json({ error: 'Project not found' });
+    const { data: project } = await db
+      .from('projects').select('id, owner, name').eq('id', projectId).single();
+    if (!project) return res.status(404).json({ error: 'Project not found' });
     if (project.owner !== userId) return res.status(403).json({ error: 'Not your project' });
 
     const { data: profile } = await db
       .from('profiles').select('plan').eq('id', userId).single();
-    const plan = profile?.plan || 'free';
+    const plan = (profile && profile.plan) || 'free';
 
     if (plan === 'free'){
       const { data: existing } = await db
@@ -130,16 +197,10 @@ app.post('/api/unpublish', async (req, res) => {
   try {
     const { projectId, userId } = req.body || {};
     if (!projectId || !userId) return res.status(400).json({ error: 'Missing fields' });
-
     const { data: project } = await db
       .from('projects').select('id, owner').eq('id', projectId).single();
     if (!project || project.owner !== userId) return res.status(403).json({ error: 'Not allowed' });
-
-    await db.from('projects').update({
-      is_published: false,
-      subdomain: null
-    }).eq('id', projectId);
-
+    await db.from('projects').update({ is_published: false, subdomain: null }).eq('id', projectId);
     res.json({ ok: true });
   } catch (err){
     console.error(err);
@@ -148,22 +209,20 @@ app.post('/api/unpublish', async (req, res) => {
 });
 
 // ============================================================
-// AI CHAT — with shop context
+// AI CHAT
 // ============================================================
 app.post('/api/ai/chat', async (req, res) => {
   try {
-    if (!GROQ_KEY){
-      return res.status(500).json({ error: 'AI not configured yet.' });
-    }
+    if (!GROQ_KEY) return res.status(500).json({ error: 'AI not configured yet.' });
 
     const { userId, messages, projectContext, wantsImage } = req.body || {};
     if (!userId || !Array.isArray(messages) || !messages.length){
-      return res.status(400).json({ error: 'Missing userId or messages' });
+      return res.status(400).json({ error: 'Missing fields' });
     }
 
     const { data: profile } = await db
       .from('profiles').select('plan').eq('id', userId).single();
-    const plan = profile?.plan || 'free';
+    const plan = (profile && profile.plan) || 'free';
 
     if (plan === 'free'){
       const { data: todayCount } = await db.rpc('ai_messages_today', { uid: userId });
@@ -174,7 +233,6 @@ app.post('/api/ai/chat', async (req, res) => {
         });
       }
     }
-
     if (wantsImage && plan === 'free'){
       const { data: imgCount } = await db.rpc('ai_images_today', { uid: userId });
       if ((imgCount || 0) >= AI_IMAGE_LIMIT){
@@ -187,70 +245,47 @@ app.post('/api/ai/chat', async (req, res) => {
 
     const lastUser = [...messages].reverse().find(m => m.role === 'user');
     if (lastUser){
-      await db.from('ai_messages').insert({
-        user_id: userId, role: 'user', content: lastUser.content
-      });
+      await db.from('ai_messages').insert({ user_id: userId, role: 'user', content: lastUser.content });
     }
-
     if (wantsImage && lastUser){
-      await db.from('ai_images').insert({
-        user_id: userId, prompt: lastUser.content.slice(0, 400)
-      });
+      await db.from('ai_images').insert({ user_id: userId, prompt: lastUser.content.slice(0, 400) });
     }
 
     const systemPrompt = [
       'You are KUMG AI, a friendly coding and business assistant inside the KUMG Forge mobile app.',
       'Users build websites and run online shops from their phones.',
-      'Help with HTML, CSS, JavaScript — and help shop owners improve their listings, write product descriptions, and set prices.',
-      'Assume beginner level unless clearly advanced. Never invent KUMG features that do not exist.',
+      'Help with HTML, CSS, JavaScript — and help shop owners improve their listings.',
+      'Assume beginner level unless clearly advanced. Never invent KUMG features.',
       '',
       'STYLE: Keep answers short — 2-3 short paragraphs, then code if needed.',
       'Wrap code in triple-backtick fences with a language tag: ```html, ```css, ```js.',
       '',
       'MATH: Show calculations like Google — clean steps, no $ signs unless money was asked.',
-      'Example: "15% of 200" →',
-      '  15% of 200',
-      '  = 15 ÷ 100 × 200',
-      '  = 0.15 × 200',
-      '  = 30',
       '',
-      'IMAGE: When asked for an image/picture/photo, respond with:',
+      'IMAGE: When asked for an image, respond with:',
       '  ![short description](https://image.pollinations.ai/prompt/WORDS+JOINED+BY+PLUS?width=1024&height=768&nologo=true)',
       '',
       'VIDEO: When asked for a video, respond with:',
-      '  [Watch videos about TOPIC](https://www.pexels.com/search/videos/TOPIC%20ENCODED/)',
-      '',
-      'SHOPS: If the user has shops (listed below), you know their names, taglines, and publish status.',
-      'Help them write better product names, taglines, delivery info, and WhatsApp replies.',
-      'If a shop is still a draft, encourage them to publish it.'
+      '  [Watch videos](https://www.pexels.com/search/videos/TOPIC%20ENCODED/)'
     ].join('\n');
 
-    // Build context — HTML/CSS/JS + user's shops
     let contextNote = '';
     if (projectContext){
       const parts = [];
-
-      if (projectContext.html) parts.push('Current HTML: ' + String(projectContext.html).slice(0, 700));
-      if (projectContext.css)  parts.push('Current CSS: '  + String(projectContext.css).slice(0, 700));
-      if (projectContext.js)   parts.push('Current JS: '   + String(projectContext.js).slice(0, 700));
-
+      if (projectContext.html) parts.push('HTML: ' + String(projectContext.html).slice(0, 700));
+      if (projectContext.css)  parts.push('CSS: '  + String(projectContext.css).slice(0, 700));
+      if (projectContext.js)   parts.push('JS: '   + String(projectContext.js).slice(0, 700));
       if (Array.isArray(projectContext.shops) && projectContext.shops.length){
-        const shopLines = projectContext.shops.map(s => {
-          let line = '- "' + (s.name || 'untitled') + '"';
-          line += ' (URL: /store/' + (s.slug || 'unknown') + ')';
-          line += ', status: ' + (s.is_published ? 'published' : 'draft');
-          if (s.tagline) line += ', tagline: "' + String(s.tagline).slice(0, 80) + '"';
-          if (s.whatsapp) line += ', WhatsApp: ' + String(s.whatsapp).slice(0, 30);
-          if (s.ecocash) line += ', EcoCash: ' + String(s.ecocash).slice(0, 30);
-          if (s.delivery_info) line += ', delivery: ' + String(s.delivery_info).slice(0, 80);
-          return line;
+        const lines = projectContext.shops.map(s => {
+          let l = '- "' + (s.name || 'untitled') + '" (URL: /store/' + (s.slug || '') + '), ';
+          l += (s.is_published ? 'published' : 'draft');
+          if (s.tagline) l += ', tagline: "' + String(s.tagline).slice(0, 80) + '"';
+          if (s.whatsapp) l += ', WhatsApp: ' + String(s.whatsapp).slice(0, 30);
+          return l;
         });
-        parts.push('User\'s shops (context only — do not repeat back):\n' + shopLines.join('\n'));
+        parts.push('User shops:\n' + lines.join('\n'));
       }
-
-      if (parts.length){
-        contextNote = '\n\n=== USER CONTEXT ===\n' + parts.join('\n');
-      }
+      if (parts.length) contextNote = '\n\n=== USER CONTEXT ===\n' + parts.join('\n');
     }
 
     const groqMessages = [
@@ -278,15 +313,13 @@ app.post('/api/ai/chat', async (req, res) => {
     if (!groqRes.ok){
       const errTxt = await groqRes.text();
       console.error('Groq error:', errTxt);
-      return res.status(500).json({ error: 'AI request failed. Try again.' });
+      return res.status(500).json({ error: 'AI request failed.' });
     }
 
     const groqJson = await groqRes.json();
-    const reply = groqJson?.choices?.[0]?.message?.content || 'Sorry, I could not generate a reply.';
+    const reply = (groqJson.choices && groqJson.choices[0] && groqJson.choices[0].message && groqJson.choices[0].message.content) || 'Sorry, no reply.';
 
-    await db.from('ai_messages').insert({
-      user_id: userId, role: 'assistant', content: reply
-    });
+    await db.from('ai_messages').insert({ user_id: userId, role: 'assistant', content: reply });
 
     res.json({ ok: true, reply });
   } catch (err){
@@ -295,7 +328,9 @@ app.post('/api/ai/chat', async (req, res) => {
   }
 });
 
-// ===== AI usage =====
+// ============================================================
+// AI USAGE
+// ============================================================
 app.post('/api/ai/usage', async (req, res) => {
   try {
     const { userId } = req.body || {};
@@ -303,12 +338,10 @@ app.post('/api/ai/usage', async (req, res) => {
 
     const { data: profile } = await db
       .from('profiles').select('plan').eq('id', userId).single();
+    const plan = (profile && profile.plan) || 'free';
 
-    const plan = profile?.plan || 'free';
     if (plan === 'pro'){
-      return res.json({
-        ok: true, plan, used: 0, limit: null, images: 0, imageLimit: null
-      });
+      return res.json({ ok: true, plan, used: 0, limit: null, images: 0, imageLimit: null });
     }
 
     const { data: used } = await db.rpc('ai_messages_today', { uid: userId });
@@ -338,10 +371,10 @@ app.post('/api/paynow/initiate', async (req, res) => {
     const amount = plan === 'pro' ? 5.00 : 15.00;
     const reference = 'KUMG-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
 
-    const { error: insErr } = await db.from('payments').insert({
+    const ins = await db.from('payments').insert({
       user_id: userId, reference, amount, currency: 'USD', status: 'pending'
     });
-    if (insErr) return res.status(500).json({ error: 'Failed to create payment' });
+    if (ins.error) return res.status(500).json({ error: 'Failed to create payment' });
 
     const paynow = new Paynow(PAYNOW_ID, PAYNOW_KEY);
     paynow.resultUrl = PUBLIC_URL + '/api/paynow/webhook';
@@ -359,7 +392,7 @@ app.post('/api/paynow/initiate', async (req, res) => {
     await db.from('payments').update({ poll_url: response.pollUrl }).eq('reference', reference);
     res.json({ ok: true, redirectUrl: response.redirectUrl, reference });
   } catch (err){
-    console.error('Paynow initiate error:', err);
+    console.error(err);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -387,7 +420,6 @@ app.post('/api/paynow/webhook', async (req, res) => {
     }
     res.send('OK');
   } catch (err){
-    console.error('Paynow webhook error:', err);
     res.status(500).send('Error');
   }
 });
@@ -398,7 +430,7 @@ app.get('/api/paynow/return', (req, res) => {
 });
 
 // ============================================================
-// SERVE PUBLISHED SITES
+// SERVE PUBLISHED SITES (with badge + share)
 // ============================================================
 app.get('/s/:subdomain', serveSite);
 app.get('/site/:subdomain', serveSite);
@@ -415,14 +447,11 @@ async function serveSite(req, res){
     .maybeSingle();
 
   if (!project) return res.status(404).send(render404(sub));
-  res.set('Content-Type', 'text/html; charset=utf-8');
-  res.send(buildPage(project));
-}
 
-function buildPage(project){
   let html = project.html || '';
   const css = project.css || '';
   const js  = project.js  || '';
+
   if (css.trim()){
     const style = '<style>' + css + '</style>';
     if (html.includes('</head>')) html = html.replace('</head>', style + '</head>');
@@ -433,7 +462,14 @@ function buildPage(project){
     if (html.includes('</body>')) html = html.replace('</body>', script + '</body>');
     else html = html + script;
   }
-  return html;
+
+  // Inject KUMG badge + share button
+  const badge = kumgBadge();
+  if (html.includes('</body>')) html = html.replace('</body>', badge + '</body>');
+  else html = html + badge;
+
+  res.set('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
 }
 
 function render404(sub){
@@ -441,11 +477,11 @@ function render404(sub){
 <style>body{font-family:system-ui;background:#0A0A0A;color:#E8F5EE;display:grid;place-items:center;min-height:100vh;margin:0;padding:24px;text-align:center}
 h1{font-size:56px;margin:0;color:#1F9D62}p{color:#A8BAB1}a{color:#1F9D62}</style></head>
 <body><div><h1>404</h1><p>No site at <strong>${escapeHtml(sub)}.kumg.app</strong> yet.</p>
-<p><a href="https://kumg.app">Build yours free</a></p></div></body></html>`;
+<p><a href="${APP_URL}">Build yours free</a></p></div></body></html>`;
 }
 
 // ============================================================
-// SERVE PUBLIC SHOPS
+// SERVE PUBLIC SHOPS (with share button)
 // ============================================================
 app.get('/store/:slug', servePublicShop);
 
@@ -454,18 +490,11 @@ async function servePublicShop(req, res){
   if (!slug) return res.status(400).send('Missing slug');
 
   const { data: shop } = await db
-    .from('shops')
-    .select('*')
-    .eq('slug', slug)
-    .eq('is_published', true)
-    .maybeSingle();
-
+    .from('shops').select('*').eq('slug', slug).eq('is_published', true).maybeSingle();
   if (!shop) return res.status(404).send(renderShop404(slug));
 
   const { data: products } = await db
-    .from('shop_products')
-    .select('*')
-    .eq('shop_id', shop.id)
+    .from('shop_products').select('*').eq('shop_id', shop.id)
     .order('sort_order', { ascending: true });
 
   db.from('shops').update({ views: (shop.views || 0) + 1 }).eq('id', shop.id).then(()=>{}).catch(()=>{});
@@ -488,9 +517,7 @@ function buildShopPage(shop, products){
   const waLink = waNum ? 'https://wa.me/' + waNum : '#';
 
   const initial = (shop.name || '?')[0].toUpperCase();
-  const logo = shop.logo_url
-    ? '<img src="' + escapeHtml(shop.logo_url) + '" alt="">'
-    : initial;
+  const logo = shop.logo_url ? '<img src="' + escapeHtml(shop.logo_url) + '" alt="">' : initial;
 
   const fmt = (n, cur) => {
     const num = Number(n || 0);
@@ -500,9 +527,7 @@ function buildShopPage(shop, products){
   const productCards = products.length
     ? products.map(p => {
         const pInit = (p.name || '?')[0].toUpperCase();
-        const pic = p.image_url
-          ? '<img src="' + escapeHtml(p.image_url) + '" alt="">'
-          : pInit;
+        const pic = p.image_url ? '<img src="' + escapeHtml(p.image_url) + '" alt="">' : pInit;
         const out = p.in_stock ? '' : '<span class="out">Out</span>';
         return '<div class="pcard" data-id="' + p.id + '" ' +
           'data-name="' + escapeHtml(p.name) + '" ' +
@@ -525,6 +550,8 @@ function buildShopPage(shop, products){
     whatsapp: shop.whatsapp, ecocash: shop.ecocash
   });
 
+  const badge = kumgBadge();
+
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -538,26 +565,24 @@ body{margin:0;background:${t.bg};color:${t.text};font-family:system-ui,-apple-sy
 .shop-top{padding:22px 20px 26px;background:linear-gradient(160deg,${t.accentDark},${t.accent});color:#fff;border-radius:0 0 24px 24px;text-align:center}
 .shop-logo{width:80px;height:80px;border-radius:20px;background:rgba(255,255,255,.15);display:grid;place-items:center;margin:0 auto 12px;font-size:32px;font-weight:900;color:#fff;overflow:hidden;border:2px solid rgba(255,255,255,.3)}
 .shop-logo img{width:100%;height:100%;object-fit:cover}
-.shop-top h1{margin:0 0 6px;font-size:22px;font-weight:800;color:#fff;letter-spacing:-.4px}
+.shop-top h1{margin:0 0 6px;font-size:22px;font-weight:800;color:#fff}
 .tagline{margin:0 0 16px;font-size:13.5px;color:rgba(255,255,255,.85)}
 .wa-btn{display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#04140C;padding:12px 20px;border-radius:999px;font-weight:800;font-size:14px;text-decoration:none}
 .delivery-info{background:rgba(0,0,0,.2);border-radius:12px;padding:10px 14px;margin:14px 0 0;font-size:12.5px;color:rgba(255,255,255,.9)}
 .shop-body{padding:20px 16px 120px;max-width:640px;margin:0 auto}
 .prod-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(min-width:560px){.prod-grid{grid-template-columns:1fr 1fr 1fr}}
-.pcard{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;cursor:pointer;transition:transform .05s}
+.pcard{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;cursor:pointer}
 .pcard:active{transform:scale(.98)}
 .pcard .pic{width:100%;aspect-ratio:1/1;background:linear-gradient(135deg,${t.accentDark},${t.accent});display:grid;place-items:center;color:#fff;font-weight:900;font-size:36px;overflow:hidden}
 .pcard .pic img{width:100%;height:100%;object-fit:cover}
 .pcard .info{padding:10px 12px}
 .pcard .nm{font-weight:700;font-size:13.5px;margin-bottom:4px;line-height:1.3}
 .pcard .pr{font-weight:800;color:${t.accent};font-size:14px}
-.pcard .out{font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;background:#E5484D;color:#fff;padding:2px 6px;border-radius:6px;margin-left:6px}
+.pcard .out{font-size:10px;font-weight:800;text-transform:uppercase;background:#E5484D;color:#fff;padding:2px 6px;border-radius:6px;margin-left:6px}
 .empty-shop{text-align:center;padding:40px 20px;opacity:.6}
 .cart-bar{position:fixed;left:12px;right:12px;bottom:12px;z-index:40;background:${t.accent};color:#04140C;border-radius:16px;padding:14px 18px;display:none;align-items:center;justify-content:space-between;box-shadow:0 8px 24px rgba(0,0,0,.4);font-weight:800}
 .cart-bar.show{display:flex}
-.cart-bar .count{font-size:13px;opacity:.85}
-.cart-bar .total{font-size:16px}
 .cart-bar button{background:#04140C;color:#fff;border:0;padding:10px 16px;border-radius:12px;font-weight:800;font-size:13.5px}
 .cart-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:60;display:none;align-items:flex-end;justify-content:center}
 .cart-bg.show{display:flex}
@@ -566,7 +591,6 @@ body{margin:0;background:${t.bg};color:${t.text};font-family:system-ui,-apple-sy
 .ci{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px}
 .ci .qty-ctrl{display:flex;align-items:center;gap:8px}
 .ci .qty-ctrl button{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:${t.text};font-weight:800;padding:0}
-.ci .qty-ctrl .q{font-weight:800;min-width:22px;text-align:center}
 .cart-total{display:flex;justify-content:space-between;padding:14px 0;margin-top:8px;border-top:2px solid ${t.accent};font-weight:800;font-size:16px}
 .cart-actions{display:flex;gap:8px;margin-top:8px}
 .cart-actions button{flex:1;padding:14px;border-radius:12px;font-weight:800;font-size:15px;border:0}
@@ -590,8 +614,8 @@ body{margin:0;background:${t.bg};color:${t.text};font-family:system-ui,-apple-sy
 
 <div class="cart-bar" id="cartBar">
   <div>
-    <div class="count" id="cartCount">0 items</div>
-    <div class="total" id="cartTotal">$0.00</div>
+    <div id="cartCount">0 items</div>
+    <div id="cartTotal">$0.00</div>
   </div>
   <button id="viewCartBtn">View cart</button>
 </div>
@@ -600,10 +624,7 @@ body{margin:0;background:${t.bg};color:${t.text};font-family:system-ui,-apple-sy
   <div class="cart-sheet">
     <h3>Your cart</h3>
     <div id="cartItems"></div>
-    <div class="cart-total">
-      <span>Total</span>
-      <span id="cartTotalSheet">$0.00</span>
-    </div>
+    <div class="cart-total"><span>Total</span><span id="cartTotalSheet">$0.00</span></div>
     <div class="cart-actions">
       <button id="closeCart">Keep shopping</button>
       <button id="checkoutBtn">Order on WhatsApp</button>
@@ -695,11 +716,9 @@ document.getElementById('viewCartBtn').onclick = function(){
   renderCartItems();
   document.getElementById('cartBg').classList.add('show');
 };
-
 document.getElementById('closeCart').onclick = function(){
   document.getElementById('cartBg').classList.remove('show');
 };
-
 document.getElementById('checkoutBtn').onclick = function(){
   var items = Object.entries(cart).map(function(e){
     var p = PRODUCTS.find(function(x){ return x.id === e[0]; });
@@ -731,6 +750,8 @@ document.getElementById('checkoutBtn').onclick = function(){
   location.href = 'https://wa.me/' + num + '?text=' + encodeURIComponent(lines.join('\\n'));
 };
 </script>
+
+${badge}
 </body>
 </html>`;
 }
@@ -740,13 +761,11 @@ function renderShop404(slug){
 <style>body{font-family:system-ui;background:#0A0A0A;color:#E8F5EE;display:grid;place-items:center;min-height:100vh;margin:0;padding:24px;text-align:center}
 h1{font-size:56px;margin:0;color:#1F9D62}p{color:#A8BAB1}a{color:#1F9D62}</style></head>
 <body><div><h1>404</h1><p>No shop at <strong>/store/${escapeHtml(slug)}</strong>.</p>
-<p><a href="https://kumg.app">Create your own free shop</a></p></div></body></html>`;
+<p><a href="${APP_URL}">Create your own free shop</a></p></div></body></html>`;
 }
 
-// ===== START =====
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log('KUMG Forge + TouRryl Store running on port ' + PORT);
+  console.log('KUMG Forge server on port ' + PORT);
   console.log('AI model: ' + GROQ_MODEL);
-  console.log('AI limits — messages: ' + AI_FREE_LIMIT + ', images: ' + AI_IMAGE_LIMIT);
 });

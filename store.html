@@ -17,184 +17,36 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="css/style.css">
 <style>
-  .hero{
-    background: linear-gradient(135deg, var(--deep), var(--green));
-    border-radius: 16px;
-    padding: 22px 20px;
-    color: #E8F5EE;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-  .hero-icon{
-    width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
-    background: rgba(255,255,255,.15);
-    display: grid; place-items: center;
-  }
-  .hero-icon svg{
-    width: 26px; height: 26px;
-    stroke: #E8F5EE; fill: none;
-    stroke-width: 1.9;
-    stroke-linecap: round; stroke-linejoin: round;
-  }
-  .hero-txt{ flex: 1; min-width: 0; }
-  .hero h1{
-    margin: 0 0 4px;
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: -0.4px;
-    color: #fff;
-  }
-  .hero p{ margin: 0; font-size: 13px; opacity: .88; line-height: 1.45; }
-
-  .plan-note{
-    text-align: center;
-    font-size: 12px;
-    color: var(--muted);
-    margin: 0 0 14px;
-    padding: 8px 12px;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-  }
-  .plan-note.pro{
-    background: rgba(31,157,98,.1);
-    border-color: rgba(31,157,98,.3);
-    color: var(--green);
-  }
-
-  .shop-card{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 14px;
-    margin-bottom: 10px;
-    display: flex;
-    gap: 14px;
-    align-items: center;
-    cursor: pointer;
-    transition: border-color .15s;
-  }
-  .shop-card:hover{ border-color: var(--green); }
-
-  .shop-logo{
-    width: 56px; height: 56px; border-radius: 14px; flex-shrink: 0;
-    background: linear-gradient(135deg, var(--deep), var(--green));
-    display: grid; place-items: center;
-    color: #04140C;
-    font-weight: 900; font-size: 22px;
-    overflow: hidden;
-  }
-  .shop-logo img{ width: 100%; height: 100%; object-fit: cover; }
-
-  .shop-meta{ flex: 1; min-width: 0; }
-  .shop-meta .name{
-    font-weight: 800; font-size: 15.5px; margin-bottom: 4px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    color: var(--mint);
-  }
-  .shop-meta .sub{
-    font-size: 12px; color: var(--muted);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .shop-meta .url{
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--green);
-    margin-top: 4px;
-  }
-
-  .shop-status{
-    font-size: 9.5px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    padding: 4px 9px;
-    border-radius: 999px;
-    background: var(--deep);
-    color: var(--mint);
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .shop-status .dot{
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--muted);
-  }
-  .shop-status.live{
-    background: var(--green);
-    color: #04140C;
-  }
-  .shop-status.live .dot{ background: #04140C; }
-
-  .empty-shop-state{
-    text-align: center;
-    padding: 40px 20px 24px;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-  }
-  .empty-shop-state .ill{
-    width: 72px; height: 72px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, var(--deep), var(--green));
-    display: grid; place-items: center;
-    margin: 0 auto 18px;
-  }
-  .empty-shop-state .ill svg{
-    width: 36px; height: 36px;
-    stroke: #04140C; fill: none;
-    stroke-width: 1.9;
-    stroke-linecap: round; stroke-linejoin: round;
-  }
-  .empty-shop-state h3{
-    margin: 0 0 8px;
-    font-size: 18px;
-    font-weight: 800;
-    letter-spacing: -0.3px;
-  }
-  .empty-shop-state p{
-    margin: 0 0 20px;
-    color: var(--muted);
-    font-size: 13.5px;
-    line-height: 1.55;
-    max-width: 300px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .empty-shop-state .benefits{
-    text-align: left;
-    max-width: 320px;
-    margin: 20px auto;
-    padding: 14px 16px;
-    background: rgba(31,157,98,.06);
-    border-radius: 12px;
-  }
-  .empty-shop-state .benefit{
-    display: flex;
-    gap: 10px;
-    padding: 6px 0;
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-  .empty-shop-state .benefit svg{
-    width: 16px; height: 16px; flex-shrink: 0;
-    stroke: var(--green); fill: none;
-    stroke-width: 2.5;
-    stroke-linecap: round; stroke-linejoin: round;
-    margin-top: 2px;
-  }
-
-  footer.legal{
-    text-align: center;
-    font-size: 12px;
-    color: var(--muted);
-    padding: 24px 0;
-  }
-  footer.legal a{ color: var(--muted); }
+  .hero{background:linear-gradient(135deg,var(--deep),var(--green));border-radius:16px;padding:22px 20px;color:#E8F5EE;margin-bottom:20px;display:flex;align-items:center;gap:14px}
+  .hero-icon{width:52px;height:52px;border-radius:14px;flex-shrink:0;background:rgba(255,255,255,.15);display:grid;place-items:center}
+  .hero-icon svg{width:26px;height:26px;stroke:#E8F5EE;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .hero-txt{flex:1;min-width:0}
+  .hero h1{margin:0 0 4px;font-size:20px;font-weight:800;letter-spacing:-0.4px;color:#fff}
+  .hero p{margin:0;font-size:13px;opacity:.88;line-height:1.45}
+  .plan-note{text-align:center;font-size:12px;color:var(--muted);margin:0 0 14px;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:10px}
+  .plan-note.pro{background:rgba(31,157,98,.1);border-color:rgba(31,157,98,.3);color:var(--green)}
+  .shop-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;display:flex;gap:14px;align-items:center;cursor:pointer;transition:border-color .15s}
+  .shop-card:hover{border-color:var(--green)}
+  .shop-logo{width:56px;height:56px;border-radius:14px;flex-shrink:0;background:linear-gradient(135deg,var(--deep),var(--green));display:grid;place-items:center;color:#04140C;font-weight:900;font-size:22px;overflow:hidden}
+  .shop-logo img{width:100%;height:100%;object-fit:cover}
+  .shop-meta{flex:1;min-width:0}
+  .shop-meta .name{font-weight:800;font-size:15.5px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--mint)}
+  .shop-meta .sub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .shop-meta .url{font-family:var(--mono);font-size:11px;color:var(--green);margin-top:4px}
+  .shop-status{font-size:9.5px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:var(--deep);color:var(--mint);flex-shrink:0;display:flex;align-items:center;gap:5px}
+  .shop-status .dot{width:6px;height:6px;border-radius:50%;background:var(--muted)}
+  .shop-status.live{background:var(--green);color:#04140C}
+  .shop-status.live .dot{background:#04140C}
+  .empty-shop-state{text-align:center;padding:40px 20px 24px;background:var(--card);border:1px solid var(--line);border-radius:16px}
+  .empty-shop-state .ill{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--deep),var(--green));display:grid;place-items:center;margin:0 auto 18px}
+  .empty-shop-state .ill svg{width:36px;height:36px;stroke:#04140C;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .empty-shop-state h3{margin:0 0 8px;font-size:18px;font-weight:800;letter-spacing:-0.3px}
+  .empty-shop-state p{margin:0 0 20px;color:var(--muted);font-size:13.5px;line-height:1.55;max-width:300px;margin-left:auto;margin-right:auto}
+  .empty-shop-state .benefits{text-align:left;max-width:320px;margin:20px auto;padding:14px 16px;background:rgba(31,157,98,.06);border-radius:12px}
+  .empty-shop-state .benefit{display:flex;gap:10px;padding:6px 0;font-size:13px;color:var(--muted);line-height:1.5}
+  .empty-shop-state .benefit svg{width:16px;height:16px;flex-shrink:0;stroke:var(--green);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;margin-top:2px}
+  footer.legal{text-align:center;font-size:12px;color:var(--muted);padding:24px 0}
+  footer.legal a{color:var(--muted)}
 </style>
 </head>
 <body class="has-bottom-nav">
@@ -211,10 +63,7 @@
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18z"/><path d="M3 12h18"/></svg>
     </button>
     <button class="icon-btn" onclick="location.href='settings.html'" title="Settings" aria-label="Settings">
-      <svg viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="3"/>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-      </svg>
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
   </div>
 </header>
@@ -234,7 +83,6 @@
   </div>
 
   <p class="plan-note" id="planNote">Loading…</p>
-
   <div id="list"></div>
 </main>
 
@@ -269,6 +117,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 <script src="js/settings.js"></script>
+<script src="js/analytics.js"></script>
 <script>
 var userId = null;
 var userPlan = 'free';
@@ -322,23 +171,15 @@ async function load(){
         <h3>Open your first shop</h3>
         <p>Turn your products into a professional online shop in under 5 minutes.</p>
         <div class="benefits">
-          <div class="benefit">
-            <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-            <span>Share one link on WhatsApp or social</span>
-          </div>
-          <div class="benefit">
-            <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-            <span>Customers order directly on WhatsApp</span>
-          </div>
-          <div class="benefit">
-            <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-            <span>No commissions. No hidden fees.</span>
-          </div>
+          <div class="benefit"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Share one link on WhatsApp or social</span></div>
+          <div class="benefit"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Customers order directly on WhatsApp</span></div>
+          <div class="benefit"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>No commissions. No hidden fees.</span></div>
         </div>
         <button class="btn btn-block" id="firstShopBtn" style="max-width:280px;margin:0 auto">Create a shop</button>
       </div>
     `;
     document.getElementById('firstShopBtn').addEventListener('click', function(){
+      kumgTrack('open_create_shop');
       location.href = 'store-edit.html';
     });
     return;
@@ -347,20 +188,17 @@ async function load(){
   listEl.innerHTML = shops.data.map(function(s){
     var initial = (s.name || '?')[0].toUpperCase();
     var logo = s.logo_url ? '<img src="' + esc(s.logo_url) + '" alt="">' : initial;
-    return `
-      <div class="shop-card" data-id="${s.id}">
-        <div class="shop-logo">${logo}</div>
-        <div class="shop-meta">
-          <div class="name">${esc(s.name)}</div>
-          <div class="sub">${esc(s.tagline || 'No tagline yet')}</div>
-          <div class="url">/store/${esc(s.slug)}</div>
-        </div>
-        <span class="shop-status ${s.is_published ? 'live' : ''}">
-          <span class="dot"></span>
-          ${s.is_published ? 'Live' : 'Draft'}
-        </span>
-      </div>
-    `;
+    return '<div class="shop-card" data-id="' + s.id + '">' +
+      '<div class="shop-logo">' + logo + '</div>' +
+      '<div class="shop-meta">' +
+        '<div class="name">' + esc(s.name) + '</div>' +
+        '<div class="sub">' + esc(s.tagline || 'No tagline yet') + '</div>' +
+        '<div class="url">/store/' + esc(s.slug) + '</div>' +
+      '</div>' +
+      '<span class="shop-status ' + (s.is_published ? 'live' : '') + '">' +
+        '<span class="dot"></span>' + (s.is_published ? 'Live' : 'Draft') +
+      '</span>' +
+    '</div>';
   }).join('');
 
   listEl.querySelectorAll('.shop-card').forEach(function(card){
@@ -369,13 +207,13 @@ async function load(){
     });
   });
 
-  // Add "+ New shop" button if user can create more
   if (userPlan === 'pro' || shops.data.length < 1){
     var btn = document.createElement('button');
     btn.className = 'btn btn-block';
     btn.textContent = '+ Create another shop';
     btn.style.marginTop = '16px';
     btn.addEventListener('click', function(){
+      kumgTrack('open_create_shop_again');
       location.href = 'store-edit.html';
     });
     listEl.appendChild(btn);
@@ -390,6 +228,7 @@ async function load(){
   var profile = await db.from('profiles').select('dob').eq('id', userId).maybeSingle();
   if (!profile.data || !profile.data.dob){ location.href = 'verify.html'; return; }
 
+  kumgTrack('open_store');
   load();
 })();
 </script>

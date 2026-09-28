@@ -9,69 +9,192 @@
 (function(){
   var t = localStorage.getItem('kumg_theme');
   if (t === 'light') document.documentElement.setAttribute('data-theme','light');
-  var l = localStorage.getItem('kumg_lang') || 'en';
-  document.documentElement.setAttribute('lang', l);
 })();
 </script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/icon-192.png">
 <link rel="icon" type="image/svg+xml" href="assets/store-icon.svg">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="KUMG">
 <link rel="stylesheet" href="css/style.css">
 <style>
   .hero{
-    background:linear-gradient(135deg,var(--deep),var(--green));
-    border-radius:var(--radius);
-    padding:24px 20px;margin-bottom:20px;
-    color:#E8F5EE;
-  }
-  .hero-head{
-    display:flex;align-items:center;gap:12px;margin-bottom:10px;
+    background: linear-gradient(135deg, var(--deep), var(--green));
+    border-radius: 16px;
+    padding: 22px 20px;
+    color: #E8F5EE;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
   }
   .hero-icon{
-    width:44px;height:44px;border-radius:12px;
-    background:rgba(255,255,255,.15);
-    display:grid;place-items:center;flex-shrink:0;
+    width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+    background: rgba(255,255,255,.15);
+    display: grid; place-items: center;
   }
   .hero-icon svg{
-    width:22px;height:22px;
-    stroke:#E8F5EE;fill:none;
-    stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;
+    width: 26px; height: 26px;
+    stroke: #E8F5EE; fill: none;
+    stroke-width: 1.9;
+    stroke-linecap: round; stroke-linejoin: round;
   }
-  .hero h2{margin:0;font-size:20px;font-weight:800;letter-spacing:-.4px;color:#E8F5EE}
-  .hero p{margin:0;font-size:13.5px;opacity:.9;line-height:1.55}
+  .hero-txt{ flex: 1; min-width: 0; }
+  .hero h1{
+    margin: 0 0 4px;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    color: #fff;
+  }
+  .hero p{ margin: 0; font-size: 13px; opacity: .88; line-height: 1.45; }
+
+  .plan-note{
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0 0 14px;
+    padding: 8px 12px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  .plan-note.pro{
+    background: rgba(31,157,98,.1);
+    border-color: rgba(31,157,98,.3);
+    color: var(--green);
+  }
 
   .shop-card{
-    background:var(--card);border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:14px 16px;margin-bottom:10px;
-    cursor:pointer;transition:border-color .15s ease;
-    display:flex;gap:14px;align-items:center;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    cursor: pointer;
+    transition: border-color .15s;
   }
-  .shop-card:hover{border-color:var(--green)}
-  .shop-card .logo{
-    width:52px;height:52px;border-radius:12px;flex-shrink:0;
-    background:linear-gradient(135deg,var(--deep),var(--green));
-    display:grid;place-items:center;color:#04140C;
-    font-weight:900;font-size:20px;overflow:hidden;
+  .shop-card:hover{ border-color: var(--green); }
+
+  .shop-logo{
+    width: 56px; height: 56px; border-radius: 14px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--deep), var(--green));
+    display: grid; place-items: center;
+    color: #04140C;
+    font-weight: 900; font-size: 22px;
+    overflow: hidden;
   }
-  .shop-card .logo img{width:100%;height:100%;object-fit:cover}
-  .shop-card .meta{flex:1;min-width:0}
-  .shop-card .name{
-    font-weight:800;font-size:15.5px;margin-bottom:3px;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  .shop-logo img{ width: 100%; height: 100%; object-fit: cover; }
+
+  .shop-meta{ flex: 1; min-width: 0; }
+  .shop-meta .name{
+    font-weight: 800; font-size: 15.5px; margin-bottom: 4px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    color: var(--mint);
   }
-  .shop-card .sub{font-size:12px;color:var(--muted)}
-  .shop-card .status{
-    font-size:10px;font-weight:800;letter-spacing:.5px;
-    text-transform:uppercase;
-    padding:3px 8px;border-radius:999px;
-    background:var(--deep);color:var(--mint);
-    flex-shrink:0;
+  .shop-meta .sub{
+    font-size: 12px; color: var(--muted);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .shop-card .status.live{background:var(--green);color:#04140C}
+  .shop-meta .url{
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--green);
+    margin-top: 4px;
+  }
+
+  .shop-status{
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: var(--deep);
+    color: var(--mint);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .shop-status .dot{
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--muted);
+  }
+  .shop-status.live{
+    background: var(--green);
+    color: #04140C;
+  }
+  .shop-status.live .dot{ background: #04140C; }
+
+  .empty-shop-state{
+    text-align: center;
+    padding: 40px 20px 24px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+  }
+  .empty-shop-state .ill{
+    width: 72px; height: 72px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--deep), var(--green));
+    display: grid; place-items: center;
+    margin: 0 auto 18px;
+  }
+  .empty-shop-state .ill svg{
+    width: 36px; height: 36px;
+    stroke: #04140C; fill: none;
+    stroke-width: 1.9;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+  .empty-shop-state h3{
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+  .empty-shop-state p{
+    margin: 0 0 20px;
+    color: var(--muted);
+    font-size: 13.5px;
+    line-height: 1.55;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .empty-shop-state .benefits{
+    text-align: left;
+    max-width: 320px;
+    margin: 20px auto;
+    padding: 14px 16px;
+    background: rgba(31,157,98,.06);
+    border-radius: 12px;
+  }
+  .empty-shop-state .benefit{
+    display: flex;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .empty-shop-state .benefit svg{
+    width: 16px; height: 16px; flex-shrink: 0;
+    stroke: var(--green); fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round; stroke-linejoin: round;
+    margin-top: 2px;
+  }
+
+  footer.legal{
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 24px 0;
+  }
+  footer.legal a{ color: var(--muted); }
 </style>
 </head>
 <body class="has-bottom-nav">
@@ -84,41 +207,45 @@
     </a>
   </div>
   <div class="actions">
-    <button class="btn-ghost" onclick="location.href='index.html'" style="font-size:13px;padding:8px 12px">Home</button>
+    <button class="icon-btn" onclick="location.href='discover.html'" title="Browse shops" aria-label="Browse shops">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18z"/><path d="M3 12h18"/></svg>
+    </button>
+    <button class="icon-btn" onclick="location.href='settings.html'" title="Settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
   </div>
 </header>
 
 <main class="container">
   <div class="hero">
-    <div class="hero-head">
-      <div class="hero-icon">
-        <svg viewBox="0 0 24 24">
-          <path d="M 4 8 h 16 l -1.5 12 a 1.6 1.6 0 0 1 -1.6 1.4 h -9.8 a 1.6 1.6 0 0 1 -1.6 -1.4 z"/>
-          <path d="M 8.5 8 V 6.5 a 3.5 3.5 0 0 1 7 0 V 8"/>
-        </svg>
-      </div>
-      <h2>TouRryl Store</h2>
+    <div class="hero-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M 4 8 h 16 l -1.5 12 a 1.6 1.6 0 0 1 -1.6 1.4 h -9.8 a 1.6 1.6 0 0 1 -1.6 -1.4 z"/>
+        <path d="M 8.5 8 V 6.5 a 3.5 3.5 0 0 1 7 0 V 8"/>
+      </svg>
     </div>
-    <p>Turn your business into an online shop in 5 minutes. Share one link. Take orders on WhatsApp.</p>
+    <div class="hero-txt">
+      <h1>TouRryl Store</h1>
+      <p>Open a shop in 5 minutes. Share one link. Take orders on WhatsApp.</p>
+    </div>
   </div>
 
-  <h1 class="page-title" style="font-size:18px">Your shops</h1>
-  <p class="page-sub" style="margin-bottom:14px">Free plan: 1 shop · 5 products</p>
+  <p class="plan-note" id="planNote">Loading…</p>
 
   <div id="list"></div>
-
-  <button class="btn btn-block" id="newBtn" style="margin-top:20px">+ Create a shop</button>
-
-  <footer class="legal" style="text-align:center;font-size:12px;color:var(--muted);padding:24px 0">
-    <a href="terms.html" style="color:var(--muted)">Terms</a> ·
-    <a href="privacy.html" style="color:var(--muted)">Privacy</a>
-  </footer>
 </main>
 
 <nav class="bottom-nav">
   <a class="nav-item" href="index.html">
     <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg>
     <span>Home</span>
+  </a>
+  <a class="nav-item" href="chat.html">
+    <svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z"/></svg>
+    <span>Chats</span>
   </a>
   <a class="nav-item" href="discover.html">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18z"/><path d="M3 12h18"/></svg>
@@ -130,10 +257,6 @@
       <path d="M 8.5 8 V 6.5 a 3.5 3.5 0 0 1 7 0 V 8"/>
     </svg>
     <span>Store</span>
-  </a>
-  <a class="nav-item" href="wallet.html">
-    <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><circle cx="16" cy="15" r="1"/></svg>
-    <span>Wallet</span>
   </a>
   <a class="nav-item" href="ai.html">
     <svg viewBox="0 0 24 24"><path d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7z"/><path d="M19 15.5l.5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5z"/></svg>
@@ -147,91 +270,128 @@
 <script src="js/supabase.js"></script>
 <script src="js/settings.js"></script>
 <script>
-let userId = null;
+var userId = null;
+var userPlan = 'free';
 
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
 function toast(msg){
-  const t = document.getElementById('toast');
+  var t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  setTimeout(()=> t.classList.remove('show'), 2200);
+  setTimeout(function(){ t.classList.remove('show'); }, 2200);
 }
 
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, c => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[c]));
-}
+async function load(){
+  var listEl = document.getElementById('list');
 
-async function render(){
-  const { data: shops, error } = await db
+  var profile = await db.from('profiles').select('plan').eq('id', userId).maybeSingle();
+  userPlan = (profile.data && profile.data.plan) || 'free';
+
+  var noteEl = document.getElementById('planNote');
+  if (userPlan === 'pro'){
+    noteEl.textContent = 'Pro plan: unlimited shops and unlimited products';
+    noteEl.classList.add('pro');
+  } else {
+    noteEl.textContent = 'Free plan: 1 shop with up to 5 products';
+    noteEl.classList.remove('pro');
+  }
+
+  var shops = await db
     .from('shops')
     .select('id, name, tagline, slug, logo_url, is_published, created_at')
+    .eq('owner', userId)
     .order('created_at', { ascending: false });
 
-  const listEl = document.getElementById('list');
-
-  if (error){
+  if (shops.error){
     listEl.innerHTML = '<div class="empty"><h3>Could not load shops</h3></div>';
     return;
   }
 
-  if (!shops || !shops.length){
+  if (!shops.data || !shops.data.length){
     listEl.innerHTML = `
-      <div class="empty">
-        <h3>No shops yet</h3>
-        <p>Create your first shop to start selling.</p>
-      </div>`;
+      <div class="empty-shop-state">
+        <div class="ill">
+          <svg viewBox="0 0 24 24">
+            <path d="M 4 8 h 16 l -1.5 12 a 1.6 1.6 0 0 1 -1.6 1.4 h -9.8 a 1.6 1.6 0 0 1 -1.6 -1.4 z"/>
+            <path d="M 8.5 8 V 6.5 a 3.5 3.5 0 0 1 7 0 V 8"/>
+          </svg>
+        </div>
+        <h3>Open your first shop</h3>
+        <p>Turn your products into a professional online shop in under 5 minutes.</p>
+        <div class="benefits">
+          <div class="benefit">
+            <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+            <span>Share one link on WhatsApp or social</span>
+          </div>
+          <div class="benefit">
+            <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+            <span>Customers order directly on WhatsApp</span>
+          </div>
+          <div class="benefit">
+            <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+            <span>No commissions. No hidden fees.</span>
+          </div>
+        </div>
+        <button class="btn btn-block" id="firstShopBtn" style="max-width:280px;margin:0 auto">Create a shop</button>
+      </div>
+    `;
+    document.getElementById('firstShopBtn').addEventListener('click', function(){
+      location.href = 'store-edit.html';
+    });
     return;
   }
 
-  listEl.innerHTML = shops.map(s => {
-    const initial = (s.name || '?')[0].toUpperCase();
-    const logo = s.logo_url
-      ? `<img src="${escapeHtml(s.logo_url)}" alt="">`
-      : initial;
+  listEl.innerHTML = shops.data.map(function(s){
+    var initial = (s.name || '?')[0].toUpperCase();
+    var logo = s.logo_url ? '<img src="' + esc(s.logo_url) + '" alt="">' : initial;
     return `
       <div class="shop-card" data-id="${s.id}">
-        <div class="logo">${logo}</div>
-        <div class="meta">
-          <div class="name">${escapeHtml(s.name)}</div>
-          <div class="sub">${escapeHtml(s.tagline || 'No tagline yet')} · /store/${escapeHtml(s.slug)}</div>
+        <div class="shop-logo">${logo}</div>
+        <div class="shop-meta">
+          <div class="name">${esc(s.name)}</div>
+          <div class="sub">${esc(s.tagline || 'No tagline yet')}</div>
+          <div class="url">/store/${esc(s.slug)}</div>
         </div>
-        <span class="status ${s.is_published ? 'live' : ''}">
+        <span class="shop-status ${s.is_published ? 'live' : ''}">
+          <span class="dot"></span>
           ${s.is_published ? 'Live' : 'Draft'}
         </span>
       </div>
     `;
   }).join('');
 
-  listEl.querySelectorAll('.shop-card').forEach(card => {
-    card.addEventListener('click', () => {
+  listEl.querySelectorAll('.shop-card').forEach(function(card){
+    card.addEventListener('click', function(){
       location.href = 'store-edit.html?id=' + card.dataset.id;
     });
   });
+
+  // Add "+ New shop" button if user can create more
+  if (userPlan === 'pro' || shops.data.length < 1){
+    var btn = document.createElement('button');
+    btn.className = 'btn btn-block';
+    btn.textContent = '+ Create another shop';
+    btn.style.marginTop = '16px';
+    btn.addEventListener('click', function(){
+      location.href = 'store-edit.html';
+    });
+    listEl.appendChild(btn);
+  }
 }
 
-document.getElementById('newBtn').addEventListener('click', () => {
-  location.href = 'store-edit.html';
-});
+(async function(){
+  var sess = await db.auth.getSession();
+  if (!sess.data.session){ location.href = 'auth.html'; return; }
+  userId = sess.data.session.user.id;
 
-(async () => {
-  const { data } = await db.auth.getSession();
-  if (!data.session){ location.href = 'auth.html'; return; }
-  userId = data.session.user.id;
+  var profile = await db.from('profiles').select('dob').eq('id', userId).maybeSingle();
+  if (!profile.data || !profile.data.dob){ location.href = 'verify.html'; return; }
 
-  const { data: profile } = await db
-    .from('profiles')
-    .select('dob')
-    .eq('id', userId)
-    .maybeSingle();
-  if (!profile?.dob){ location.href = 'verify.html'; return; }
-
-  render();
+  load();
 })();
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
-}
 </script>
 </body>
 </html>

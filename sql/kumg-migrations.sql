@@ -1,0 +1,21 @@
+-- ============================================================
+-- KUMG FORGE — MIGRATIONS
+-- Add-only. Never deletes user data.
+-- Run this after the fresh install. Safe to run multiple times.
+-- ============================================================
+
+-- [2026-09-28] Analytics events already in fresh install.
+-- Future changes go below this line.
+
+-- [Template — copy this pattern for each new change]
+--
+-- alter table profiles add column if not exists new_field text;
+-- create table if not exists new_feature (
+--   id uuid primary key default gen_random_uuid(),
+--   user_id uuid references profiles(id) on delete cascade,
+--   ...
+-- );
+-- alter table new_feature enable row level security;
+-- drop policy if exists "own new_feature" on new_feature;
+-- create policy "own new_feature" on new_feature for all
+--   using (auth.uid() = user_id) with check (auth.uid() = user_id);

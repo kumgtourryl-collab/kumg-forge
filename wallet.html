@@ -15,100 +15,35 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="css/style.css">
 <style>
-  .balance-card{
-    background:linear-gradient(135deg,var(--deep),var(--green));
-    border-radius:var(--radius);padding:24px 20px;
-    color:#E8F5EE;text-align:center;margin-bottom:20px;
-    position:relative;overflow:hidden;
-  }
-  .balance-card::before{
-    content:'';position:absolute;top:-40px;right:-40px;
-    width:140px;height:140px;border-radius:50%;
-    background:rgba(255,255,255,.06);
-  }
+  .balance-card{background:linear-gradient(135deg,var(--deep),var(--green));border-radius:var(--radius);padding:24px 20px;color:#E8F5EE;text-align:center;margin-bottom:20px;position:relative;overflow:hidden}
+  .balance-card::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.06)}
   .balance-card .lbl{font-size:12px;text-transform:uppercase;letter-spacing:1.5px;opacity:.85;position:relative}
   .balance-card .bal{font-size:44px;font-weight:900;margin:6px 0;letter-spacing:-1px;position:relative}
   .balance-card .sub{font-size:12.5px;opacity:.85;position:relative}
-
-  .redeem-section{
-    margin-bottom:20px;
-  }
-  .redeem-section h3{
-    font-size:12px;font-weight:800;text-transform:uppercase;
-    letter-spacing:1.4px;color:var(--muted);
-    margin:0 0 10px;
-  }
-
-  .redeem-card{
-    background:var(--card);border:1px solid var(--line);
-    border-radius:14px;padding:16px;margin-bottom:10px;
-    display:flex;gap:14px;align-items:center;
-    cursor:pointer;transition:border-color .15s;
-  }
-  .redeem-card:hover{ border-color:var(--green); }
-  .redeem-card:active{ background:var(--deep); }
-  .redeem-card:disabled{ opacity:.5; cursor:not-allowed; }
-
-  .redeem-icon{
-    width:44px;height:44px;border-radius:12px;flex-shrink:0;
-    background:linear-gradient(135deg,var(--deep),var(--green));
-    display:grid;place-items:center;
-  }
-  .redeem-icon svg{
-    width:20px;height:20px;
-    stroke:#04140C;fill:none;stroke-width:2;
-    stroke-linecap:round;stroke-linejoin:round;
-  }
-  .redeem-body{ flex:1;min-width:0; }
-  .redeem-body h4{
-    margin:0 0 3px;font-size:15px;font-weight:800;
-    color:var(--mint);
-  }
-  .redeem-body p{
-    margin:0;font-size:12.5px;color:var(--muted);line-height:1.4;
-  }
-  .redeem-price{
-    font-weight:800;color:var(--green);font-size:14px;
-    flex-shrink:0;
-  }
-
-  .tap-row{
-    background:var(--card);border:1px solid var(--line);
-    border-radius:12px;padding:12px 14px;margin-bottom:8px;
-    display:flex;justify-content:space-between;align-items:center;
-    font-size:13.5px;
-  }
+  .redeem-section{margin-bottom:20px}
+  .redeem-section h3{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin:0 0 10px}
+  .redeem-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:10px;display:flex;gap:14px;align-items:center;cursor:pointer;transition:border-color .15s;font-family:inherit;text-align:left;color:inherit;width:100%}
+  .redeem-card:hover{border-color:var(--green)}
+  .redeem-card:active{background:var(--deep)}
+  .redeem-card:disabled{opacity:.5;cursor:not-allowed}
+  .redeem-icon{width:44px;height:44px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,var(--deep),var(--green));display:grid;place-items:center}
+  .redeem-icon svg{width:20px;height:20px;stroke:#04140C;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .redeem-body{flex:1;min-width:0}
+  .redeem-body h4{margin:0 0 3px;font-size:15px;font-weight:800;color:var(--mint)}
+  .redeem-body p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.4}
+  .redeem-price{font-weight:800;color:var(--green);font-size:14px;flex-shrink:0}
+  .tap-row{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;font-size:13.5px}
   .tap-row .who{color:var(--muted);font-size:12px;margin-top:2px}
   .tap-row .amt{color:var(--green);font-weight:800}
   .tap-row .amt.neg{color:var(--danger)}
-
-  .modal-bg{
-    position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:50;
-    display:none;align-items:center;justify-content:center;padding:20px;
-  }
-  .modal-bg.show{ display:flex; }
-  .modal{
-    background:var(--card);border:1px solid var(--line);
-    border-radius:16px;padding:22px;width:100%;max-width:400px;
-  }
-  .modal h3{ margin:0 0 6px;font-size:17px; }
-  .modal p{ margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.55; }
-
-  .modal-actions{
-    display:flex;gap:8px;margin-top:18px;
-  }
-  .modal-actions button{ flex:1; }
-
-  .info-box{
-    background:rgba(31,157,98,.08);
-    border-left:3px solid var(--green);
-    border-radius:0 10px 10px 0;
-    padding:10px 14px;
-    font-size:12.5px;
-    color:var(--muted);
-    line-height:1.55;
-    margin-bottom:14px;
-  }
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:50;display:none;align-items:center;justify-content:center;padding:20px}
+  .modal-bg.show{display:flex}
+  .modal{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;width:100%;max-width:400px}
+  .modal h3{margin:0 0 6px;font-size:17px}
+  .modal p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.55}
+  .modal-actions{display:flex;gap:8px;margin-top:18px}
+  .modal-actions button{flex:1}
+  .info-box{background:rgba(31,157,98,.08);border-left:3px solid var(--green);border-radius:0 10px 10px 0;padding:10px 14px;font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:14px}
 </style>
 </head>
 <body>
@@ -126,7 +61,6 @@
 </header>
 
 <main class="container" style="max-width:520px">
-
   <div class="balance-card">
     <div class="lbl">Your balance</div>
     <div class="bal" id="balance">$0.00</div>
@@ -135,26 +69,14 @@
 
   <div class="redeem-section">
     <h3>Redeem</h3>
-
     <button class="redeem-card" id="proBtn" type="button">
-      <div class="redeem-icon">
-        <svg viewBox="0 0 24 24"><path d="M12 2l3 6 6 .9-4.5 4.3 1.1 6.3L12 16.8 6.4 19.5l1.1-6.3L3 8.9 9 8z"/></svg>
-      </div>
-      <div class="redeem-body">
-        <h4>Become Pro</h4>
-        <p>Unlimited sites, shops, and AI</p>
-      </div>
+      <div class="redeem-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3 6 6 .9-4.5 4.3 1.1 6.3L12 16.8 6.4 19.5l1.1-6.3L3 8.9 9 8z"/></svg></div>
+      <div class="redeem-body"><h4>Become Pro</h4><p>Unlimited sites, shops, and AI</p></div>
       <div class="redeem-price">$5.00</div>
     </button>
-
     <button class="redeem-card" id="cashBtn" type="button">
-      <div class="redeem-icon">
-        <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><circle cx="16" cy="15" r="1"/></svg>
-      </div>
-      <div class="redeem-body">
-        <h4>Cash out via EcoCash</h4>
-        <p>Payout within 24 hours</p>
-      </div>
+      <div class="redeem-icon"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><circle cx="16" cy="15" r="1"/></svg></div>
+      <div class="redeem-body"><h4>Cash out via EcoCash</h4><p>Payout within 24 hours</p></div>
       <div class="redeem-price">$5.00 min</div>
     </button>
   </div>
@@ -163,17 +85,13 @@
     <h3>Recent activity</h3>
     <div id="history"></div>
   </div>
-
 </main>
 
-<!-- Pro confirm modal -->
 <div class="modal-bg" id="proModal">
   <div class="modal">
     <h3>Confirm upgrade</h3>
     <p>Spend <strong>$5.00</strong> from your wallet to unlock Pro immediately?</p>
-    <div class="info-box">
-      You'll get unlimited websites, unlimited shops, unlimited products, and unlimited AI. This does not expire monthly — you keep Pro indefinitely.
-    </div>
+    <div class="info-box">You get unlimited websites, shops, products, and AI. This does not expire monthly — you keep Pro indefinitely.</div>
     <div class="modal-actions">
       <button class="btn-ghost" id="proCancel">Cancel</button>
       <button id="proConfirm">Confirm</button>
@@ -181,20 +99,15 @@
   </div>
 </div>
 
-<!-- Cash out modal -->
 <div class="modal-bg" id="cashModal">
   <div class="modal">
     <h3>Cash out</h3>
     <p>Enter the EcoCash number where we should send the payout.</p>
-
     <label for="cashAmount">Amount (min $5.00)</label>
     <input id="cashAmount" type="number" inputmode="decimal" step="0.01" min="5" placeholder="5.00">
-
     <label for="cashNumber">EcoCash number</label>
     <input id="cashNumber" type="tel" inputmode="tel" placeholder="07XX XXX XXXX">
-
     <p id="cashMsg" style="font-size:12px;min-height:18px;margin-top:10px"></p>
-
     <div class="modal-actions">
       <button class="btn-ghost" id="cashCancel">Cancel</button>
       <button id="cashConfirm">Request payout</button>
@@ -207,6 +120,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 <script src="js/settings.js"></script>
+<script src="js/analytics.js"></script>
 <script>
 var userId = null;
 var currentBalance = 0;
@@ -233,16 +147,15 @@ function timeAgo(iso){
 
 async function loadWallet(){
   var w = await db.from('wallets').select('*').eq('user_id', userId).maybeSingle();
-  currentBalance = w.data?.balance_cents || 0;
+  currentBalance = (w.data && w.data.balance_cents) || 0;
   document.getElementById('balance').textContent = centsToUsd(currentBalance);
-  if (w.data?.lifetime_cents){
+  if (w.data && w.data.lifetime_cents){
     document.getElementById('lifetime').textContent = 'Lifetime earned ' + centsToUsd(w.data.lifetime_cents);
   }
 
   var p = await db.from('profiles').select('plan').eq('id', userId).maybeSingle();
-  userPlan = p.data?.plan || 'free';
+  userPlan = (p.data && p.data.plan) || 'free';
 
-  // Disable Pro button if already Pro or insufficient balance
   var proBtn = document.getElementById('proBtn');
   if (userPlan === 'pro'){
     proBtn.disabled = true;
@@ -268,21 +181,9 @@ async function loadWallet(){
 }
 
 async function loadHistory(){
-  var taps = await db
-    .from('taps')
-    .select('id, amount_cents, created_at, sponsor_id')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(20);
+  var taps = await db.from('taps').select('id, amount_cents, created_at, sponsor_id').eq('user_id', userId).order('created_at', { ascending: false }).limit(20);
+  var redeems = await db.from('redemptions').select('id, kind, amount_cents, status, submitted_at').eq('user_id', userId).order('submitted_at', { ascending: false }).limit(10);
 
-  var redeems = await db
-    .from('redemptions')
-    .select('id, kind, amount_cents, status, submitted_at')
-    .eq('user_id', userId)
-    .order('submitted_at', { ascending: false })
-    .limit(10);
-
-  // Sponsor names
   var sponsorIds = [...new Set((taps.data || []).map(function(t){ return t.sponsor_id; }))];
   var sponsorsMap = {};
   if (sponsorIds.length){
@@ -291,29 +192,14 @@ async function loadHistory(){
   }
 
   var rows = [];
-
   (taps.data || []).forEach(function(t){
-    rows.push({
-      ts: t.created_at,
-      label: sponsorsMap[t.sponsor_id] || 'Sponsor',
-      sub: timeAgo(t.created_at),
-      amount: '+' + centsToUsd(t.amount_cents),
-      neg: false
-    });
+    rows.push({ ts: t.created_at, label: sponsorsMap[t.sponsor_id] || 'Sponsor', sub: timeAgo(t.created_at), amount: '+' + centsToUsd(t.amount_cents), neg: false });
   });
-
   (redeems.data || []).forEach(function(r){
     var label = r.kind === 'pro' ? 'Upgrade to Pro' : 'Cash out';
     var sub = r.status === 'pending' ? 'Pending · ' + timeAgo(r.submitted_at) : r.status + ' · ' + timeAgo(r.submitted_at);
-    rows.push({
-      ts: r.submitted_at,
-      label: label,
-      sub: sub,
-      amount: '−' + centsToUsd(r.amount_cents),
-      neg: true
-    });
+    rows.push({ ts: r.submitted_at, label: label, sub: sub, amount: '−' + centsToUsd(r.amount_cents), neg: true });
   });
-
   rows.sort(function(a, b){ return new Date(b.ts) - new Date(a.ts); });
 
   var el = document.getElementById('history');
@@ -323,15 +209,12 @@ async function loadHistory(){
   }
 
   el.innerHTML = rows.slice(0, 25).map(function(r){
-    return '<div class="tap-row">' +
-      '<div><div>' + esc(r.label) + '</div>' +
+    return '<div class="tap-row"><div><div>' + esc(r.label) + '</div>' +
       '<div class="who">' + esc(r.sub) + '</div></div>' +
-      '<div class="amt ' + (r.neg ? 'neg' : '') + '">' + r.amount + '</div>' +
-    '</div>';
+      '<div class="amt ' + (r.neg ? 'neg' : '') + '">' + r.amount + '</div></div>';
   }).join('');
 }
 
-// ===== PRO UPGRADE =====
 document.getElementById('proBtn').addEventListener('click', function(){
   document.getElementById('proModal').classList.add('show');
 });
@@ -350,12 +233,10 @@ document.getElementById('proConfirm').addEventListener('click', async function()
   var res = await db.rpc('redeem_pro', { p_user_id: userId });
 
   if (res.error || !res.data || !res.data.ok){
-    var reason = res.data?.reason || 'failed';
-    var msg = reason === 'insufficient'
-      ? 'Not enough balance. You need $5.00.'
-      : reason === 'already_pro'
-      ? 'You are already Pro.'
-      : 'Could not complete upgrade.';
+    var reason = res.data ? res.data.reason : 'failed';
+    var msg = reason === 'insufficient' ? 'Not enough balance. You need $5.00.' :
+              reason === 'already_pro' ? 'You are already Pro.' :
+              'Could not complete upgrade.';
     toast(msg);
     btn.disabled = false;
     btn.textContent = 'Confirm';
@@ -363,6 +244,7 @@ document.getElementById('proConfirm').addEventListener('click', async function()
     return;
   }
 
+  kumgTrack('redeem_pro');
   toast('You are now Pro!');
   document.getElementById('proModal').classList.remove('show');
   btn.disabled = false;
@@ -371,7 +253,6 @@ document.getElementById('proConfirm').addEventListener('click', async function()
   loadHistory();
 });
 
-// ===== CASH OUT =====
 document.getElementById('cashBtn').addEventListener('click', function(){
   document.getElementById('cashAmount').value = '5.00';
   document.getElementById('cashNumber').value = '';
@@ -393,21 +274,9 @@ document.getElementById('cashConfirm').addEventListener('click', async function(
   var amountUsd = parseFloat(document.getElementById('cashAmount').value);
   var number = document.getElementById('cashNumber').value.trim();
 
-  if (isNaN(amountUsd) || amountUsd < 5){
-    msg.textContent = 'Minimum is $5.00';
-    msg.style.color = 'var(--danger)';
-    return;
-  }
-  if (amountUsd * 100 > currentBalance){
-    msg.textContent = 'Amount exceeds your balance of ' + centsToUsd(currentBalance);
-    msg.style.color = 'var(--danger)';
-    return;
-  }
-  if (!number || number.replace(/\D/g,'').length < 9){
-    msg.textContent = 'Enter a valid EcoCash number';
-    msg.style.color = 'var(--danger)';
-    return;
-  }
+  if (isNaN(amountUsd) || amountUsd < 5){ msg.textContent = 'Minimum is $5.00'; msg.style.color = 'var(--danger)'; return; }
+  if (amountUsd * 100 > currentBalance){ msg.textContent = 'Amount exceeds your balance of ' + centsToUsd(currentBalance); msg.style.color = 'var(--danger)'; return; }
+  if (!number || number.replace(/\D/g,'').length < 9){ msg.textContent = 'Enter a valid EcoCash number'; msg.style.color = 'var(--danger)'; return; }
 
   var btn = this;
   btn.disabled = true;
@@ -415,28 +284,18 @@ document.getElementById('cashConfirm').addEventListener('click', async function(
 
   try {
     var amountCents = Math.round(amountUsd * 100);
-
-    // Deduct wallet first (prevents double-spend)
-    var upd = await db.from('wallets')
-      .update({ balance_cents: currentBalance - amountCents, updated_at: new Date().toISOString() })
-      .eq('user_id', userId);
+    var upd = await db.from('wallets').update({ balance_cents: currentBalance - amountCents, updated_at: new Date().toISOString() }).eq('user_id', userId);
     if (upd.error) throw upd.error;
 
-    var ins = await db.from('redemptions').insert({
-      user_id: userId,
-      kind: 'cash',
-      amount_cents: amountCents,
-      ecocash_to: number,
-      status: 'pending'
-    });
+    var ins = await db.from('redemptions').insert({ user_id: userId, kind: 'cash', amount_cents: amountCents, ecocash_to: number, status: 'pending' });
     if (ins.error) throw ins.error;
 
+    kumgTrack('request_cashout', { amount: amountUsd });
     toast('Payout requested');
     document.getElementById('cashModal').classList.remove('show');
     loadWallet();
     loadHistory();
   } catch(err){
-    console.error(err);
     msg.textContent = err.message || 'Request failed';
     msg.style.color = 'var(--danger)';
   } finally {
@@ -445,12 +304,11 @@ document.getElementById('cashConfirm').addEventListener('click', async function(
   }
 });
 
-// ===== INIT =====
 (async function(){
   var sess = await db.auth.getSession();
   if (!sess.data.session){ location.href = 'auth.html'; return; }
   userId = sess.data.session.user.id;
-
+  kumgTrack('open_wallet');
   await loadWallet();
   await loadHistory();
 })();

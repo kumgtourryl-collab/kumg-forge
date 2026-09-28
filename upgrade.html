@@ -16,217 +16,44 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="css/style.css">
 <style>
-  .hero{
-    background: linear-gradient(135deg, var(--deep), var(--green));
-    border-radius: 16px;
-    padding: 22px 20px;
-    color: #E8F5EE;
-    margin-bottom: 20px;
-  }
-  .hero h1{
-    margin: 0 0 6px;
-    font-size: 24px;
-    font-weight: 800;
-    letter-spacing: -0.4px;
-    color: #E8F5EE;
-  }
-  .hero p{ margin: 0 0 14px; font-size: 13.5px; opacity: .9; line-height: 1.55; }
-  .price-row{
-    display: flex; align-items: baseline; gap: 8px;
-  }
-  .price{ font-size: 34px; font-weight: 900; letter-spacing: -1px; color: #fff; }
-  .price-period{ font-size: 13px; opacity: .8; }
-
-  .benefits{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 16px 18px;
-    margin-bottom: 16px;
-  }
-  .benefits h3{ margin: 0 0 12px; font-size: 14px; font-weight: 800; }
-  .benefit{
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 8px 0;
-    font-size: 13.5px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-  .benefit svg{
-    width: 18px; height: 18px;
-    stroke: var(--green); fill: none;
-    stroke-width: 2.5;
-    stroke-linecap: round; stroke-linejoin: round;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .benefit strong{ color: var(--mint); font-weight: 700; }
-
-  /* Payment box */
-  .pay-box{
-    background: linear-gradient(135deg, #0B3D2E, #0F5138);
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 16px;
-    color: #E8F5EE;
-    border: 1px solid rgba(31,157,98,.4);
-  }
-  .pay-box h3{
-    margin: 0 0 4px;
-    font-size: 13px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    opacity: .85;
-  }
-  .pay-num{
-    font-family: var(--mono);
-    font-size: 28px;
-    font-weight: 900;
-    letter-spacing: 1px;
-    color: #fff;
-    margin: 8px 0 4px;
-    user-select: all;
-    -webkit-user-select: all;
-  }
-  .pay-num-hint{ font-size: 11.5px; opacity: .8; margin: 0 0 14px; }
-
-  .pay-amount{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 14px;
-    border-top: 1px solid rgba(255,255,255,.15);
-    margin-top: 14px;
-  }
-  .pay-amount .l{ font-size: 12px; opacity: .85; }
-  .pay-amount .v{ font-size: 20px; font-weight: 900; }
-
-  .copy-btn{
-    background: rgba(255,255,255,.12);
-    border: 1px solid rgba(255,255,255,.2);
-    color: #fff;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 11px;
-    font-weight: 700;
-    font-family: var(--font);
-    cursor: pointer;
-    margin-top: 6px;
-  }
-  .copy-btn:active{ background: rgba(255,255,255,.2); }
-
-  /* Steps */
-  .steps{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 16px 18px;
-    margin-bottom: 16px;
-  }
-  .steps h3{ margin: 0 0 12px; font-size: 14px; font-weight: 800; }
-  .step{
-    display: flex;
-    gap: 12px;
-    padding: 8px 0;
-    font-size: 13.5px;
-    color: var(--muted);
-    line-height: 1.55;
-  }
-  .step .n{
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    background: var(--deep);
-    color: var(--green);
-    font-weight: 800;
-    font-size: 11px;
-    display: grid; place-items: center;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .step strong{ color: var(--mint); font-weight: 700; }
-
-  /* Form */
-  .form-box{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 18px;
-    margin-bottom: 16px;
-  }
-  .form-box h3{ margin: 0 0 4px; font-size: 14px; font-weight: 800; }
-  .form-box .hint{
-    font-size: 12px;
-    color: var(--muted);
-    margin: 0 0 12px;
-    line-height: 1.5;
-  }
-
-  .check-row{
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-top: 16px;
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-  .check-row input{
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    margin-top: 1px;
-    accent-color: var(--green);
-  }
-
-  .success-box{
-    display: none;
-    background: linear-gradient(135deg, var(--deep), var(--green));
-    border-radius: 16px;
-    padding: 26px 20px;
-    text-align: center;
-    color: #E8F5EE;
-    margin-bottom: 16px;
-  }
-  .success-box.show{ display: block; }
-  .success-box svg{
-    width: 56px; height: 56px;
-    stroke: #fff; fill: none;
-    stroke-width: 3;
-    stroke-linecap: round; stroke-linejoin: round;
-    margin-bottom: 12px;
-  }
-  .success-box h2{
-    margin: 0 0 8px; font-size: 20px;
-    font-weight: 800; color: #fff;
-  }
-  .success-box p{
-    margin: 0; font-size: 13.5px; opacity: .9; line-height: 1.55;
-  }
-
-  .already-pro{
-    background: linear-gradient(135deg, var(--deep), var(--green));
-    border-radius: 16px;
-    padding: 26px 20px;
-    text-align: center;
-    color: #E8F5EE;
-    margin-bottom: 16px;
-  }
-  .already-pro h2{ margin: 0 0 6px; font-size: 20px; font-weight: 800; color: #fff; }
-  .already-pro p{ margin: 0; font-size: 13.5px; opacity: .9; }
-
-  .pending-box{
-    background: #2A2208;
-    border: 1px solid #7A6520;
-    color: #F5DEA0;
-    border-radius: 12px;
-    padding: 14px;
-    font-size: 13px;
-    line-height: 1.55;
-    margin-bottom: 16px;
-  }
+  .hero{background:linear-gradient(135deg,var(--deep),var(--green));border-radius:16px;padding:22px 20px;color:#E8F5EE;margin-bottom:20px}
+  .hero h1{margin:0 0 6px;font-size:24px;font-weight:800;letter-spacing:-0.4px;color:#E8F5EE}
+  .hero p{margin:0 0 14px;font-size:13.5px;opacity:.9;line-height:1.55}
+  .price-row{display:flex;align-items:baseline;gap:8px}
+  .price{font-size:34px;font-weight:900;letter-spacing:-1px;color:#fff}
+  .price-period{font-size:13px;opacity:.8}
+  .benefits{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px}
+  .benefits h3{margin:0 0 12px;font-size:14px;font-weight:800}
+  .benefit{display:flex;align-items:flex-start;gap:10px;padding:8px 0;font-size:13.5px;color:var(--muted);line-height:1.5}
+  .benefit svg{width:18px;height:18px;stroke:var(--green);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:1px}
+  .benefit strong{color:var(--mint);font-weight:700}
+  .pay-box{background:linear-gradient(135deg,#0B3D2E,#0F5138);border-radius:16px;padding:20px;margin-bottom:16px;color:#E8F5EE;border:1px solid rgba(31,157,98,.4)}
+  .pay-box h3{margin:0 0 4px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;opacity:.85}
+  .pay-num{font-family:var(--mono);font-size:28px;font-weight:900;letter-spacing:1px;color:#fff;margin:8px 0 4px;user-select:all;-webkit-user-select:all}
+  .pay-num-hint{font-size:11.5px;opacity:.8;margin:0 0 14px}
+  .pay-amount{display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid rgba(255,255,255,.15);margin-top:14px}
+  .pay-amount .l{font-size:12px;opacity:.85}
+  .pay-amount .v{font-size:20px;font-weight:900}
+  .copy-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;font-family:var(--font);cursor:pointer;margin-top:6px}
+  .steps{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px}
+  .steps h3{margin:0 0 12px;font-size:14px;font-weight:800}
+  .step{display:flex;gap:12px;padding:8px 0;font-size:13.5px;color:var(--muted);line-height:1.55}
+  .step .n{width:22px;height:22px;border-radius:50%;background:var(--deep);color:var(--green);font-weight:800;font-size:11px;display:grid;place-items:center;flex-shrink:0;margin-top:1px}
+  .step strong{color:var(--mint);font-weight:700}
+  .form-box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+  .form-box h3{margin:0 0 4px;font-size:14px;font-weight:800}
+  .form-box .hint{font-size:12px;color:var(--muted);margin:0 0 12px;line-height:1.5}
+  .check-row{display:flex;align-items:flex-start;gap:10px;margin-top:16px;font-size:13px;color:var(--muted);line-height:1.5}
+  .check-row input{width:20px;height:20px;flex-shrink:0;margin-top:1px;accent-color:var(--green)}
+  .success-box{display:none;background:linear-gradient(135deg,var(--deep),var(--green));border-radius:16px;padding:26px 20px;text-align:center;color:#E8F5EE;margin-bottom:16px}
+  .success-box.show{display:block}
+  .success-box svg{width:56px;height:56px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;margin-bottom:12px}
+  .success-box h2{margin:0 0 8px;font-size:20px;font-weight:800;color:#fff}
+  .success-box p{margin:0;font-size:13.5px;opacity:.9;line-height:1.55}
+  .already-pro{background:linear-gradient(135deg,var(--deep),var(--green));border-radius:16px;padding:26px 20px;text-align:center;color:#E8F5EE;margin-bottom:16px}
+  .already-pro h2{margin:0 0 6px;font-size:20px;font-weight:800;color:#fff}
+  .already-pro p{margin:0;font-size:13.5px;opacity:.9}
+  .pending-box{background:#2A2208;border:1px solid #7A6520;color:#F5DEA0;border-radius:12px;padding:14px;font-size:13px;line-height:1.55;margin-bottom:16px}
 </style>
 </head>
 <body>
@@ -248,10 +75,7 @@
   <div class="hero" id="heroBlock">
     <h1>Upgrade to Pro</h1>
     <p>Unlimited everything. Cancel anytime by simply not renewing.</p>
-    <div class="price-row">
-      <span class="price">$5</span>
-      <span class="price-period">/ month</span>
-    </div>
+    <div class="price-row"><span class="price">$5</span><span class="price-period">/ month</span></div>
   </div>
 
   <div class="already-pro" id="alreadyPro" style="display:none">
@@ -260,29 +84,13 @@
   </div>
 
   <div id="formArea">
-
     <div class="benefits">
       <h3>What you unlock</h3>
-      <div class="benefit">
-        <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-        <div><strong>Unlimited websites</strong> — publish as many as you want</div>
-      </div>
-      <div class="benefit">
-        <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-        <div><strong>Unlimited shops</strong> — no 5-product limit</div>
-      </div>
-      <div class="benefit">
-        <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-        <div><strong>Unlimited AI</strong> — no daily limits on messages or images</div>
-      </div>
-      <div class="benefit">
-        <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-        <div><strong>Priority queue</strong> — faster AI responses</div>
-      </div>
-      <div class="benefit">
-        <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-        <div><strong>All future features</strong> — free forever</div>
-      </div>
+      <div class="benefit"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><div><strong>Unlimited websites</strong> — publish as many as you want</div></div>
+      <div class="benefit"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><div><strong>Unlimited shops</strong> — no 5-product limit</div></div>
+      <div class="benefit"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><div><strong>Unlimited AI</strong> — no daily limits on messages or images</div></div>
+      <div class="benefit"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><div><strong>Priority queue</strong> — faster AI responses</div></div>
+      <div class="benefit"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><div><strong>All future features</strong> — free forever</div></div>
     </div>
 
     <div class="pay-box">
@@ -290,41 +98,19 @@
       <div class="pay-num" id="payNum">0790272300</div>
       <p class="pay-num-hint">EcoCash number</p>
       <button class="copy-btn" id="copyNum">Copy number</button>
-
       <div class="pay-amount">
-        <div>
-          <div class="l">Amount to send</div>
-          <div class="v">$5.00 USD</div>
-        </div>
-        <div style="text-align:right">
-          <div class="l">Currency</div>
-          <div class="v">USD</div>
-        </div>
+        <div><div class="l">Amount to send</div><div class="v">$5.00 USD</div></div>
+        <div style="text-align:right"><div class="l">Currency</div><div class="v">USD</div></div>
       </div>
     </div>
 
     <div class="steps">
       <h3>How it works</h3>
-      <div class="step">
-        <div class="n">1</div>
-        <div>Open your EcoCash app or dial <strong>*151#</strong>.</div>
-      </div>
-      <div class="step">
-        <div class="n">2</div>
-        <div>Send <strong>$5 USD</strong> to <strong>0790272300</strong>.</div>
-      </div>
-      <div class="step">
-        <div class="n">3</div>
-        <div>Use <strong>your email</strong> as the reference. Example: <em>you@gmail.com</em>.</div>
-      </div>
-      <div class="step">
-        <div class="n">4</div>
-        <div>Come back here and fill the form below.</div>
-      </div>
-      <div class="step">
-        <div class="n">5</div>
-        <div>You'll be upgraded to Pro within <strong>5 minutes</strong>.</div>
-      </div>
+      <div class="step"><div class="n">1</div><div>Open your EcoCash app or dial <strong>*151#</strong>.</div></div>
+      <div class="step"><div class="n">2</div><div>Send <strong>$5 USD</strong> to <strong>0790272300</strong>.</div></div>
+      <div class="step"><div class="n">3</div><div>Use <strong>your email</strong> as the reference. Example: <em>you@gmail.com</em>.</div></div>
+      <div class="step"><div class="n">4</div><div>Come back here and fill the form below.</div></div>
+      <div class="step"><div class="n">5</div><div>You'll be upgraded to Pro within <strong>5 minutes</strong>.</div></div>
     </div>
 
     <div class="pending-box" id="pendingBox" style="display:none">
@@ -342,7 +128,7 @@
       <input id="reference" type="text" placeholder="Your email or name" autocapitalize="off" autocorrect="off">
 
       <label for="note">Optional note</label>
-      <textarea id="note" rows="2" placeholder="Anything else we should know?" maxlength="200"></textarea>
+      <textarea id="note" rows="2" placeholder="Anything else we should know?" maxlength="200" style="font-family:var(--font);font-size:14px"></textarea>
 
       <div class="check-row">
         <input type="checkbox" id="confirmed">
@@ -351,7 +137,6 @@
 
       <button class="btn btn-block" id="submitBtn" style="margin-top:18px">Submit confirmation</button>
     </div>
-
   </div>
 
   <div class="success-box" id="successBox">
@@ -364,7 +149,6 @@
     Having trouble? Email <a href="mailto:kumgtourryl@gmail.com" style="color:var(--green)">kumgtourryl@gmail.com</a><br>
     with your EcoCash screenshot and we'll upgrade you manually.
   </p>
-
 </main>
 
 <div id="toast"></div>
@@ -372,6 +156,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 <script src="js/settings.js"></script>
+<script src="js/analytics.js"></script>
 <script>
 const ECOCASH_NUMBER = '0790272300';
 const PRO_PRICE = 5.00;
@@ -396,6 +181,7 @@ document.getElementById('payNum').textContent = ECOCASH_NUMBER;
 document.getElementById('copyNum').addEventListener('click', async function(){
   try {
     await navigator.clipboard.writeText(ECOCASH_NUMBER);
+    kumgTrack('copy_ecocash_number');
     toast('Number copied');
   } catch {
     toast('Copy failed — number is ' + ECOCASH_NUMBER);
@@ -408,9 +194,8 @@ async function init(){
   userId = sess.data.session.user.id;
   userEmail = sess.data.session.user.email;
 
-  // Plan check
   var profile = await db.from('profiles').select('plan').eq('id', userId).single();
-  var plan = profile?.data?.plan || 'free';
+  var plan = (profile && profile.data && profile.data.plan) || 'free';
 
   if (plan === 'pro'){
     heroBlock.style.display = 'none';
@@ -419,21 +204,14 @@ async function init(){
     return;
   }
 
-  // Existing pending payment?
-  var pending = await db
-    .from('manual_payments')
-    .select('id, status')
-    .eq('user_id', userId)
-    .order('submitted_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  kumgTrack('view_upgrade_page');
 
+  var pending = await db.from('manual_payments').select('id, status').eq('user_id', userId).order('submitted_at', { ascending: false }).limit(1).maybeSingle();
   if (pending.data && pending.data.status === 'pending'){
     formBox.style.display = 'none';
     pendingBox.style.display = 'block';
   }
 
-  // Pre-fill reference with email
   document.getElementById('reference').value = userEmail || '';
 }
 
@@ -451,14 +229,7 @@ document.getElementById('submitBtn').addEventListener('click', async function(){
   btn.textContent = 'Submitting…';
 
   try {
-    // Check for existing pending
-    var existing = await db
-      .from('manual_payments')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('status', 'pending')
-      .maybeSingle();
-
+    var existing = await db.from('manual_payments').select('id').eq('user_id', userId).eq('status', 'pending').maybeSingle();
     if (existing.data){
       toast('You already have a pending confirmation');
       formBox.style.display = 'none';
@@ -477,8 +248,9 @@ document.getElementById('submitBtn').addEventListener('click', async function(){
       note: note || null,
       status: 'pending'
     });
+    if (insert.error) throw insert.error;
 
-    if (insert.error){ throw insert.error; }
+    kumgTrack('upgrade_submitted', { ecocash_from: ecocashFrom });
 
     formArea.style.display = 'none';
     successBox.classList.add('show');

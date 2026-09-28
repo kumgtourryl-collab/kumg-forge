@@ -1,21 +1,79 @@
 -- ============================================================
 -- KUMG FORGE — MIGRATIONS
--- Add-only. Never deletes user data.
--- Run this after the fresh install. Safe to run multiple times.
+-- ============================================================
+--
+-- WHAT THIS FILE IS
+-- Every change to the database AFTER the initial fresh install goes here.
+-- This file NEVER deletes user data. It only adds or updates.
+--
+-- HOW TO USE IT
+--   1. When I send you a new migration block, append it to the bottom
+--      of this file (below the last dated entry).
+--   2. Save it in GitHub.
+--   3. Run the WHOLE file in Supabase → SQL Editor → Run.
+--   4. It is safe to run multiple times — every statement uses
+--      "if not exists", "or replace", or "drop policy if exists".
+--
+-- THE GOLDEN RULE
+--   Never write "drop table", "truncate", or "delete from" in this file.
+--   Those kill user data. Only fresh-install.sql is allowed to drop tables.
+--
 -- ============================================================
 
--- [2026-09-28] Analytics events already in fresh install.
--- Future changes go below this line.
 
--- [Template — copy this pattern for each new change]
+-- ============================================================
+-- 2026-09-28 — Initial state
+-- ============================================================
+-- Nothing to migrate. The fresh install already contains:
+-- profiles, projects, payments, manual_payments, redemptions,
+-- ai_messages, ai_images, shops, shop_products, shop_orders,
+-- sponsors, wallets, taps, chats, chat_messages, events.
 --
+-- All functions, triggers, RLS policies, and 3 storage buckets
+-- are already set up by kumg-fresh-install.sql.
+--
+-- Future migrations go below this line.
+
+
+-- ============================================================
+-- MIGRATION TEMPLATE — copy for every new change
+-- ============================================================
+--
+-- -- [YYYY-MM-DD] Short description of what this does
+--
+-- -- Add a column (safe, keeps existing data)
 -- alter table profiles add column if not exists new_field text;
--- create table if not exists new_feature (
+--
+-- -- Add a table
+-- create table if not exists new_table (
 --   id uuid primary key default gen_random_uuid(),
 --   user_id uuid references profiles(id) on delete cascade,
---   ...
+--   name text,
+--   created_at timestamptz default now()
 -- );
--- alter table new_feature enable row level security;
--- drop policy if exists "own new_feature" on new_feature;
--- create policy "own new_feature" on new_feature for all
---   using (auth.uid() = user_id) with check (auth.uid() = user_id);
+--
+-- create index if not exists new_table_user_idx on new_table(user_id);
+-- alter table new_table enable row level security;
+--
+-- drop policy if exists "own new table" on new_table;
+-- create policy "own new table" on new_table
+--   for all using (auth.uid() = user_id)
+--   with check (auth.uid() = user_id);
+--
+-- -- Add a function
+-- create or replace function public.new_helper()
+-- returns int language sql stable security definer set search_path = public
+-- as $$
+--   select count(*)::int from new_table;
+-- $$;
+--
+-- -- Add a trigger
+-- drop trigger if exists new_trigger on new_table;
+-- create trigger new_trigger
+-- after insert on new_table
+-- for each row execute procedure public.new_function();
+--
+-- -- Update data (careful — this changes existing rows)
+-- -- update profiles set bio = '' where bio is null;
+--
+-- ============================================================

@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0A">
+<title>Analytics — KUMG Admin</title>
+<script>
+(function(){
+  var t = localStorage.getItem('kumg_theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme','light');
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .period-row{
+    display: flex;
+    gap: 6px;
+    margin-bottom: 18px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 4px;
+  }
+  .period-btn{
+    flex: 1;
+    background: transparent;
+    border: 0;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 9px;
+    border-radius: 9px;
+    cursor: pointer;
+  }
+  .period-btn.active{ background: var(--green); color: #04140C; }
+
+  .stat-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .stat{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+  }
+  .stat .num{
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--green);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .stat .lbl{
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-top: 4px;
+    font-weight: 700;
+  }
+
+  .section-title{
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    font-weight: 800;
+    margin: 22px 0 10px;
+  }
+
+  .funnel{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .funnel-step{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .funnel-step:last-child{ border-bottom: 0; }
+  .funnel-step .name{
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--mint);
+  }
+  .funnel-step .count{
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--green);
+  }
+  .funnel-step .pct{
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-left: 8px;
+    font-weight: 600;
+  }
+
+  .event-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 14px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    font-size: 13.5px;
+  }
+  .event-row .nm{
+    font-weight: 700;
+    font-family: var(--mono);
+    color: var(--mint);
+    font-size: 12.5px;
+  }
+  .event-row .cnt{
+    font-weight: 800;
+    color: var(--green);
+  }
+
+  .loading{
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 13.5px;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <a href="admin.html" style="display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none">
+      <div class="logo">K</div>
+      <div>KUMG <span class="accent">Analytics</span></div>
+    </a>
+  </div>
+  <div class="actions">
+    <button class="btn-ghost" onclick="location.href='admin.html'" style="font-size:13px;padding:8px 12px">Back</button>
+  </div>
+</header>
+
+<main class="container" style="max-width:640px">
+
+  <h1 class="page-title">Analytics</h1>
+  <p class="page-sub" id="summary">Loading…</p>
+
+  <div class="period-row">
+    <button class="period-btn" data-days="1">Today</button>
+    <button class="period-btn active" data-days="7">7 days</button>
+    <button class="period-btn" data-days="30">30 days</button>
+    <button class="period-btn" data-days="90">90 days</button>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat"><div class="num" id="sUsers">—</div><div class="lbl">Active users</div></div>
+    <div class="stat"><div class="num" id="sOpens">—</div><div class="lbl">App opens</div></div>
+    <div class="stat"><div class="num" id="sProjects">—</div><div class="lbl">Projects created</div></div>
+    <div class="stat"><div class="num" id="sPublished">—</div><div class="lbl">Projects published</div></div>
+    <div class="stat"><div class="num" id="sShops">—</div><div class="lbl">Shops created</div></div>
+    <div class="stat"><div class="num" id="sAiMsgs">—</div><div class="lbl">AI messages</div></div>
+  </div>
+
+  <div class="section-title">Funnel</div>
+  <div class="funnel" id="funnel"></div>
+
+  <div class="section-title">All events</div>
+  <div id="events"></div>
+
+</main>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script>
+var currentDays = 7;
+var adminId = null;
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+function sinceDate(days){
+  return new Date(Date.now() - days * 86400000).toISOString();
+}
+
+document.querySelectorAll('.period-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.period-btn').forEach(function(x){ x.classList.remove('active'); });
+    btn.classList.add('active');
+    currentDays = parseInt(btn.dataset.days, 10);
+    load();
+  });
+});
+
+async function load(){
+  var sess = await db.auth.getSession();
+  if (!sess.data.session){ location.href = 'auth.html'; return; }
+  adminId = sess.data.session.user.id;
+
+  var me = await db.from('profiles').select('is_admin').eq('id', adminId).maybeSingle();
+  if (!me.data || !me.data.is_admin){
+    document.querySelector('main').innerHTML = '<div class="empty"><h3>Not allowed</h3><p>Admin only.</p></div>';
+    return;
+  }
+
+  var since = sinceDate(currentDays);
+
+  // Load all events in window
+  var res = await db
+    .from('events')
+    .select('name, user_id, created_at, meta')
+    .gte('created_at', since)
+    .order('created_at', { ascending: false })
+    .limit(2000);
+
+  if (res.error){
+    document.getElementById('events').innerHTML =
+      '<div class="loading">Could not load: ' + esc(res.error.message) + '</div>';
+    return;
+  }
+
+  var rows = res.data || [];
+
+  // Group by name
+  var counts = {};
+  var usersByEvent = {};
+  rows.forEach(function(r){
+    counts[r.name] = (counts[r.name] || 0) + 1;
+    if (r.user_id){
+      if (!usersByEvent[r.name]) usersByEvent[r.name] = {};
+      usersByEvent[r.name][r.user_id] = true;
+    }
+  });
+
+  function uniqueCounts(name){
+    return usersByEvent[name] ? Object.keys(usersByEvent[name]).length : 0;
+  }
+
+  document.getElementById('sUsers').textContent =
+    Object.keys(usersByEvent['open_app'] || {}).length || 0;
+
+  document.getElementById('sOpens').textContent = counts['open_app'] || 0;
+  document.getElementById('sProjects').textContent = counts['create_project'] || 0;
+  document.getElementById('sPublished').textContent = counts['publish_project'] || 0;
+  document.getElementById('sShops').textContent = counts['create_shop'] || 0;
+  document.getElementById('sAiMsgs').textContent = counts['send_ai_message'] || 0;
+
+  document.getElementById('summary').textContent =
+    rows.length + ' events in the last ' + currentDays + ' day' + (currentDays === 1 ? '' : 's');
+
+  // Funnel
+  var funnelSteps = [
+    { name: 'Opened app',    key: 'open_app' },
+    { name: 'Created project', key: 'create_project' },
+    { name: 'Opened AI',     key: 'open_ai' },
+    { name: 'Published site', key: 'publish_project' },
+    { name: 'Viewed upgrade', key: 'view_upgrade_page' },
+    { name: 'Submitted upgrade', key: 'upgrade_submitted' }
+  ];
+
+  var base = uniqueCounts('open_app') || 1;
+  document.getElementById('funnel').innerHTML = funnelSteps.map(function(step){
+    var u = uniqueCounts(step.key);
+    var pct = Math.round((u / base) * 100);
+    return '<div class="funnel-step">' +
+      '<div class="name">' + esc(step.name) + '</div>' +
+      '<div><span class="count">' + u + '</span>' +
+      '<span class="pct">' + pct + '%</span></div>' +
+    '</div>';
+  }).join('');
+
+  // All events list
+  var sorted = Object.entries(counts).sort(function(a, b){ return b[1] - a[1]; });
+  document.getElementById('events').innerHTML = sorted.map(function(e){
+    return '<div class="event-row">' +
+      '<div class="nm">' + esc(e[0]) + '</div>' +
+      '<div class="cnt">' + e[1] + '</div>' +
+    '</div>';
+  }).join('') || '<div class="loading">No events yet</div>';
+}
+
+load();
+</script>
+</body>
+</html>

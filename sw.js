@@ -1,5 +1,5 @@
 // KUMG Forge — Service Worker
-const CACHE = 'kumg-v13';
+const CACHE = 'kumg-v14';
 
 const ASSETS = [
   './',
@@ -22,6 +22,7 @@ const ASSETS = [
   './sponsor-signup.html',
   './sponsors.html',
   './admin.html',
+  './admin-analytics.html',
   './wallet.html',
   './upgrade.html',
   './payments.html',
@@ -31,6 +32,7 @@ const ASSETS = [
   './css/style.css',
   './js/supabase.js',
   './js/settings.js',
+  './js/analytics.js',
   './js/auth.js',
   './js/verify.js',
   './js/projects.js',

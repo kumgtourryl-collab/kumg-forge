@@ -48,6 +48,11 @@ async function init(){
     return;
   }
 
+  // === ANALYTICS: publish page opened ===
+  if (typeof kumgTrack === 'function'){
+    kumgTrack('open_publish_page', { id: project.id });
+  }
+
   projNameEl.textContent = project.name;
 
   if (project.subdomain){
@@ -90,6 +95,9 @@ publishBtn.addEventListener('click', async () => {
     if (!res.ok){
       if (json.upgrade){
         setStatus('Free plan allows 1 published site. Upgrade to Pro.', 'err');
+        if (typeof kumgTrack === 'function'){
+          kumgTrack('publish_blocked_free_plan');
+        }
       } else {
         setStatus(json.error || 'Publish failed.', 'err');
       }
@@ -100,6 +108,11 @@ publishBtn.addEventListener('click', async () => {
     showLive(sub);
     toast('Published 🎉');
     publishBtn.textContent = 'Update publish';
+
+    // === ANALYTICS: project published ===
+    if (typeof kumgTrack === 'function'){
+      kumgTrack('publish_project', { sub: sub, name: project.name });
+    }
   } catch(err){
     console.error(err);
     setStatus('Network error. Try again.', 'err');
@@ -112,6 +125,9 @@ copyBtn.addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(liveUrl.href);
     toast('Link copied');
+    if (typeof kumgTrack === 'function'){
+      kumgTrack('copy_published_link');
+    }
   } catch {
     toast('Copy failed');
   }
@@ -135,6 +151,11 @@ unpublishBtn.addEventListener('click', async () => {
     setStatus('Unpublished.', '');
     toast('Site unpublished');
     publishBtn.textContent = 'Publish';
+
+    // === ANALYTICS: unpublished ===
+    if (typeof kumgTrack === 'function'){
+      kumgTrack('unpublish_project', { id: project.id });
+    }
   } catch(err){
     toast(err.message || 'Failed');
   }

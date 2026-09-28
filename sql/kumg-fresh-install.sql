@@ -1,11 +1,11 @@
 -- ============================================================
--- KUMG FORGE — FRESH INSTALL
+-- KUMG FORGE — FRESH INSTALL (v2)
 -- ⚠️  RUN THIS ONLY ONCE. IT DELETES ALL EXISTING DATA.
 -- ⚠️  NEVER RUN THIS AGAIN AFTER USERS SIGN UP.
 -- ⚠️  FOR FUTURE CHANGES, USE kumg-migrations.sql INSTEAD.
 -- ============================================================
 
--- === WIPE (only ever runs on fresh install) ===
+-- === WIPE TABLES ===
 drop trigger if exists on_auth_user_created on auth.users;
 
 drop function if exists public.handle_new_user() cascade;
@@ -40,6 +40,20 @@ drop table if exists ai_messages cascade;
 drop table if exists payments cascade;
 drop table if exists projects cascade;
 drop table if exists profiles cascade;
+
+-- === WIPE STORAGE POLICIES ===
+drop policy if exists "avatar public read" on storage.objects;
+drop policy if exists "avatar user insert" on storage.objects;
+drop policy if exists "avatar user update" on storage.objects;
+drop policy if exists "avatar user delete" on storage.objects;
+drop policy if exists "shop images public read" on storage.objects;
+drop policy if exists "shop images user write" on storage.objects;
+drop policy if exists "shop images user update" on storage.objects;
+drop policy if exists "shop images user delete" on storage.objects;
+drop policy if exists "user-media public read" on storage.objects;
+drop policy if exists "user-media user write" on storage.objects;
+drop policy if exists "user-media user update" on storage.objects;
+drop policy if exists "user-media user delete" on storage.objects;
 
 
 -- ============================================================
@@ -483,7 +497,7 @@ $$;
 
 
 -- ============================================================
--- 20. CHAT — auto-update preview
+-- 20. CHAT AUTO-PREVIEW
 -- ============================================================
 create or replace function public.update_chat_on_message()
 returns trigger language plpgsql security definer set search_path = public
@@ -607,6 +621,7 @@ create policy "admin read all events" on events for select using (public.is_admi
 -- ============================================================
 insert into storage.buckets (id, name, public) values ('avatars', 'avatars', true)
 on conflict (id) do update set public = true;
+
 create policy "avatar public read" on storage.objects for select using (bucket_id = 'avatars');
 create policy "avatar user insert" on storage.objects for insert with check (bucket_id = 'avatars' and auth.uid()::text = (storage.foldername(name))[1]);
 create policy "avatar user update" on storage.objects for update using (bucket_id = 'avatars' and auth.uid()::text = (storage.foldername(name))[1]);
@@ -614,6 +629,7 @@ create policy "avatar user delete" on storage.objects for delete using (bucket_i
 
 insert into storage.buckets (id, name, public) values ('shop-images', 'shop-images', true)
 on conflict (id) do update set public = true;
+
 create policy "shop images public read" on storage.objects for select using (bucket_id = 'shop-images');
 create policy "shop images user write" on storage.objects for insert with check (bucket_id = 'shop-images' and auth.uid()::text = (storage.foldername(name))[1]);
 create policy "shop images user update" on storage.objects for update using (bucket_id = 'shop-images' and auth.uid()::text = (storage.foldername(name))[1]);
@@ -621,6 +637,7 @@ create policy "shop images user delete" on storage.objects for delete using (buc
 
 insert into storage.buckets (id, name, public) values ('user-media', 'user-media', true)
 on conflict (id) do update set public = true;
+
 create policy "user-media public read" on storage.objects for select using (bucket_id = 'user-media');
 create policy "user-media user write" on storage.objects for insert with check (bucket_id = 'user-media' and auth.uid()::text = (storage.foldername(name))[1]);
 create policy "user-media user update" on storage.objects for update using (bucket_id = 'user-media' and auth.uid()::text = (storage.foldername(name))[1]);
@@ -639,7 +656,7 @@ on conflict (id) do nothing;
 
 insert into public.wallets (user_id, balance_cents, lifetime_cents)
 select p.id, 0, 0 from public.profiles p
-left join public.wallets w on w.user_id = p.id 
+left join public.wallets w on w.user_id = p.id
 where w.user_id is null
 on conflict (user_id) do nothing;
 

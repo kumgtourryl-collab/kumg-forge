@@ -16,135 +16,390 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="KUMG">
 <link rel="stylesheet" href="css/style.css">
 <style>
-  .avatar-wrap{text-align:center;margin-bottom:22px}
+  .profile-header{
+    text-align: center;
+    padding: 8px 0 20px;
+  }
+  .avatar-wrap{
+    position: relative;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
   .avatar{
-    width:104px;height:104px;border-radius:50%;
-    background:linear-gradient(135deg,var(--deep),var(--green));
-    display:grid;place-items:center;margin:0 auto 10px;
-    font-size:38px;font-weight:900;color:#04140C;
-    overflow:hidden;position:relative;cursor:pointer;
-    border:2px solid var(--green);
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--deep), var(--green));
+    display: grid;
+    place-items: center;
+    font-size: 38px;
+    font-weight: 900;
+    color: #04140C;
+    overflow: hidden;
+    border: 3px solid var(--green);
+    cursor: pointer;
   }
-  .avatar img{width:100%;height:100%;object-fit:cover;display:block}
-  .avatar .letter{display:block;line-height:1}
-  .avatar .edit{
-    position:absolute;bottom:-2px;right:-2px;
-    background:var(--green);color:#04140C;
-    width:32px;height:32px;border-radius:50%;
-    display:grid;place-items:center;font-size:14px;
-    border:3px solid var(--black);
+  .avatar img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
-  .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:20px 0}
-  .stat{
-    background:var(--card);border:1px solid var(--line);
-    border-radius:var(--radius);padding:14px 8px;text-align:center;
+  .avatar-edit{
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--green);
+    color: #04140C;
+    display: grid;
+    place-items: center;
+    border: 3px solid var(--black);
   }
-  .stat .num{font-size:22px;font-weight:800;color:var(--green)}
-  .stat .lbl{font-size:11px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.6px}
-  .row{
-    display:flex;justify-content:space-between;align-items:center;
-    padding:14px 0;border-bottom:1px solid var(--line);
+  .avatar-edit svg{
+    width: 15px;
+    height: 15px;
+    stroke: #04140C;
+    fill: none;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
-  .row:last-child{border-bottom:0}
-  .row .label{font-size:14px;color:var(--muted)}
-  .row .value{font-weight:700;font-size:15px}
+  .profile-header .name{
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    margin: 0 0 4px;
+  }
+  .profile-header .email{
+    font-size: 13px;
+    color: var(--muted);
+    word-break: break-all;
+    margin: 0;
+  }
+  .plan-pill{
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: var(--green);
+    color: #04140C;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .plan-pill.free{ background: var(--deep); color: var(--mint); }
+
+  /* Stat grid */
+  .stat-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin: 22px 0;
+  }
+  .stat-box{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px 8px;
+    text-align: center;
+  }
+  .stat-box .num{
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--green);
+    letter-spacing: -0.5px;
+  }
+  .stat-box .lbl{
+    font-size: 10.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-top: 2px;
+    font-weight: 700;
+  }
+
+  /* Menu rows */
+  .menu-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    color: inherit;
+    text-decoration: none;
+  }
+  .menu-row:last-child{ border-bottom: 0; }
+  .menu-row .label{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--mint);
+  }
+  .menu-row .label svg{
+    width: 20px;
+    height: 20px;
+    stroke: var(--muted);
+    fill: none;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+  .menu-row .right{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .menu-row .value{
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .menu-row .arrow{
+    color: var(--muted);
+    font-size: 18px;
+  }
+
+  /* Edit form */
+  .card label{
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin: 14px 0 6px;
+    font-weight: 600;
+  }
+  .card label:first-child{ margin-top: 0; }
+
+  .bio-counter{
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    margin-top: 4px;
+  }
+
+  /* Modals */
+  .modal-bg{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.75);
+    z-index: 50;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-bg.show{ display: flex; }
+  .modal{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 22px;
+    width: 100%;
+    max-width: 400px;
+  }
+  .modal h3{ margin: 0 0 4px; font-size: 17px; }
+  .modal p{ margin: 0 0 16px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+
   .dob-row{
-    display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:10px;
-    margin-bottom:10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.4fr;
+    gap: 10px;
+    margin-bottom: 12px;
   }
   .dob-row label{
-    display:block;font-size:11px;color:var(--muted);
-    text-transform:uppercase;letter-spacing:1px;font-weight:700;
-    margin-bottom:6px;
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    margin-bottom: 6px;
   }
   .dob-row input{
-    text-align:center;font-family:var(--mono);letter-spacing:2px;
+    text-align: center;
+    font-family: var(--mono);
+    letter-spacing: 2px;
   }
-  .avatar-actions{
-    display:flex;gap:8px;justify-content:center;margin-top:6px;
+
+  .modal-actions{
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
   }
-  .avatar-actions button{
-    font-size:12px;padding:7px 14px;border-radius:10px;
-    font-weight:700;
+  .modal-actions button{ flex: 1; }
+
+  .avatar-menu{
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
   }
+  .avatar-menu button{
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--mint);
+    font-weight: 700;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .avatar-menu button.primary{ background: var(--green); color: #04140C; border-color: var(--green); }
+  .avatar-menu button.danger{ color: var(--danger); border-color: var(--danger); }
+
+  footer.legal{
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 24px 0;
+  }
+  footer.legal a{ color: var(--muted); }
+  footer.legal a:hover{ color: var(--green); }
 </style>
 </head>
 <body>
+
 <header class="topbar">
   <div class="brand">
     <a href="index.html" style="display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none">
       <div class="logo">K</div>
-      <div>KUMG <span class="accent">Forge</span></div>
+      <div>KUMG <span class="accent">Profile</span></div>
     </a>
   </div>
   <div class="actions">
-    <button class="btn-ghost" onclick="location.href='settings.html'" style="font-size:13px;padding:8px 12px">Back</button>
+    <button class="icon-btn" onclick="location.href='settings.html'" title="Settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
   </div>
 </header>
 
 <main class="container" style="max-width:520px">
-  <div class="avatar-wrap">
-    <div class="avatar" id="avatar">
-      <span class="letter" id="avatarLetter">?</span>
-      <div class="edit">✎</div>
+
+  <div class="profile-header">
+    <div class="avatar-wrap">
+      <div class="avatar" id="avatar">
+        <span id="avatarLetter">?</span>
+      </div>
+      <div class="avatar-edit">
+        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      </div>
     </div>
-    <input id="fileInput" type="file" accept="image/*" style="display:none">
-    <p style="font-size:12px;color:var(--muted);margin:0">Tap to change photo</p>
-    <div class="avatar-actions" id="avatarActions" style="display:none">
-      <button class="btn-ghost" id="removeAvatarBtn">Remove photo</button>
+    <h1 class="name" id="displayName">Loading…</h1>
+    <p class="email" id="displayEmail">—</p>
+    <span class="plan-pill free" id="planPill">Free</span>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-box">
+      <div class="num" id="statProjects">0</div>
+      <div class="lbl">Projects</div>
+    </div>
+    <div class="stat-box">
+      <div class="num" id="statShops">0</div>
+      <div class="lbl">Shops</div>
+    </div>
+    <div class="stat-box">
+      <div class="num" id="statEarned">$0</div>
+      <div class="lbl">Earned</div>
     </div>
   </div>
 
   <div class="card">
+    <h3 style="margin:0 0 12px;font-size:15px">About you</h3>
+
     <label for="username">Username</label>
     <input id="username" type="text" placeholder="yourname" maxlength="30" autocapitalize="off" autocorrect="off">
 
     <label for="bio">Bio</label>
-    <textarea id="bio" rows="3" maxlength="160" placeholder="A short line about you."></textarea>
+    <textarea id="bio" rows="3" maxlength="160" placeholder="A short line about you." style="font-family:var(--font);font-size:14px"></textarea>
+    <div class="bio-counter"><span id="bioCount">0</span>/160</div>
 
     <button class="btn btn-block" id="saveBtn" style="margin-top:16px">Save changes</button>
   </div>
 
-  <div class="stats">
-    <div class="stat"><div class="num" id="statProjects">0</div><div class="lbl">Projects</div></div>
-    <div class="stat"><div class="num" id="statPublished">0</div><div class="lbl">Live</div></div>
-    <div class="stat"><div class="num" id="statDays">0</div><div class="lbl">Days</div></div>
+  <div class="card" style="padding:0 16px">
+    <a class="menu-row" href="store.html">
+      <div class="label">
+        <svg viewBox="0 0 24 24"><path d="M 4 8 h 16 l -1.5 12 a 1.6 1.6 0 0 1 -1.6 1.4 h -9.8 a 1.6 1.6 0 0 1 -1.6 -1.4 z"/><path d="M 8.5 8 V 6.5 a 3.5 3.5 0 0 1 7 0 V 8"/></svg>
+        My shops
+      </div>
+      <div class="right"><span class="arrow">›</span></div>
+    </a>
+
+    <a class="menu-row" href="wallet.html">
+      <div class="label">
+        <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><circle cx="16" cy="15" r="1"/></svg>
+        Wallet
+      </div>
+      <div class="right"><span class="arrow">›</span></div>
+    </a>
+
+    <div class="menu-row" id="dobRow">
+      <div class="label">
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg>
+        Date of birth
+      </div>
+      <div class="right">
+        <span class="value" id="dobVal">—</span>
+        <span class="arrow">›</span>
+      </div>
+    </div>
+
+    <a class="menu-row" href="settings.html">
+      <div class="label">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+        Settings
+      </div>
+      <div class="right"><span class="arrow">›</span></div>
+    </a>
+
+    <button class="menu-row" id="logoutBtn" style="background:transparent;border:0;width:100%;text-align:left;font-family:inherit">
+      <div class="label">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        Sign out
+      </div>
+      <div class="right"><span class="arrow">›</span></div>
+    </button>
   </div>
 
-  <div class="card">
-    <div class="row" onclick="location.href='settings.html'" style="cursor:pointer">
-      <div class="label">Settings</div>
-      <div class="value">Open →</div>
-    </div>
-    <div class="row">
-      <div class="label">Email</div>
-      <div class="value" id="emailVal" style="word-break:break-all">—</div>
-    </div>
-    <div class="row" id="dobRow" style="cursor:pointer">
-      <div class="label">Date of birth</div>
-      <div class="value" id="dobVal">—</div>
-    </div>
-    <div class="row">
-      <div class="label">Plan</div>
-      <div class="value" id="planVal">Free</div>
-    </div>
-  </div>
-
-  <footer class="legal" style="text-align:center;font-size:12px;color:var(--muted);padding:24px 0">
-    <a href="terms.html" style="color:var(--muted)">Terms</a> ·
-    <a href="privacy.html" style="color:var(--muted)">Privacy</a>
+  <footer class="legal">
+    <a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a>
   </footer>
 </main>
 
+<!-- Avatar menu -->
+<div class="modal-bg" id="avatarModal">
+  <div class="modal">
+    <h3>Profile photo</h3>
+    <p>Upload a square image. Max 5MB.</p>
+    <div class="avatar-menu">
+      <button class="primary" id="uploadBtn">Upload</button>
+      <button class="danger" id="removeBtn">Remove</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="avatarCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- DOB modal -->
-<div id="dobModal" style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:50;display:none;align-items:center;justify-content:center;padding:20px">
-  <div style="background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;width:100%;max-width:400px">
-    <h3 style="margin:0 0 4px">Date of birth</h3>
-    <p style="margin:0 0 14px;color:var(--muted);font-size:13px">Must be 13 or older.</p>
+<div class="modal-bg" id="dobModal">
+  <div class="modal">
+    <h3>Date of birth</h3>
+    <p>Must be 13 or older. You can change this later.</p>
     <div class="dob-row">
       <div>
         <label>Day</label>
@@ -159,13 +414,15 @@
         <input id="pYyyy" type="text" inputmode="numeric" maxlength="4" placeholder="YYYY">
       </div>
     </div>
-    <p id="dobMsg" style="font-size:12px;min-height:18px;margin:0 0 12px"></p>
-    <div style="display:flex;gap:8px">
-      <button class="btn-ghost" id="dobCancel" style="flex:1">Cancel</button>
-      <button id="dobSave" style="flex:1">Save</button>
+    <p id="dobMsg" style="font-size:12px;min-height:18px;margin:0"></p>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="dobCancel">Cancel</button>
+      <button id="dobSave">Save</button>
     </div>
   </div>
 </div>
+
+<input id="fileInput" type="file" accept="image/*" style="display:none">
 
 <div id="toast"></div>
 
@@ -173,131 +430,82 @@
 <script src="js/supabase.js"></script>
 <script src="js/settings.js"></script>
 <script>
+var userId = null;
+
 function toast(msg){
-  const t = document.getElementById('toast');
+  var t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  setTimeout(()=> t.classList.remove('show'), 2200);
+  setTimeout(function(){ t.classList.remove('show'); }, 2200);
 }
 
-let userId = null;
-let currentDob = null;
+function setAvatar(url, letter){
+  var av = document.getElementById('avatar');
+  if (url){
+    av.innerHTML = '<img src="' + url + '" alt="">';
+  } else {
+    av.innerHTML = '<span id="avatarLetter">' + letter + '</span>';
+  }
+}
 
 async function init(){
-  const { data } = await db.auth.getSession();
-  if (!data.session){ location.href = 'auth.html'; return; }
-  userId = data.session.user.id;
-  document.getElementById('emailVal').textContent = data.session.user.email;
+  var sess = await db.auth.getSession();
+  if (!sess.data.session){ location.href = 'auth.html'; return; }
+  userId = sess.data.session.user.id;
 
-  const { data: profile } = await db
-    .from('profiles')
-    .select('username, plan, bio, avatar_url, dob, created_at')
-    .eq('id', userId)
-    .maybeSingle();
+  var user = sess.data.session.user;
+  document.getElementById('displayEmail').textContent = user.email;
 
-  if (profile){
-    document.getElementById('username').value = profile.username || '';
-    document.getElementById('bio').value = profile.bio || '';
-    document.getElementById('planVal').textContent = (profile.plan === 'pro' ? 'Pro' : 'Free');
+  var p = await db.from('profiles').select('*').eq('id', userId).maybeSingle();
+  if (!p.data){ toast('Profile not found'); return; }
+  var profile = p.data;
 
-    if (profile.dob){
-      currentDob = profile.dob;
-      const [y,m,d] = profile.dob.split('-');
-      document.getElementById('dobVal').textContent = `${d}/${m}/${y}`;
-      document.getElementById('pDd').value = d;
-      document.getElementById('pMm').value = m;
-      document.getElementById('pYyyy').value = y;
-    }
+  var displayName = profile.username || user.email.split('@')[0];
+  document.getElementById('displayName').textContent = displayName;
+  document.getElementById('username').value = profile.username || '';
+  document.getElementById('bio').value = profile.bio || '';
+  document.getElementById('bioCount').textContent = (profile.bio || '').length;
 
-    if (profile.avatar_url){
-      showAvatar(profile.avatar_url);
-    } else {
-      showInitial((profile.username || data.session.user.email || '?')[0].toUpperCase());
-    }
-
-    if (profile.created_at){
-      const days = Math.max(1, Math.floor((Date.now() - new Date(profile.created_at).getTime()) / 86400000));
-      document.getElementById('statDays').textContent = days;
-    }
+  if (profile.avatar_url){
+    setAvatar(profile.avatar_url, '');
+  } else {
+    setAvatar(null, (displayName[0] || '?').toUpperCase());
   }
 
-  const { count: projCount } = await db
-    .from('projects').select('*', { count: 'exact', head: true })
-    .eq('owner', userId);
-  document.getElementById('statProjects').textContent = projCount || 0;
-
-  const { count: pubCount } = await db
-    .from('projects').select('*', { count: 'exact', head: true })
-    .eq('owner', userId)
-    .eq('is_published', true);
-  document.getElementById('statPublished').textContent = pubCount || 0;
-}
-
-function showAvatar(url){
-  const av = document.getElementById('avatar');
-  av.innerHTML = `<img src="${url}" alt=""><div class="edit">✎</div>`;
-  document.getElementById('avatarActions').style.display = 'flex';
-}
-
-function showInitial(letter){
-  const av = document.getElementById('avatar');
-  av.innerHTML = `<span class="letter">${letter}</span><div class="edit">✎</div>`;
-  document.getElementById('avatarActions').style.display = 'none';
-}
-
-// Upload avatar
-document.getElementById('avatar').addEventListener('click', () => {
-  document.getElementById('fileInput').click();
-});
-
-document.getElementById('fileInput').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  if (file.size > 5 * 1024 * 1024){ toast('Max 5MB'); return; }
-  if (!file.type.startsWith('image/')){ toast('Must be an image'); return; }
-
-  toast('Uploading…');
-  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-  const path = userId + '/avatar.' + ext;
-
-  const { error } = await db.storage
-    .from('user-media')
-    .upload(path, file, { upsert: true, cacheControl: '3600' });
-
-  if (error){ toast(error.message || 'Upload failed'); return; }
-
-  const { data: urlData } = db.storage.from('user-media').getPublicUrl(path);
-  const publicUrl = urlData.publicUrl + '?t=' + Date.now();
-
-  const { error: upErr } = await db
-    .from('profiles')
-    .update({ avatar_url: publicUrl })
-    .eq('id', userId);
-  if (upErr){ toast(upErr.message || 'Save failed'); return; }
-
-  showAvatar(publicUrl);
-  toast('Photo updated');
-});
-
-// Remove avatar
-document.getElementById('removeAvatarBtn').addEventListener('click', async () => {
-  if (!confirm('Remove your profile photo? You can upload a new one any time.')) return;
-  try {
-    const { error } = await db.from('profiles').update({ avatar_url: null }).eq('id', userId);
-    if (error) throw error;
-
-    const letter = (document.getElementById('username').value.trim() || '?')[0].toUpperCase();
-    showInitial(letter);
-    toast('Photo removed');
-  } catch(err){
-    toast(err.message || 'Remove failed');
+  if (profile.plan === 'pro'){
+    var pill = document.getElementById('planPill');
+    pill.textContent = 'Pro';
+    pill.classList.remove('free');
   }
+
+  if (profile.dob){
+    var parts = profile.dob.split('-');
+    document.getElementById('dobVal').textContent = parts[2] + '/' + parts[1] + '/' + parts[0];
+    document.getElementById('pDd').value = parts[2];
+    document.getElementById('pMm').value = parts[1];
+    document.getElementById('pYyyy').value = parts[0];
+  }
+
+  // Stats
+  var pCount = await db.from('projects').select('*', { count:'exact', head:true }).eq('owner', userId);
+  document.getElementById('statProjects').textContent = pCount.count || 0;
+
+  var sCount = await db.from('shops').select('*', { count:'exact', head:true }).eq('owner', userId);
+  document.getElementById('statShops').textContent = sCount.count || 0;
+
+  var w = await db.from('wallets').select('lifetime_cents').eq('user_id', userId).maybeSingle();
+  var earned = (w.data && w.data.lifetime_cents) ? w.data.lifetime_cents : 0;
+  document.getElementById('statEarned').textContent = '$' + (earned / 100).toFixed(2);
+}
+
+// Bio counter
+document.getElementById('bio').addEventListener('input', function(){
+  document.getElementById('bioCount').textContent = this.value.length;
 });
 
-// Save profile
-document.getElementById('saveBtn').addEventListener('click', async () => {
-  const username = document.getElementById('username').value
-    .trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
-  const bio = document.getElementById('bio').value.trim();
+// Save changes
+document.getElementById('saveBtn').addEventListener('click', async function(){
+  var username = document.getElementById('username').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
+  var bio = document.getElementById('bio').value.trim();
 
   if (username && username.length < 3){
     toast('Username must be 3+ characters');
@@ -305,90 +513,138 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   }
 
   try {
-    const { error } = await db.from('profiles')
-      .update({ username: username || null, bio })
+    var upd = await db.from('profiles')
+      .update({ username: username || null, bio: bio })
       .eq('id', userId);
-    if (error) throw error;
+    if (upd.error) throw upd.error;
+
+    document.getElementById('displayName').textContent = username || document.getElementById('displayEmail').textContent.split('@')[0];
     toast('Saved');
   } catch(err){
     toast(err.message || 'Save failed');
   }
 });
 
-// DOB edit
-const dobModal = document.getElementById('dobModal');
-const pDd = document.getElementById('pDd');
-const pMm = document.getElementById('pMm');
-const pYyyy = document.getElementById('pYyyy');
-const dobMsg = document.getElementById('dobMsg');
+// Avatar menu
+document.getElementById('avatar').addEventListener('click', function(){
+  document.getElementById('avatarModal').classList.add('show');
+});
+document.getElementById('avatarCancel').addEventListener('click', function(){
+  document.getElementById('avatarModal').classList.remove('show');
+});
+document.getElementById('avatarModal').addEventListener('click', function(e){
+  if (e.target === document.getElementById('avatarModal')) e.target.classList.remove('show');
+});
 
-[pDd, pMm, pYyyy].forEach(el => {
-  el.addEventListener('input', () => {
-    el.value = el.value.replace(/[^0-9]/g,'');
+document.getElementById('uploadBtn').addEventListener('click', function(){
+  document.getElementById('avatarModal').classList.remove('show');
+  document.getElementById('fileInput').click();
+});
+
+document.getElementById('removeBtn').addEventListener('click', async function(){
+  document.getElementById('avatarModal').classList.remove('show');
+  if (!confirm('Remove your profile photo?')) return;
+  var upd = await db.from('profiles').update({ avatar_url: null }).eq('id', userId);
+  if (upd.error){ toast('Remove failed'); return; }
+  var name = document.getElementById('displayName').textContent;
+  setAvatar(null, (name[0] || '?').toUpperCase());
+  toast('Photo removed');
+});
+
+document.getElementById('fileInput').addEventListener('change', async function(e){
+  var file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024){ toast('Max 5MB'); return; }
+  if (!file.type.startsWith('image/')){ toast('Must be an image'); return; }
+
+  toast('Uploading…');
+  var ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  var path = userId + '/avatar.' + ext;
+
+  var up = await db.storage.from('user-media').upload(path, file, { upsert: true, cacheControl: '3600' });
+  if (up.error){ toast(up.error.message || 'Upload failed'); return; }
+
+  var urlData = db.storage.from('user-media').getPublicUrl(path);
+  var publicUrl = urlData.data.publicUrl + '?t=' + Date.now();
+
+  var upd = await db.from('profiles').update({ avatar_url: publicUrl }).eq('id', userId);
+  if (upd.error){ toast('Save failed'); return; }
+
+  setAvatar(publicUrl, '');
+  toast('Photo updated');
+});
+
+// DOB
+var dobModal = document.getElementById('dobModal');
+document.getElementById('dobRow').addEventListener('click', function(){
+  document.getElementById('dobMsg').textContent = '';
+  dobModal.classList.add('show');
+});
+document.getElementById('dobCancel').addEventListener('click', function(){
+  dobModal.classList.remove('show');
+});
+dobModal.addEventListener('click', function(e){
+  if (e.target === dobModal) dobModal.classList.remove('show');
+});
+
+['pDd','pMm','pYyyy'].forEach(function(id){
+  document.getElementById(id).addEventListener('input', function(){
+    this.value = this.value.replace(/[^0-9]/g,'');
   });
 });
-pDd.addEventListener('input', () => { if (pDd.value.length === 2) pMm.focus(); });
-pMm.addEventListener('input', () => { if (pMm.value.length === 2) pYyyy.focus(); });
-
-document.getElementById('dobRow').addEventListener('click', () => {
-  dobMsg.textContent = '';
-  dobModal.style.display = 'flex';
+document.getElementById('pDd').addEventListener('input', function(){
+  if (this.value.length === 2) document.getElementById('pMm').focus();
 });
-document.getElementById('dobCancel').addEventListener('click', () => {
-  dobModal.style.display = 'none';
-});
-dobModal.addEventListener('click', (e) => {
-  if (e.target === dobModal) dobModal.style.display = 'none';
+document.getElementById('pMm').addEventListener('input', function(){
+  if (this.value.length === 2) document.getElementById('pYyyy').focus();
 });
 
-document.getElementById('dobSave').addEventListener('click', async () => {
-  dobMsg.textContent = '';
-  const d = parseInt(pDd.value, 10);
-  const m = parseInt(pMm.value, 10);
-  const y = parseInt(pYyyy.value, 10);
+document.getElementById('dobSave').addEventListener('click', async function(){
+  var msg = document.getElementById('dobMsg');
+  var d = parseInt(document.getElementById('pDd').value, 10);
+  var m = parseInt(document.getElementById('pMm').value, 10);
+  var y = parseInt(document.getElementById('pYyyy').value, 10);
 
-  if (!d || !m || !y || pYyyy.value.length !== 4){
-    dobMsg.textContent = 'Please fill in all three fields.';
-    dobMsg.style.color = 'var(--danger)';
+  if (!d || !m || !y || document.getElementById('pYyyy').value.length !== 4){
+    msg.textContent = 'Fill in all three fields.';
+    msg.style.color = 'var(--danger)';
     return;
   }
   if (m < 1 || m > 12 || d < 1 || d > 31){
-    dobMsg.textContent = 'Invalid day or month.';
-    dobMsg.style.color = 'var(--danger)';
+    msg.textContent = 'Invalid day or month.';
+    msg.style.color = 'var(--danger)';
     return;
   }
-  const dobStr = `${y.toString().padStart(4,'0')}-${m.toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
-  const dobDate = new Date(dobStr + 'T00:00:00Z');
+
+  var dobStr = y.toString().padStart(4,'0') + '-' + m.toString().padStart(2,'0') + '-' + d.toString().padStart(2,'0');
+  var dobDate = new Date(dobStr + 'T00:00:00Z');
   if (dobDate.getUTCDate() !== d || dobDate.getUTCMonth() + 1 !== m || dobDate.getUTCFullYear() !== y){
-    dobMsg.textContent = 'That date does not exist.';
-    dobMsg.style.color = 'var(--danger)';
+    msg.textContent = 'That date does not exist.';
+    msg.style.color = 'var(--danger)';
     return;
   }
 
   try {
-    const { error } = await db.from('profiles')
-      .update({ dob: dobStr, age_verified: true })
-      .eq('id', userId);
-    if (error) throw error;
-
-    currentDob = dobStr;
-    document.getElementById('dobVal').textContent =
-      `${pDd.value.padStart(2,'0')}/${pMm.value.padStart(2,'0')}/${pYyyy.value}`;
-    dobModal.style.display = 'none';
+    var upd = await db.from('profiles').update({ dob: dobStr, age_verified: true }).eq('id', userId);
+    if (upd.error) throw upd.error;
+    document.getElementById('dobVal').textContent = d.toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0') + '/' + y;
+    dobModal.classList.remove('show');
     toast('Date of birth updated');
   } catch(err){
-    const raw = (err?.message || 'Failed').toString();
-    dobMsg.textContent = /13/.test(raw) ? 'You must be at least 13.' : raw;
-    dobMsg.style.color = 'var(--danger)';
+    var raw = (err.message || 'Failed').toString();
+    msg.textContent = /13/.test(raw) ? 'You must be at least 13.' : raw;
+    msg.style.color = 'var(--danger)';
   }
 });
 
+// Logout
+document.getElementById('logoutBtn').addEventListener('click', async function(){
+  if (!confirm('Sign out?')) return;
+  await db.auth.signOut();
+  location.href = 'auth.html';
+});
+
 init();
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
-}
 </script>
 </body>
 </html>

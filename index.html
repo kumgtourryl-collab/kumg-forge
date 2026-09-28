@@ -36,282 +36,87 @@
   }
   .project-card .del:hover{color:var(--danger)}
 
-  /* ============ WELCOME / START SCREEN ============ */
-  .welcome{
-    text-align:center;
-    padding: 12px 0 20px;
-  }
-  .welcome h2{
-    margin: 0 0 8px;
-    font-size: 24px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    line-height: 1.2;
-  }
-  .welcome h2 span{ color: var(--green); }
-  .welcome p{
-    margin: 0 0 24px;
-    color: var(--muted);
-    font-size: 14px;
-    line-height: 1.55;
-  }
+  .welcome{text-align:center;padding:12px 0 20px}
+  .welcome h2{margin:0 0 8px;font-size:24px;font-weight:800;letter-spacing:-0.5px;line-height:1.2}
+  .welcome h2 span{color:var(--green)}
+  .welcome p{margin:0 0 24px;color:var(--muted);font-size:14px;line-height:1.55}
 
   .start-label{
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1.4px;
-    color: var(--muted);
-    text-align: left;
-    margin: 0 4px 10px;
+    font-size:11px;font-weight:800;text-transform:uppercase;
+    letter-spacing:1.4px;color:var(--muted);text-align:left;
+    margin:0 4px 10px;
   }
-
-  .start-grid{
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-    margin-bottom: 18px;
-  }
-  @media(min-width:560px){ .start-grid{ grid-template-columns: 1fr 1fr; } }
-
+  .start-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:18px}
+  @media(min-width:560px){ .start-grid{grid-template-columns:1fr 1fr} }
   .start-card{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 16px;
-    display: flex;
-    gap: 14px;
-    align-items: center;
-    text-align: left;
-    cursor: pointer;
-    transition: all .15s ease;
-    color: inherit;
-    font-family: inherit;
-    width: 100%;
+    background:var(--card);border:1px solid var(--line);
+    border-radius:16px;padding:16px;display:flex;gap:14px;
+    align-items:center;text-align:left;cursor:pointer;
+    transition:all .15s ease;color:inherit;font-family:inherit;width:100%;
   }
-  .start-card:hover{ border-color: var(--green); }
-  .start-card:active{ transform: scale(.99); background: var(--deep); }
-
+  .start-card:hover{border-color:var(--green)}
+  .start-card:active{transform:scale(.99);background:var(--deep)}
   .start-icon{
-    width: 46px;
-    height: 46px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--deep), var(--green));
-    display: grid;
-    place-items: center;
-    flex-shrink: 0;
+    width:46px;height:46px;border-radius:12px;
+    background:linear-gradient(135deg,var(--deep),var(--green));
+    display:grid;place-items:center;flex-shrink:0;
   }
-  .start-icon svg{
-    width: 22px;
-    height: 22px;
-    stroke: #04140C;
-    fill: none;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  .start-body{ flex: 1; min-width: 0; }
-  .start-body h3{
-    margin: 0 0 4px;
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: -0.2px;
-    color: var(--mint);
-  }
-  .start-body p{
-    margin: 0;
-    font-size: 12.5px;
-    color: var(--muted);
-    line-height: 1.4;
-  }
-
-  .start-arrow{
-    color: var(--green);
-    font-weight: 900;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-
-  /* Highlighted "Ask AI" card */
-  .start-card.featured{
-    background: linear-gradient(135deg, var(--deep), var(--green));
-    border-color: var(--green);
-  }
-  .start-card.featured .start-icon{
-    background: rgba(255,255,255,.18);
-  }
-  .start-card.featured .start-icon svg{ stroke: #fff; }
-  .start-card.featured h3{ color: #fff; }
-  .start-card.featured p{ color: rgba(255,255,255,.85); }
-  .start-card.featured .start-arrow{ color: #fff; }
-
+  .start-icon svg{width:22px;height:22px;stroke:#04140C;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .start-body{flex:1;min-width:0}
+  .start-body h3{margin:0 0 4px;font-size:15px;font-weight:800;letter-spacing:-0.2px;color:var(--mint)}
+  .start-body p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.4}
+  .start-arrow{color:var(--green);font-weight:900;font-size:18px;flex-shrink:0}
+  .start-card.featured{background:linear-gradient(135deg,var(--deep),var(--green));border-color:var(--green)}
+  .start-card.featured .start-icon{background:rgba(255,255,255,.18)}
+  .start-card.featured .start-icon svg{stroke:#fff}
+  .start-card.featured h3{color:#fff}
+  .start-card.featured p{color:rgba(255,255,255,.85)}
+  .start-card.featured .start-arrow{color:#fff}
   .start-skip{
-    background: transparent;
-    border: 1px solid var(--line);
-    color: var(--muted);
-    font-size: 13px;
-    font-weight: 600;
-    padding: 12px;
-    border-radius: 12px;
-    width: 100%;
-    font-family: inherit;
-    cursor: pointer;
+    background:transparent;border:1px solid var(--line);color:var(--muted);
+    font-size:13px;font-weight:600;padding:12px;border-radius:12px;width:100%;
+    font-family:inherit;cursor:pointer;
   }
-  .start-skip:active{ background: var(--deep); color: var(--mint); }
+  .start-skip:active{background:var(--deep);color:var(--mint)}
 
-  /* Project list section (when user has projects) */
-  .project-actions{
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-  }
+  .project-actions{display:flex;gap:10px;margin-top:20px}
 
-  /* Shop card */
   .store-card{
-    background: linear-gradient(135deg, var(--deep), var(--green));
-    border-radius: var(--radius);
-    padding: 18px;
-    margin-bottom: 16px;
-    color: #E8F5EE;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 14px;
-    cursor: pointer;
+    background:linear-gradient(135deg,var(--deep),var(--green));
+    border-radius:var(--radius);padding:18px;margin-bottom:16px;
+    color:#E8F5EE;display:flex;justify-content:space-between;align-items:center;gap:14px;
+    cursor:pointer;
   }
-  .store-card:hover{ opacity: .95; }
-  .store-card .txt{ flex: 1; min-width: 0; }
-  .store-card h3{
-    margin: 0 0 4px;
-    font-size: 16px;
-    color: #E8F5EE;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .store-card h3 svg{
-    width: 20px;
-    height: 20px;
-    stroke: #E8F5EE;
-    fill: none;
-    stroke-width: 1.9;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    flex-shrink: 0;
-  }
-  .store-card p{
-    margin: 0;
-    font-size: 12.5px;
-    opacity: .85;
-    line-height: 1.4;
-  }
-  .store-card .arrow{
-    font-size: 22px;
-    font-weight: 900;
-    color: #E8F5EE;
-    flex-shrink: 0;
-  }
+  .store-card:hover{opacity:.95}
+  .store-card .txt{flex:1;min-width:0}
+  .store-card h3{margin:0 0 4px;font-size:16px;color:#E8F5EE;display:flex;align-items:center;gap:10px}
+  .store-card h3 svg{width:20px;height:20px;stroke:#E8F5EE;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+  .store-card p{margin:0;font-size:12.5px;opacity:.85;line-height:1.4}
+  .store-card .arrow{font-size:22px;font-weight:900;color:#E8F5EE;flex-shrink:0}
 
-  /* Sponsored card */
-  .sponsor-wrap{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 14px;
-    margin-bottom: 20px;
-  }
-  .sponsor-head{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  .sponsor-badge{
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    background: var(--deep);
-    color: var(--mint);
-    padding: 3px 8px;
-    border-radius: 999px;
-  }
-  .sponsor-reward{
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--green);
-  }
-  .sponsor-body{
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    margin-bottom: 12px;
-  }
-  .sponsor-img{
-    width: 52px;
-    height: 52px;
-    border-radius: 12px;
-    flex-shrink: 0;
-    background: linear-gradient(135deg, var(--deep), var(--green));
-    display: grid;
-    place-items: center;
-    color: #04140C;
-    font-weight: 900;
-    font-size: 20px;
-    overflow: hidden;
-  }
-  .sponsor-img img{ width: 100%; height: 100%; object-fit: cover; }
-  .sponsor-txt{ flex: 1; min-width: 0; }
-  .sponsor-name{ font-weight: 800; font-size: 14.5px; margin-bottom: 2px; }
-  .sponsor-title{ font-size: 13px; font-weight: 600; color: var(--green); margin-bottom: 2px; }
-  .sponsor-desc{ font-size: 12px; color: var(--muted); line-height: 1.4; }
-  .sponsor-btn{
-    width: 100%;
-    background: var(--green);
-    color: #04140C;
-    border: 0;
-    padding: 12px;
-    border-radius: 12px;
-    font-weight: 800;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-  }
-  .sponsor-btn svg{
-    width: 16px; height: 16px;
-    stroke: #04140C; fill: none; stroke-width: 2;
-    stroke-linecap: round; stroke-linejoin: round;
-  }
-  .sponsor-btn:disabled{ opacity: .6; }
+  .sponsor-wrap{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:20px}
+  .sponsor-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .sponsor-badge{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;background:var(--deep);color:var(--mint);padding:3px 8px;border-radius:999px}
+  .sponsor-reward{font-size:11px;font-weight:700;color:var(--green)}
+  .sponsor-body{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+  .sponsor-img{width:52px;height:52px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,var(--deep),var(--green));display:grid;place-items:center;color:#04140C;font-weight:900;font-size:20px;overflow:hidden}
+  .sponsor-img img{width:100%;height:100%;object-fit:cover}
+  .sponsor-txt{flex:1;min-width:0}
+  .sponsor-name{font-weight:800;font-size:14.5px;margin-bottom:2px}
+  .sponsor-title{font-size:13px;font-weight:600;color:var(--green);margin-bottom:2px}
+  .sponsor-desc{font-size:12px;color:var(--muted);line-height:1.4}
+  .sponsor-btn{width:100%;background:var(--green);color:#04140C;border:0;padding:12px;border-radius:12px;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
+  .sponsor-btn svg{width:16px;height:16px;stroke:#04140C;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .sponsor-btn:disabled{opacity:.6}
 
-  .modal-bg{
-    position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 50;
-    display: none; align-items: center; justify-content: center; padding: 20px;
-  }
-  .modal-bg.show{ display: flex; }
-  .modal{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 20px;
-    width: 100%;
-    max-width: 380px;
-  }
-  .modal h3{ margin: 0 0 4px; }
-  .modal p{ margin: 0 0 14px; color: var(--muted); font-size: 13px; }
-
-  footer.legal{
-    text-align: center;
-    font-size: 12px;
-    color: var(--muted);
-    padding: 24px 0 32px;
-  }
-  footer.legal a{ color: var(--muted); }
-  footer.legal a:hover{ color: var(--green); }
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:50;display:none;align-items:center;justify-content:center;padding:20px}
+  .modal-bg.show{display:flex}
+  .modal{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;width:100%;max-width:380px}
+  .modal h3{margin:0 0 4px}
+  .modal p{margin:0 0 14px;color:var(--muted);font-size:13px}
+  footer.legal{text-align:center;font-size:12px;color:var(--muted);padding:24px 0 32px}
+  footer.legal a{color:var(--muted)}
+  footer.legal a:hover{color:var(--green)}
 </style>
 </head>
 <body class="has-bottom-nav">
@@ -337,7 +142,6 @@
 
 <main class="container">
 
-  <!-- ============ WELCOME / START SCREEN ============ -->
   <div id="welcomeView" style="display:none">
     <div class="welcome">
       <h2>You're 60 seconds from<br>your first <span>website</span>.</h2>
@@ -348,70 +152,35 @@
 
     <div class="start-grid">
       <button class="start-card" data-start="business" type="button">
-        <div class="start-icon">
-          <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/></svg>
-        </div>
-        <div class="start-body">
-          <h3>Business landing page</h3>
-          <p>Services, prices, contact</p>
-        </div>
+        <div class="start-icon"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/></svg></div>
+        <div class="start-body"><h3>Business landing page</h3><p>Services, prices, contact</p></div>
         <div class="start-arrow">›</div>
       </button>
-
       <button class="start-card" data-start="shop" type="button">
-        <div class="start-icon">
-          <svg viewBox="0 0 24 24">
-            <path d="M 4 8 h 16 l -1.5 12 a 1.6 1.6 0 0 1 -1.6 1.4 h -9.8 a 1.6 1.6 0 0 1 -1.6 -1.4 z"/>
-            <path d="M 8.5 8 V 6.5 a 3.5 3.5 0 0 1 7 0 V 8"/>
-          </svg>
-        </div>
-        <div class="start-body">
-          <h3>Online shop</h3>
-          <p>Sell products, take orders</p>
-        </div>
+        <div class="start-icon"><svg viewBox="0 0 24 24"><path d="M 4 8 h 16 l -1.5 12 a 1.6 1.6 0 0 1 -1.6 1.4 h -9.8 a 1.6 1.6 0 0 1 -1.6 -1.4 z"/><path d="M 8.5 8 V 6.5 a 3.5 3.5 0 0 1 7 0 V 8"/></svg></div>
+        <div class="start-body"><h3>Online shop</h3><p>Sell products, take orders</p></div>
         <div class="start-arrow">›</div>
       </button>
-
       <button class="start-card" data-start="bio" type="button">
-        <div class="start-icon">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
-        </div>
-        <div class="start-body">
-          <h3>Personal page</h3>
-          <p>Bio, links, contact</p>
-        </div>
+        <div class="start-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg></div>
+        <div class="start-body"><h3>Personal page</h3><p>Bio, links, contact</p></div>
         <div class="start-arrow">›</div>
       </button>
-
       <button class="start-card" data-start="event" type="button">
-        <div class="start-icon">
-          <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg>
-        </div>
-        <div class="start-body">
-          <h3>Event page</h3>
-          <p>Date, location, RSVP</p>
-        </div>
+        <div class="start-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg></div>
+        <div class="start-body"><h3>Event page</h3><p>Date, location, RSVP</p></div>
         <div class="start-arrow">›</div>
       </button>
-
       <button class="start-card featured" data-start="ai" type="button" style="grid-column: 1 / -1">
-        <div class="start-icon">
-          <svg viewBox="0 0 24 24"><path d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7z"/><path d="M19 15.5l.5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5z"/></svg>
-        </div>
-        <div class="start-body">
-          <h3>Ask AI to build it</h3>
-          <p>Describe what you want. We'll write the code.</p>
-        </div>
+        <div class="start-icon"><svg viewBox="0 0 24 24"><path d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7z"/><path d="M19 15.5l.5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5z"/></svg></div>
+        <div class="start-body"><h3>Ask AI to build it</h3><p>Describe what you want. We'll write the code.</p></div>
         <div class="start-arrow">›</div>
       </button>
     </div>
 
-    <button class="start-skip" id="skipWelcome" type="button">
-      Skip and start from scratch
-    </button>
+    <button class="start-skip" id="skipWelcome" type="button">Skip and start from scratch</button>
   </div>
 
-  <!-- ============ NORMAL DASHBOARD ============ -->
   <div id="dashboardView" style="display:none">
     <h1 class="page-title">Your projects</h1>
     <p class="page-sub" id="hello">Build the web from your pocket.</p>
@@ -496,185 +265,31 @@
 <script src="js/settings.js"></script>
 <script src="js/projects.js"></script>
 <script src="js/tap.js"></script>
+<script src="js/analytics.js"></script>
 <script>
 // ============================================================
-// STARTER TEMPLATES — inline, no external file
+// STARTER TEMPLATES
 // ============================================================
 var STARTERS = {
   business: {
     name: 'Business Landing',
-    html: `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Your Business</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,sans-serif;background:#0A0A0A;color:#E8F5EE;line-height:1.6;padding:36px 20px}
-.wrap{max-width:720px;margin:0 auto}
-.eyebrow{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:#1F9D62;margin-bottom:16px}
-h1{font-size:clamp(28px,5.5vw,40px);font-weight:800;margin-bottom:14px;line-height:1.15}
-.lead{color:#A8BAB1;font-size:16.5px;margin-bottom:44px;max-width:520px}
-h2{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:#7A8C84;margin-bottom:18px;font-weight:800}
-.services{display:grid;gap:12px;margin-bottom:44px}
-.service{background:#0F1512;border:1px solid #1B2A24;border-radius:14px;padding:22px;display:flex;justify-content:space-between;gap:20px}
-.service h3{font-size:17px;margin-bottom:5px}
-.service p{font-size:14px;color:#7A8C84}
-.price{color:#1F9D62;font-weight:800;font-size:16.5px}
-.cta{display:block;background:#1F9D62;color:#04140C;text-align:center;font-weight:800;padding:18px;border-radius:14px;text-decoration:none;font-size:16px}
-footer{margin-top:44px;padding-top:24px;border-top:1px solid #1B2A24;font-size:13px;color:#5A6E65;text-align:center}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <div class="eyebrow">Now taking clients</div>
-  <h1>Clean work, delivered fast.</h1>
-  <p class="lead">A short description of what your business does and who it helps.</p>
-  <h2>What we do</h2>
-  <div class="services">
-    <div class="service"><div><h3>Service One</h3><p>Short description.</p></div><div class="price">$50</div></div>
-    <div class="service"><div><h3>Service Two</h3><p>Short description.</p></div><div class="price">$100</div></div>
-    <div class="service"><div><h3>Service Three</h3><p>Short description.</p></div><div class="price">$150</div></div>
-  </div>
-  <a class="cta" href="#">Get in touch</a>
-  <footer>Available Mon-Fri. Based in Zimbabwe.</footer>
-</div>
-</body>
-</html>`
+    html: `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Your Business</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;background:#0A0A0A;color:#E8F5EE;line-height:1.6;padding:36px 20px}.wrap{max-width:720px;margin:0 auto}.eyebrow{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:#1F9D62;margin-bottom:16px}h1{font-size:clamp(28px,5.5vw,40px);font-weight:800;margin-bottom:14px;line-height:1.15}.lead{color:#A8BAB1;font-size:16.5px;margin-bottom:44px;max-width:520px}h2{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:#7A8C84;margin-bottom:18px;font-weight:800}.services{display:grid;gap:12px;margin-bottom:44px}.service{background:#0F1512;border:1px solid #1B2A24;border-radius:14px;padding:22px;display:flex;justify-content:space-between;gap:20px}.service h3{font-size:17px;margin-bottom:5px}.service p{font-size:14px;color:#7A8C84}.price{color:#1F9D62;font-weight:800;font-size:16.5px}.cta{display:block;background:#1F9D62;color:#04140C;text-align:center;font-weight:800;padding:18px;border-radius:14px;text-decoration:none;font-size:16px}footer{margin-top:44px;padding-top:24px;border-top:1px solid #1B2A24;font-size:13px;color:#5A6E65;text-align:center}</style></head><body><div class="wrap"><div class="eyebrow">Now taking clients</div><h1>Clean work, delivered fast.</h1><p class="lead">A short description of what your business does and who it helps.</p><h2>What we do</h2><div class="services"><div class="service"><div><h3>Service One</h3><p>Short description.</p></div><div class="price">$50</div></div><div class="service"><div><h3>Service Two</h3><p>Short description.</p></div><div class="price">$100</div></div><div class="service"><div><h3>Service Three</h3><p>Short description.</p></div><div class="price">$150</div></div></div><a class="cta" href="#">Get in touch</a><footer>Available Mon-Fri. Based in Zimbabwe.</footer></div></body></html>`
   },
-
   shop: {
     name: 'Online Shop',
-    html: `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Shop</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,sans-serif;background:#0A0A0A;color:#E8F5EE;padding:36px 20px;line-height:1.6}
-.wrap{max-width:680px;margin:0 auto}
-header{text-align:center;margin-bottom:44px}
-.logo{width:76px;height:76px;border-radius:20px;background:linear-gradient(135deg,#0B3D2E,#1F9D62);display:grid;place-items:center;font-weight:900;font-size:28px;color:#04140C;margin:0 auto 16px}
-h1{font-size:30px;font-weight:800;margin-bottom:6px}
-.sub{color:#A8BAB1;font-size:14.5px}
-h2{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:#1F9D62;margin:32px 0 14px;font-weight:800}
-.item{display:flex;justify-content:space-between;gap:20px;padding:16px 0;border-bottom:1px solid #1B2A24}
-.item .nm{font-weight:700;font-size:15.5px;margin-bottom:3px}
-.item .dsc{color:#7A8C84;font-size:13.5px}
-.item .pr{color:#1F9D62;font-weight:800;font-size:15.5px}
-.cta{display:block;background:#25D366;color:#04140C;text-align:center;font-weight:800;padding:18px;border-radius:14px;text-decoration:none;font-size:16px;margin-top:32px}
-footer{margin-top:24px;text-align:center;font-size:13px;color:#5A6E65}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <header>
-    <div class="logo">S</div>
-    <h1>My Shop</h1>
-    <div class="sub">Quality products, fast delivery.</div>
-  </header>
-  <h2>Featured</h2>
-  <div class="item"><div><div class="nm">Product One</div><div class="dsc">Short description.</div></div><div class="pr">$15</div></div>
-  <div class="item"><div><div class="nm">Product Two</div><div class="dsc">Short description.</div></div><div class="pr">$25</div></div>
-  <div class="item"><div><div class="nm">Product Three</div><div class="dsc">Short description.</div></div><div class="pr">$35</div></div>
-  <a class="cta" href="https://wa.me/263771234567">Order on WhatsApp</a>
-  <footer>Open daily. Delivery available.</footer>
-</div>
-</body>
-</html>`
+    html: `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>My Shop</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;background:#0A0A0A;color:#E8F5EE;padding:36px 20px;line-height:1.6}.wrap{max-width:680px;margin:0 auto}header{text-align:center;margin-bottom:44px}.logo{width:76px;height:76px;border-radius:20px;background:linear-gradient(135deg,#0B3D2E,#1F9D62);display:grid;place-items:center;font-weight:900;font-size:28px;color:#04140C;margin:0 auto 16px}h1{font-size:30px;font-weight:800;margin-bottom:6px}.sub{color:#A8BAB1;font-size:14.5px}h2{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:#1F9D62;margin:32px 0 14px;font-weight:800}.item{display:flex;justify-content:space-between;gap:20px;padding:16px 0;border-bottom:1px solid #1B2A24}.item .nm{font-weight:700;font-size:15.5px;margin-bottom:3px}.item .dsc{color:#7A8C84;font-size:13.5px}.item .pr{color:#1F9D62;font-weight:800;font-size:15.5px}.cta{display:block;background:#25D366;color:#04140C;text-align:center;font-weight:800;padding:18px;border-radius:14px;text-decoration:none;font-size:16px;margin-top:32px}footer{margin-top:24px;text-align:center;font-size:13px;color:#5A6E65}</style></head><body><div class="wrap"><header><div class="logo">S</div><h1>My Shop</h1><div class="sub">Quality products, fast delivery.</div></header><h2>Featured</h2><div class="item"><div><div class="nm">Product One</div><div class="dsc">Short description.</div></div><div class="pr">$15</div></div><div class="item"><div><div class="nm">Product Two</div><div class="dsc">Short description.</div></div><div class="pr">$25</div></div><div class="item"><div><div class="nm">Product Three</div><div class="dsc">Short description.</div></div><div class="pr">$35</div></div><a class="cta" href="https://wa.me/263771234567">Order on WhatsApp</a><footer>Open daily. Delivery available.</footer></div></body></html>`
   },
-
   bio: {
     name: 'Personal Page',
-    html: `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Page</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,sans-serif;background:#0A0A0A;color:#E8F5EE;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
-.wrap{width:100%;max-width:400px;text-align:center}
-.avatar{width:92px;height:92px;border-radius:50%;background:linear-gradient(135deg,#0B3D2E,#1F9D62);display:grid;place-items:center;font-weight:900;font-size:34px;color:#04140C;margin:0 auto 16px}
-h1{font-size:22px;font-weight:800;margin-bottom:4px}
-.handle{color:#7A8C84;font-size:13.5px;margin-bottom:10px}
-.bio{color:#A8BAB1;font-size:14px;margin-bottom:28px}
-.links{display:flex;flex-direction:column;gap:10px}
-.link{display:block;background:#0F1512;border:1px solid #1B2A24;border-radius:14px;padding:16px;color:#E8F5EE;text-decoration:none;font-weight:700}
-.link.primary{background:#1F9D62;color:#04140C}
-.foot{margin-top:32px;font-size:12px;color:#5A6E65}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <div class="avatar">M</div>
-  <h1>My Name</h1>
-  <div class="handle">@myhandle</div>
-  <p class="bio">A short line about who you are and what you do.</p>
-  <div class="links">
-    <a class="link primary" href="#">Latest project</a>
-    <a class="link" href="#">Instagram</a>
-    <a class="link" href="#">Twitter</a>
-    <a class="link" href="mailto:hello@example.com">Email me</a>
-  </div>
-  <div class="foot">Made with KUMG</div>
-</div>
-</body>
-</html>`
+    html: `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>My Page</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;background:#0A0A0A;color:#E8F5EE;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}.wrap{width:100%;max-width:400px;text-align:center}.avatar{width:92px;height:92px;border-radius:50%;background:linear-gradient(135deg,#0B3D2E,#1F9D62);display:grid;place-items:center;font-weight:900;font-size:34px;color:#04140C;margin:0 auto 16px}h1{font-size:22px;font-weight:800;margin-bottom:4px}.handle{color:#7A8C84;font-size:13.5px;margin-bottom:10px}.bio{color:#A8BAB1;font-size:14px;margin-bottom:28px}.links{display:flex;flex-direction:column;gap:10px}.link{display:block;background:#0F1512;border:1px solid #1B2A24;border-radius:14px;padding:16px;color:#E8F5EE;text-decoration:none;font-weight:700}.link.primary{background:#1F9D62;color:#04140C}.foot{margin-top:32px;font-size:12px;color:#5A6E65}</style></head><body><div class="wrap"><div class="avatar">M</div><h1>My Name</h1><div class="handle">@myhandle</div><p class="bio">A short line about who you are and what you do.</p><div class="links"><a class="link primary" href="#">Latest project</a><a class="link" href="#">Instagram</a><a class="link" href="#">Twitter</a><a class="link" href="mailto:hello@example.com">Email me</a></div><div class="foot">Made with KUMG</div></div></body></html>`
   },
-
   event: {
     name: 'Event Page',
-    html: `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Event</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,sans-serif;background:#0A0A0A;color:#E8F5EE;min-height:100vh;padding:36px 20px;display:flex;align-items:center;justify-content:center;line-height:1.6}
-.wrap{max-width:560px;width:100%}
-.tag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:#1F9D62;margin-bottom:16px}
-h1{font-size:clamp(32px,6.5vw,46px);font-weight:800;line-height:1.08;margin-bottom:20px}
-.meta{background:#0F1512;border:1px solid #1B2A24;border-radius:14px;padding:22px;margin-bottom:22px}
-.row{display:flex;align-items:center;gap:16px;padding:12px 0}
-.row+.row{border-top:1px solid #1B2A24}
-.row .dot{width:8px;height:8px;border-radius:50%;background:#1F9D62;flex-shrink:0}
-.row .label{font-size:10.5px;text-transform:uppercase;letter-spacing:1.2px;color:#7A8C84;font-weight:800}
-.row .value{font-size:15px;font-weight:700;margin-top:2px}
-.desc{color:#A8BAB1;margin-bottom:30px}
-.cta{display:block;background:#1F9D62;color:#04140C;text-align:center;font-weight:800;padding:18px;border-radius:14px;text-decoration:none;font-size:16px}
-.foot{margin-top:22px;text-align:center;font-size:13px;color:#5A6E65}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <div class="tag">You're invited</div>
-  <h1>Event Name 2026</h1>
-  <p class="desc">A short description of your event. What it is, who it's for.</p>
-  <div class="meta">
-    <div class="row"><div class="dot"></div><div><div class="label">Date</div><div class="value">Saturday, 14 March</div></div></div>
-    <div class="row"><div class="dot"></div><div><div class="label">Time</div><div class="value">10:00 - 18:00</div></div></div>
-    <div class="row"><div class="dot"></div><div><div class="label">Location</div><div class="value">Harare, Zimbabwe</div></div></div>
-  </div>
-  <a class="cta" href="#">RSVP now</a>
-  <div class="foot">Limited seats available</div>
-</div>
-</body>
-</html>`
+    html: `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Event</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;background:#0A0A0A;color:#E8F5EE;min-height:100vh;padding:36px 20px;display:flex;align-items:center;justify-content:center;line-height:1.6}.wrap{max-width:560px;width:100%}.tag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:#1F9D62;margin-bottom:16px}h1{font-size:clamp(32px,6.5vw,46px);font-weight:800;line-height:1.08;margin-bottom:20px}.meta{background:#0F1512;border:1px solid #1B2A24;border-radius:14px;padding:22px;margin-bottom:22px}.row{display:flex;align-items:center;gap:16px;padding:12px 0}.row+.row{border-top:1px solid #1B2A24}.row .dot{width:8px;height:8px;border-radius:50%;background:#1F9D62;flex-shrink:0}.row .label{font-size:10.5px;text-transform:uppercase;letter-spacing:1.2px;color:#7A8C84;font-weight:800}.row .value{font-size:15px;font-weight:700;margin-top:2px}.desc{color:#A8BAB1;margin-bottom:30px}.cta{display:block;background:#1F9D62;color:#04140C;text-align:center;font-weight:800;padding:18px;border-radius:14px;text-decoration:none;font-size:16px}.foot{margin-top:22px;text-align:center;font-size:13px;color:#5A6E65}</style></head><body><div class="wrap"><div class="tag">You are invited</div><h1>Event Name 2026</h1><p class="desc">A short description of your event. What it is, who it's for.</p><div class="meta"><div class="row"><div class="dot"></div><div><div class="label">Date</div><div class="value">Saturday, 14 March</div></div></div><div class="row"><div class="dot"></div><div><div class="label">Time</div><div class="value">10:00 - 18:00</div></div></div><div class="row"><div class="dot"></div><div><div class="label">Location</div><div class="value">Harare, Zimbabwe</div></div></div></div><a class="cta" href="#">RSVP now</a><div class="foot">Limited seats available</div></div></body></html>`
   }
 };
 
-// ============================================================
-// STATE
-// ============================================================
-let currentUserId = null;
-let hasProjects = false;
+var currentUserId = null;
 
 const welcomeView = document.getElementById('welcomeView');
 const dashboardView = document.getElementById('dashboardView');
@@ -689,20 +304,20 @@ function toast(msg){
   setTimeout(function(){ t.classList.remove('show'); }, 2200);
 }
 
-// ============================================================
-// STARTER CARDS
-// ============================================================
 document.querySelectorAll('[data-start]').forEach(function(btn){
   btn.addEventListener('click', async function(){
     var key = btn.dataset.start;
 
     if (key === 'ai'){
+      kumgTrack('start_card_ai');
       location.href = 'ai.html';
       return;
     }
 
     var starter = STARTERS[key];
     if (!starter){ toast('Starter not found'); return; }
+
+    kumgTrack('start_card_' + key);
 
     btn.disabled = true;
     var originalHTML = btn.innerHTML;
@@ -711,6 +326,7 @@ document.querySelectorAll('[data-start]').forEach(function(btn){
     try {
       var proj = await createProject(starter.name);
       await updateProject(proj.id, { html: starter.html, css: '', js: '' });
+      kumgTrack('create_project', { name: starter.name, from_starter: key });
       toast('Project created');
       location.href = 'editor.html?id=' + proj.id;
     } catch(err){
@@ -724,27 +340,23 @@ document.querySelectorAll('[data-start]').forEach(function(btn){
 });
 
 document.getElementById('skipWelcome').addEventListener('click', function(){
+  kumgTrack('welcome_skip');
   nameInput.value = '';
   modalBg.classList.add('show');
   setTimeout(function(){ nameInput.focus(); }, 100);
 });
 
-// ============================================================
-// PROJECT LIST
-// ============================================================
 async function render(){
   const projects = await listProjects();
 
   if (!projects.length){
     welcomeView.style.display = 'block';
     dashboardView.style.display = 'none';
-    hasProjects = false;
     return;
   }
 
   welcomeView.style.display = 'none';
   dashboardView.style.display = 'block';
-  hasProjects = true;
 
   listEl.innerHTML = projects.map(function(p){
     return '<div class="project-card" data-id="' + p.id + '">' +
@@ -771,6 +383,7 @@ async function render(){
       if (!confirm('Delete this project?')) return;
       try {
         await deleteProject(btn.dataset.del);
+        kumgTrack('delete_project');
         toast('Deleted');
         render();
       } catch(err){
@@ -780,40 +393,33 @@ async function render(){
   });
 }
 
-// ============================================================
-// DASHBOARD EVENTS
-// ============================================================
 document.getElementById('storeCard').addEventListener('click', function(){
   location.href = 'store.html';
 });
-
 document.getElementById('settingsBtn').addEventListener('click', function(){
   location.href = 'settings.html';
 });
-
 document.getElementById('aiNewBtn').addEventListener('click', function(){
+  kumgTrack('tap_ask_ai');
   location.href = 'ai.html';
 });
-
 document.getElementById('newBtn').addEventListener('click', function(){
   nameInput.value = '';
   modalBg.classList.add('show');
   setTimeout(function(){ nameInput.focus(); }, 100);
 });
-
 document.getElementById('cancelBtn').addEventListener('click', function(){
   modalBg.classList.remove('show');
 });
-
 nameInput.addEventListener('keydown', function(e){
   if (e.key === 'Enter') document.getElementById('createBtn').click();
 });
-
 document.getElementById('createBtn').addEventListener('click', async function(){
   const name = nameInput.value.trim();
   if (!name){ toast('Name required'); return; }
   try {
     const p = await createProject(name);
+    kumgTrack('create_project', { name: name, from_blank: true });
     modalBg.classList.remove('show');
     toast('Project created');
     location.href = 'editor.html?id=' + p.id;
@@ -822,9 +428,6 @@ document.getElementById('createBtn').addEventListener('click', async function(){
   }
 });
 
-// ============================================================
-// INIT
-// ============================================================
 (async function(){
   const sess = await db.auth.getSession();
   if (!sess.data.session){
@@ -832,6 +435,8 @@ document.getElementById('createBtn').addEventListener('click', async function(){
     return;
   }
   currentUserId = sess.data.session.user.id;
+
+  kumgTrack('open_app');
 
   const { data: profile } = await db
     .from('profiles')
@@ -866,7 +471,6 @@ document.getElementById('createBtn').addEventListener('click', async function(){
   render();
   if (typeof loadSponsorCard === 'function') loadSponsorCard();
 
-  // Unread chat badge
   async function refreshChatBadge(){
     try {
       const res = await db.rpc('unread_count', { uid: currentUserId });
@@ -890,4 +494,4 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 </body>
-</html>
+  </html> 

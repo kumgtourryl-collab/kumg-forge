@@ -6,12 +6,9 @@ let saveTimer = null;
 let previewTimer = null;
 let dirty = false;
 let vvCleanup = null;
-
-// Find state
 let findMatches = [];
 let findIndex = -1;
 
-// AI insert from ai.html
 const aiInsertParam = new URLSearchParams(location.search).get('aiInsert');
 
 const editorEl   = document.getElementById('editor');
@@ -50,10 +47,7 @@ const KEY_SETS = {
 };
 
 function escapeHtmlKey(s){
-  return String(s)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function renderKeys(){
@@ -109,7 +103,6 @@ function showKeys(on){
   codeKeysEl.classList.toggle('show', on);
 }
 
-// ===== GLUE CODE-KEYS TO KEYBOARD =====
 function pinKeys(){
   if (!window.visualViewport) return;
   const vv = window.visualViewport;
@@ -181,13 +174,17 @@ async function initEditor(){
     return;
   }
 
+  // === ANALYTICS: project opened ===
+  if (typeof kumgTrack === 'function'){
+    kumgTrack('open_project', { id: project.id, name: project.name });
+  }
+
   nameEl.value = project.name;
   editorEl.value = project[currentTab] || '';
   setStatus('Saved', 'saved');
   renderKeys();
   updatePreview();
 
-  // Handle AI code insert
   if (aiInsertParam){
     try {
       const decoded = JSON.parse(decodeURIComponent(escape(atob(aiInsertParam))));
@@ -270,6 +267,11 @@ async function saveNow(){
     });
     dirty = false;
     setStatus('Saved', 'saved');
+
+    // === ANALYTICS: project saved ===
+    if (typeof kumgTrack === 'function'){
+      kumgTrack('save_project', { tab: currentTab });
+    }
   } catch(err){
     console.error(err);
     setStatus('Save failed', 'error');
@@ -328,9 +330,7 @@ function refreshFind(){
     if (findMatches.length > 2000) break;
   }
 
-  findCount.textContent = findMatches.length
-    ? `1/${findMatches.length}`
-    : '0/0';
+  findCount.textContent = findMatches.length ? `1/${findMatches.length}` : '0/0';
 
   if (findMatches.length){
     findIndex = 0;
@@ -402,8 +402,7 @@ document.getElementById('replaceOne').addEventListener('click', () => {
 
   if (selected.toLowerCase() === q.toLowerCase()){
     const rep = replaceInput.value;
-    editorEl.value =
-      editorEl.value.slice(0, selStart) + rep + editorEl.value.slice(selEnd);
+    editorEl.value = editorEl.value.slice(0, selStart) + rep + editorEl.value.slice(selEnd);
     project[currentTab] = editorEl.value;
     markDirty();
     refreshFind();
@@ -456,10 +455,7 @@ sheetEl.addEventListener('click', async (e) => {
 });
 
 async function doCopy(){
-  const sel = editorEl.value.slice(
-    editorEl.selectionStart ?? 0,
-    editorEl.selectionEnd ?? 0
-  );
+  const sel = editorEl.value.slice(editorEl.selectionStart ?? 0, editorEl.selectionEnd ?? 0);
   const payload = sel || editorEl.value;
   if (!payload){ toast('Nothing to copy'); return; }
   try {
@@ -502,7 +498,6 @@ function doSelectAll(){
 async function doDuplicate(){
   const name = prompt('Save as — new project name:', (nameEl.value || 'Untitled') + ' copy');
   if (!name) return;
-
   try {
     await saveNow();
     const copy = await createProject(name.trim());
@@ -584,6 +579,9 @@ if (previewToggle){
 // ===== BUTTONS =====
 document.getElementById('aiBtn').addEventListener('click', async () => {
   await saveNow();
+  if (typeof kumgTrack === 'function'){
+    kumgTrack('open_ai_from_editor', { id: project.id });
+  }
   location.href = 'ai.html?return=' + encodeURIComponent(project.id);
 });
 

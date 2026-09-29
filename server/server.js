@@ -10,7 +10,6 @@ app.use(cors());
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// ===== CONFIG =====
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 const BASE_DOMAIN = process.env.BASE_DOMAIN || 'kumg.app';
@@ -23,9 +22,7 @@ const AI_FREE_LIMIT = 250;
 const AI_IMAGE_LIMIT = 50;
 
 let Paynow = null;
-try { Paynow = require('paynow').Paynow; } catch(e){
-  console.warn('Paynow SDK not installed.');
-}
+try { Paynow = require('paynow').Paynow; } catch(e){}
 const PAYNOW_ID  = process.env.PAYNOW_INTEGRATION_ID;
 const PAYNOW_KEY = process.env.PAYNOW_INTEGRATION_KEY;
 
@@ -42,65 +39,26 @@ function escapeHtml(s){
 }
 
 // ============================================================
-// KUMG BADGE + WHATSAPP SHARE (injected into published sites)
+// KUMG BADGE + WHATSAPP SHARE
 // ============================================================
 function kumgBadge(){
   return `
 <style data-kumg-badge>
-  .kumg-share-fab{
-    position: fixed;
-    bottom: 20px;
-    right: 16px;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #25D366;
-    color: #04140C;
-    border: 0;
-    border-radius: 999px;
-    padding: 12px 18px;
-    font-weight: 800;
-    font-size: 14px;
-    cursor: pointer;
-    box-shadow: 0 8px 24px rgba(0,0,0,.35);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .kumg-share-fab:active{ transform: scale(.97); }
-  .kumg-share-fab svg{ width: 18px; height: 18px; fill: #04140C; }
-  .kumg-made-footer{
-    position: fixed;
-    left: 0; right: 0; bottom: 0;
-    background: rgba(10,10,10,.92);
-    color: #E8F5EE;
-    text-align: center;
-    padding: 9px 12px calc(9px + env(safe-area-inset-bottom));
-    font-size: 11.5px;
-    z-index: 9998;
-    font-family: system-ui, -apple-system, sans-serif;
-    letter-spacing: .2px;
-    backdrop-filter: blur(8px);
-  }
-  .kumg-made-footer a{ color: #4FE39B; font-weight: 800; text-decoration: none; }
-  @media(min-width:640px){
-    .kumg-made-footer{ display: none; }
-    .kumg-share-fab{ bottom: 20px; }
-  }
-  @media(max-width:639px){
-    .kumg-share-fab{ bottom: 52px; }
-  }
+.kumg-share-fab{position:fixed;bottom:20px;right:16px;z-index:9999;display:flex;align-items:center;gap:8px;background:#25D366;color:#04140C;border:0;border-radius:999px;padding:12px 18px;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.35);font-family:system-ui,-apple-system,sans-serif}
+.kumg-share-fab:active{transform:scale(.97)}
+.kumg-share-fab svg{width:18px;height:18px;fill:#04140C}
+.kumg-made-footer{position:fixed;left:0;right:0;bottom:0;background:rgba(10,10,10,.92);color:#E8F5EE;text-align:center;padding:9px 12px calc(9px + env(safe-area-inset-bottom));font-size:11.5px;z-index:9998;font-family:system-ui,-apple-system,sans-serif;backdrop-filter:blur(8px)}
+.kumg-made-footer a{color:#4FE39B;font-weight:800;text-decoration:none}
+@media(min-width:640px){.kumg-made-footer{display:none}}
+@media(max-width:639px){.kumg-share-fab{bottom:52px}}
 </style>
-
 <button class="kumg-share-fab" onclick="kumgShare()" aria-label="Share on WhatsApp">
-  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-  Share
+<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+Share
 </button>
-
 <div class="kumg-made-footer">
-  Built with <a href="${APP_URL}" target="_blank" rel="noopener">KUMG</a> — create your own free
+Built with <a href="${APP_URL}" target="_blank" rel="noopener">KUMG</a> — create your own free
 </div>
-
 <script data-kumg-badge>
 function kumgShare(){
   try {
@@ -136,7 +94,6 @@ app.post('/api/publish', async (req, res) => {
     if (!projectId || !subdomain || !userId){
       return res.status(400).json({ error: 'Missing fields' });
     }
-
     const reserved = ['www','api','app','admin','mail','blog','docs','help','support','status','store'];
     const clean = String(subdomain).toLowerCase().trim();
     if (!/^[a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])$/.test(clean)){
@@ -146,44 +103,31 @@ app.post('/api/publish', async (req, res) => {
       return res.status(400).json({ error: 'That subdomain is reserved.' });
     }
 
-    const { data: project } = await db
-      .from('projects').select('id, owner, name').eq('id', projectId).single();
+    const { data: project } = await db.from('projects').select('id, owner, name').eq('id', projectId).single();
     if (!project) return res.status(404).json({ error: 'Project not found' });
     if (project.owner !== userId) return res.status(403).json({ error: 'Not your project' });
 
-    const { data: profile } = await db
-      .from('profiles').select('plan').eq('id', userId).single();
+    const { data: profile } = await db.from('profiles').select('plan').eq('id', userId).single();
     const plan = (profile && profile.plan) || 'free';
 
     if (plan === 'free'){
-      const { data: existing } = await db
-        .from('projects').select('id')
+      const { data: existing } = await db.from('projects').select('id')
         .eq('owner', userId).eq('is_published', true).neq('id', projectId);
       if (existing && existing.length > 0){
-        return res.status(402).json({
-          error: 'Free plan allows 1 published site. Upgrade to Pro for unlimited.',
-          upgrade: true
-        });
+        return res.status(402).json({ error: 'Free plan allows 1 published site. Upgrade to Pro for unlimited.', upgrade: true });
       }
     }
 
-    const { data: taken } = await db
-      .from('projects').select('id, owner')
+    const { data: taken } = await db.from('projects').select('id, owner')
       .eq('subdomain', clean).neq('id', projectId).maybeSingle();
     if (taken) return res.status(409).json({ error: 'That subdomain is already taken.' });
 
     const { error: uErr } = await db.from('projects').update({
-      subdomain: clean,
-      is_published: true,
-      updated_at: new Date().toISOString()
+      subdomain: clean, is_published: true, updated_at: new Date().toISOString()
     }).eq('id', projectId);
     if (uErr) return res.status(500).json({ error: 'Failed to save publish state' });
 
-    res.json({
-      ok: true,
-      url: `https://${clean}.${BASE_DOMAIN}`,
-      preview: `${PUBLIC_URL}/s/${clean}`
-    });
+    res.json({ ok: true, url: `https://${clean}.${BASE_DOMAIN}`, preview: `${PUBLIC_URL}/s/${clean}` });
   } catch (err){
     console.error(err);
     res.status(500).json({ error: 'Server error' });
@@ -197,8 +141,7 @@ app.post('/api/unpublish', async (req, res) => {
   try {
     const { projectId, userId } = req.body || {};
     if (!projectId || !userId) return res.status(400).json({ error: 'Missing fields' });
-    const { data: project } = await db
-      .from('projects').select('id, owner').eq('id', projectId).single();
+    const { data: project } = await db.from('projects').select('id, owner').eq('id', projectId).single();
     if (!project || project.owner !== userId) return res.status(403).json({ error: 'Not allowed' });
     await db.from('projects').update({ is_published: false, subdomain: null }).eq('id', projectId);
     res.json({ ok: true });
@@ -209,7 +152,7 @@ app.post('/api/unpublish', async (req, res) => {
 });
 
 // ============================================================
-// AI CHAT
+// AI CHAT — with strong KUMG identity
 // ============================================================
 app.post('/api/ai/chat', async (req, res) => {
   try {
@@ -220,26 +163,19 @@ app.post('/api/ai/chat', async (req, res) => {
       return res.status(400).json({ error: 'Missing fields' });
     }
 
-    const { data: profile } = await db
-      .from('profiles').select('plan').eq('id', userId).single();
+    const { data: profile } = await db.from('profiles').select('plan').eq('id', userId).single();
     const plan = (profile && profile.plan) || 'free';
 
     if (plan === 'free'){
       const { data: todayCount } = await db.rpc('ai_messages_today', { uid: userId });
       if ((todayCount || 0) >= AI_FREE_LIMIT){
-        return res.status(402).json({
-          error: `Free plan includes ${AI_FREE_LIMIT} AI messages per day.`,
-          upgrade: true, reason: 'messages'
-        });
+        return res.status(402).json({ error: `Free plan includes ${AI_FREE_LIMIT} AI messages per day.`, upgrade: true, reason: 'messages' });
       }
     }
     if (wantsImage && plan === 'free'){
       const { data: imgCount } = await db.rpc('ai_images_today', { uid: userId });
       if ((imgCount || 0) >= AI_IMAGE_LIMIT){
-        return res.status(402).json({
-          error: `Free plan includes ${AI_IMAGE_LIMIT} AI images per day.`,
-          upgrade: true, reason: 'images'
-        });
+        return res.status(402).json({ error: `Free plan includes ${AI_IMAGE_LIMIT} AI images per day.`, upgrade: true, reason: 'images' });
       }
     }
 
@@ -251,30 +187,59 @@ app.post('/api/ai/chat', async (req, res) => {
       await db.from('ai_images').insert({ user_id: userId, prompt: lastUser.content.slice(0, 400) });
     }
 
+    // ========================================================
+    // SYSTEM PROMPT — teaches KUMG AI what KUMG actually is
+    // ========================================================
     const systemPrompt = [
-      'You are KUMG AI, a friendly coding and business assistant inside the KUMG Forge mobile app.',
-      'Users build websites and run online shops from their phones.',
-      'Help with HTML, CSS, JavaScript — and help shop owners improve their listings.',
-      'Assume beginner level unless clearly advanced. Never invent KUMG features.',
+      'You are KUMG AI, the built-in assistant inside the KUMG app.',
       '',
-      'STYLE: Keep answers short — 2-3 short paragraphs, then code if needed.',
-      'Wrap code in triple-backtick fences with a language tag: ```html, ```css, ```js.',
+      '=== WHAT KUMG IS ===',
+      'KUMG is a mobile-first web studio built in Zimbabwe. It lets anyone build websites and online shops from any phone — no laptop, no installs, no credit card needed.',
       '',
-      'MATH: Show calculations like Google — clean steps, no $ signs unless money was asked.',
+      'The KUMG app has these features:',
       '',
-      'IMAGE: When asked for an image, respond with:',
+      '1. EDITOR — Users write HTML, CSS, and JavaScript in a code editor with live preview. They get starter templates (Business Landing, Online Shop, Personal Page, Event Page). They can publish a site and share it with a public link.',
+      '',
+      '2. TOURRYL STORE — Users open an online shop in 5 minutes. They add products with photos and prices, and take orders directly on WhatsApp. Free plan: 1 shop, 5 products. Pro: unlimited.',
+      '',
+      '3. KUMG AI (you) — Writes code, generates images, finds videos, does math, and helps users improve their sites and shops.',
+      '',
+      '4. KUMG TAP — Sponsored cards from local businesses appear on the dashboard. Users earn from tapping them. The earnings go to their KUMG Wallet.',
+      '',
+      '5. WALLET — Users see their earnings. They can redeem for Pro or cash out via EcoCash at $5 minimum.',
+      '',
+      '6. CHAT — Shop-focused messaging between users.',
+      '',
+      '7. DISCOVER — A public directory of every shop built on KUMG.',
+      '',
+      '8. INVITE — Users get a referral code. Friends who sign up and build something earn them $0.50.',
+      '',
+      '9. PRO PLAN — $5/month. Unlimited websites, shops, products, and AI. Upgradable via manual EcoCash or Paynow.',
+      '',
+      '10. FREE PLAN — 1 published site, 1 shop with 5 products, 250 AI messages/day, 50 AI images/day.',
+      '',
+      '=== HOW TO ANSWER ===',
+      '- If the user asks about KUMG itself (features, plans, pricing, how to do something in the app) — answer using ONLY the facts above. Never invent features that are not listed.',
+      '- If the user asks for code — give clean HTML/CSS/JS in triple-backtick fenced blocks with a language tag.',
+      '- If the user asks for an image — respond with ONE markdown image line:',
       '  ![short description](https://image.pollinations.ai/prompt/WORDS+JOINED+BY+PLUS?width=1024&height=768&nologo=true)',
+      '- If the user asks for a video — respond with: [Watch videos about TOPIC](https://www.pexels.com/search/videos/TOPIC%20ENCODED/)',
+      '- If the user asks math — show steps like Google: clean, one line per step, no $ unless money was asked.',
+      '- If the user is a shop owner — help them write product names, taglines, delivery info, WhatsApp replies, and pricing.',
+      '- If the user asks how to grow KUMG or make money with KUMG — advise on: opening a TouRryl Store, publishing a landing page to share on WhatsApp, using KUMG AI to write content, inviting friends for $0.50 each, and tapping sponsored cards.',
       '',
-      'VIDEO: When asked for a video, respond with:',
-      '  [Watch videos](https://www.pexels.com/search/videos/TOPIC%20ENCODED/)'
+      '=== STYLE ===',
+      '- Keep answers short: 2-3 short paragraphs, then code if needed.',
+      '- Assume beginner level unless clearly advanced.',
+      '- Be practical and warm, not corporate.'
     ].join('\n');
 
     let contextNote = '';
     if (projectContext){
       const parts = [];
-      if (projectContext.html) parts.push('HTML: ' + String(projectContext.html).slice(0, 700));
-      if (projectContext.css)  parts.push('CSS: '  + String(projectContext.css).slice(0, 700));
-      if (projectContext.js)   parts.push('JS: '   + String(projectContext.js).slice(0, 700));
+      if (projectContext.html) parts.push('Current HTML: ' + String(projectContext.html).slice(0, 700));
+      if (projectContext.css)  parts.push('Current CSS: '  + String(projectContext.css).slice(0, 700));
+      if (projectContext.js)   parts.push('Current JS: '   + String(projectContext.js).slice(0, 700));
       if (Array.isArray(projectContext.shops) && projectContext.shops.length){
         const lines = projectContext.shops.map(s => {
           let l = '- "' + (s.name || 'untitled') + '" (URL: /store/' + (s.slug || '') + '), ';
@@ -285,7 +250,7 @@ app.post('/api/ai/chat', async (req, res) => {
         });
         parts.push('User shops:\n' + lines.join('\n'));
       }
-      if (parts.length) contextNote = '\n\n=== USER CONTEXT ===\n' + parts.join('\n');
+      if (parts.length) contextNote = '\n\n=== CURRENT USER CONTEXT ===\n' + parts.join('\n');
     }
 
     const groqMessages = [
@@ -305,7 +270,7 @@ app.post('/api/ai/chat', async (req, res) => {
       body: JSON.stringify({
         model: GROQ_MODEL,
         messages: groqMessages,
-        temperature: 0.7,
+        temperature: 0.6,
         max_tokens: 2048
       })
     });
@@ -336,8 +301,7 @@ app.post('/api/ai/usage', async (req, res) => {
     const { userId } = req.body || {};
     if (!userId) return res.status(400).json({ error: 'Missing userId' });
 
-    const { data: profile } = await db
-      .from('profiles').select('plan').eq('id', userId).single();
+    const { data: profile } = await db.from('profiles').select('plan').eq('id', userId).single();
     const plan = (profile && profile.plan) || 'free';
 
     if (plan === 'pro'){
@@ -404,17 +368,14 @@ app.post('/api/paynow/webhook', async (req, res) => {
     const reference = body.reference;
     if (!reference) return res.status(400).send('Missing reference');
 
-    const { data: payment } = await db
-      .from('payments').select('id, user_id, status')
+    const { data: payment } = await db.from('payments').select('id, user_id, status')
       .eq('reference', reference).maybeSingle();
     if (!payment) return res.status(404).send('Unknown reference');
     if (payment.status === 'paid') return res.send('OK');
 
     if (['paid','awaiting delivery','delivered'].includes(status)){
       await db.from('profiles').update({ plan: 'pro' }).eq('id', payment.user_id);
-      await db.from('payments').update({
-        status: 'paid', paid_at: new Date().toISOString()
-      }).eq('id', payment.id);
+      await db.from('payments').update({ status: 'paid', paid_at: new Date().toISOString() }).eq('id', payment.id);
     } else if (['cancelled','failed'].includes(status)){
       await db.from('payments').update({ status }).eq('id', payment.id);
     }
@@ -430,7 +391,7 @@ app.get('/api/paynow/return', (req, res) => {
 });
 
 // ============================================================
-// SERVE PUBLISHED SITES (with badge + share)
+// SERVE PUBLISHED SITES
 // ============================================================
 app.get('/s/:subdomain', serveSite);
 app.get('/site/:subdomain', serveSite);
@@ -439,12 +400,9 @@ async function serveSite(req, res){
   const sub = String(req.params.subdomain || '').toLowerCase();
   if (!sub) return res.status(400).send('Missing subdomain');
 
-  const { data: project } = await db
-    .from('projects')
+  const { data: project } = await db.from('projects')
     .select('name, html, css, js, is_published')
-    .eq('subdomain', sub)
-    .eq('is_published', true)
-    .maybeSingle();
+    .eq('subdomain', sub).eq('is_published', true).maybeSingle();
 
   if (!project) return res.status(404).send(render404(sub));
 
@@ -463,7 +421,6 @@ async function serveSite(req, res){
     else html = html + script;
   }
 
-  // Inject KUMG badge + share button
   const badge = kumgBadge();
   if (html.includes('</body>')) html = html.replace('</body>', badge + '</body>');
   else html = html + badge;
@@ -481,7 +438,7 @@ h1{font-size:56px;margin:0;color:#1F9D62}p{color:#A8BAB1}a{color:#1F9D62}</style
 }
 
 // ============================================================
-// SERVE PUBLIC SHOPS (with share button)
+// SERVE PUBLIC SHOPS
 // ============================================================
 app.get('/store/:slug', servePublicShop);
 
@@ -489,13 +446,12 @@ async function servePublicShop(req, res){
   const slug = String(req.params.slug || '').toLowerCase();
   if (!slug) return res.status(400).send('Missing slug');
 
-  const { data: shop } = await db
-    .from('shops').select('*').eq('slug', slug).eq('is_published', true).maybeSingle();
+  const { data: shop } = await db.from('shops').select('*')
+    .eq('slug', slug).eq('is_published', true).maybeSingle();
   if (!shop) return res.status(404).send(renderShop404(slug));
 
-  const { data: products } = await db
-    .from('shop_products').select('*').eq('shop_id', shop.id)
-    .order('sort_order', { ascending: true });
+  const { data: products } = await db.from('shop_products').select('*')
+    .eq('shop_id', shop.id).order('sort_order', { ascending: true });
 
   db.from('shops').update({ views: (shop.views || 0) + 1 }).eq('id', shop.id).then(()=>{}).catch(()=>{});
 
